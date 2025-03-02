@@ -25,7 +25,7 @@ function EditBoxModal({ isOpen, onClose, box, onSubmit, colorPalette }) {
             school,
             time,
             teacher,
-            color
+            color,
         });
     };
 
@@ -39,7 +39,7 @@ function EditBoxModal({ isOpen, onClose, box, onSubmit, colorPalette }) {
                 <label className="block text-sm font-semibold mb-1">학교</label>
                 <input
                     type="text"
-                    className="w-full border p-2 rounded mb-3"
+                    className="w-full border p-2 rounded mb-3 text-left focus:outline-none focus:border-blue-500"
                     value={school}
                     onChange={(e) => setSchool(e.target.value)}
                 />
@@ -47,7 +47,7 @@ function EditBoxModal({ isOpen, onClose, box, onSubmit, colorPalette }) {
                 <label className="block text-sm font-semibold mb-1">시간</label>
                 <input
                     type="text"
-                    className="w-full border p-2 rounded mb-3"
+                    className="w-full border p-2 rounded mb-3 text-left focus:outline-none focus:border-blue-500"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
                 />
@@ -55,7 +55,7 @@ function EditBoxModal({ isOpen, onClose, box, onSubmit, colorPalette }) {
                 <label className="block text-sm font-semibold mb-1">강사</label>
                 <input
                     type="text"
-                    className="w-full border p-2 rounded mb-3"
+                    className="w-full border p-2 rounded mb-3 text-left focus:outline-none focus:border-blue-500"
                     value={teacher}
                     onChange={(e) => setTeacher(e.target.value)}
                 />

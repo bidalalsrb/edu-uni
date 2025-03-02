@@ -13,10 +13,9 @@ export default function ApplyPage() {
     const COL_COUNT = 8;
     const [boxes, setBoxes] = useState([]);
 
-    // 생성 모달
+    // 생성 모달 상태
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-
-    // 수정 모달
+    // 수정 모달 상태
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingBox, setEditingBox] = useState(null);
 
@@ -60,6 +59,11 @@ export default function ApplyPage() {
         closeEditModal();
     };
 
+    // 박스 삭제
+    const handleDeleteBox = (boxId) => {
+        setBoxes((prev) => prev.filter((b) => b.id !== boxId));
+    };
+
     // 그리드 드롭 (자리 교환 포함)
     const onDropToGrid = (boxId, row, col) => {
         setBoxes((prev) => {
@@ -99,7 +103,7 @@ export default function ApplyPage() {
             <div className="bg-gray-100 min-h-screen p-6">
                 <h2 className="text-xl font-bold text-center mb-4">박스 배치도 관리자전용</h2>
 
-                {/* 격자 */}
+                {/* 격자 레이아웃 */}
                 <div className="grid grid-rows-5 grid-cols-8 gap-1 border">
                     {Array.from({ length: ROW_COUNT }).map((_, row) =>
                         Array.from({ length: COL_COUNT }).map((__, col) => {
@@ -114,6 +118,7 @@ export default function ApplyPage() {
                                     box={placedBox}
                                     onDropToGrid={onDropToGrid}
                                     onOpenSettings={openEditModal}
+                                    onDelete={handleDeleteBox}
                                 />
                             );
                         })
@@ -131,10 +136,7 @@ export default function ApplyPage() {
                                     .filter((b) => !b.placed)
                                     .map((box) => (
                                         <div key={box.id} className="mb-2">
-                                            <DraggableBox
-                                                box={box}
-                                                onDropToGrid={onDropToGrid}
-                                            />
+                                            <DraggableBox box={box} onDropToGrid={onDropToGrid} />
                                         </div>
                                     ))
                             ) : (

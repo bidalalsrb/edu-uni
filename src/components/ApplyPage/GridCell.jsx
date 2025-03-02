@@ -3,9 +3,9 @@ import React from "react";
 import { useDrop } from "react-dnd";
 import DraggableBox from "./DraggableBox";
 import { ItemTypes } from "./constants";
-import { CogIcon } from "@heroicons/react/24/solid";
+import { CogIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
-function GridCell({ row, col, box, onDropToGrid, onOpenSettings }) {
+function GridCell({ row, col, box, onDropToGrid, onOpenSettings, onDelete }) {
     const [{ isOver }, dropRef] = useDrop({
         accept: ItemTypes.BOX,
         drop: () => ({ row, col }),
@@ -33,6 +33,15 @@ function GridCell({ row, col, box, onDropToGrid, onOpenSettings }) {
                         className="absolute bottom-1 right-1"
                     >
                         <CogIcon className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(box.id);
+                        }}
+                        className="absolute top-1 right-1"
+                    >
+                        <XMarkIcon className="w-5 h-5 text-gray-500" />
                     </button>
                 </>
             )}
