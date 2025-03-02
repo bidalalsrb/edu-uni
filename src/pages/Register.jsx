@@ -53,7 +53,7 @@ function Register() {
         <div className="flex flex-col items-center justify-center h-screen bg-white">
             {/* 로고 */}
             <div className="mb-6">
-                <img src="/src/img/logo.png" alt="logo" className="w-60" />
+                <img src="/public/logo.png" alt="logo" className="w-60" />
             </div>
 
             {/* 회원가입 폼 */}

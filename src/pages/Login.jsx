@@ -20,7 +20,7 @@ function Login() {
         <div className="flex flex-col items-center justify-center h-screen bg-white">
             {/* 로고 */}
             <div className="mb-6">
-                <img src="/src/img/logo.png" alt="logo" className="w-60" />
+                <img src="/public/logo.png" alt="logo" className="w-60" />
             </div>
 
             {/* 로그인 폼 */}
@@ -43,7 +43,7 @@ function Login() {
                 <button
                     type="button"
                     className="w-full bg-blue-100 text-blue-500 p-3 rounded-md font-semibold cursor-pointer"
-                    onClick={() => navigate("/register")}
+                    onClick={() => navigate("/joinlist")}
                 >
                     회원가입
                 </button>

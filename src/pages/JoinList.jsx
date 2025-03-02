@@ -20,7 +20,7 @@ function JoinList() {
                     {/* 로고 중앙 배치 */}
                     <div className="flex justify-center">
                         <img
-                            src="/src/img/logo.png"
+                            src="/public/logo.png"
                             alt="logo"
                             className="w-60 object-contain"
                         />
