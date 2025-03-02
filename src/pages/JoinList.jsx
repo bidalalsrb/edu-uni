@@ -1,7 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import ExpoAttendance from "./ExpoAttendance";
 import OpenExpo from "./OpenExpo";
+import logo from "/public/bultiger.png";
 
 function JoinList() {
     const navigate = useNavigate();
@@ -20,7 +21,8 @@ function JoinList() {
                     {/* 로고 중앙 배치 */}
                     <div className="flex justify-center">
                         <img
-                            src="/public/bultiger.png"
+                            src=
+                                {logo}
                             alt="logo"
                             className="w-60 object-contain"
                         />
@@ -35,10 +37,10 @@ function JoinList() {
                 </div>
 
                 {/* 오픈 박람회 내용 */}
-                <OpenExpo />
+                <OpenExpo/>
 
                 {/* 박람회 참석 내역 컴포넌트 */}
-                <ExpoAttendance />
+                <ExpoAttendance/>
             </div>
         </div>
     );

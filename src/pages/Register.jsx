@@ -4,7 +4,7 @@ import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
-
+import logo from "/public/bultiger.png";
 // Zod 스키마 정의
 const schema = z
     .object({
@@ -53,7 +53,7 @@ function Register() {
         <div className="flex flex-col items-center justify-center h-screen bg-white">
             {/* 로고 */}
             <div className="mb-6">
-                <img src="/public/bultiger.png" alt="logo" className="w-60" />
+                <img src={logo} alt="logo" className="w-60" />
             </div>
 
             {/* 회원가입 폼 */}

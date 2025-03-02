@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import logo from "/public/bultiger.png";
 
 function Login() {
     const { register, handleSubmit } = useForm();
@@ -20,7 +21,7 @@ function Login() {
         <div className="flex flex-col items-center justify-center h-screen bg-white">
             {/* 로고 */}
             <div className="mb-6">
-                <img src="/public/bultiger.png" alt="logo" className="w-60" />
+                <img src={logo} alt="logo" className="w-60" />
             </div>
 
             {/* 로그인 폼 */}

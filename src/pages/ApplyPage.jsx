@@ -8,7 +8,18 @@ const ItemTypes = {
     BOX: "box",
 };
 
-// 드래그 가능한 박스 컴포넌트
+// 예시 색상 팔레트 (원하는 만큼 추가)
+const COLOR_PALETTE = [
+    "#ffffff", "#f8f9fa", "#e9ecef", "#dee2e6",
+    "#ff0000", "#ff7f00", "#ffff00", "#00ff00",
+    "#0000ff", "#8b00ff", "#ff1493", "#ff69b4",
+    "#808080", "#000000", "#ffb6c1", "#ffc0cb",
+    "#ffa500", "#ffd700", "#90ee90", "#add8e6",
+    "#ffa07a", "#b0e0e6", "#d3d3d3", "#d8bfd8",
+    "#fa8072", "#f08080", "#ba55d3", "#9370db",
+    // ... 더 추가 가능
+];
+
 function DraggableBox({ box, onDropToGrid }) {
     const [{ isDragging }, dragRef] = useDrag({
         type: ItemTypes.BOX,
@@ -42,13 +53,10 @@ function DraggableBox({ box, onDropToGrid }) {
     );
 }
 
-// 격자 셀 컴포넌트 (드롭 대상)
-// canDrop 조건을 제거해서, 모든 칸에서 드롭이 가능하도록 수정
 function GridCell({ row, col, box, onDropToGrid, onOpenSettings }) {
     const [{ isOver }, dropRef] = useDrop({
         accept: ItemTypes.BOX,
         drop: () => ({ row, col }),
-        // 모든 칸에서 드롭 가능하도록 canDrop 조건 제거
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
@@ -84,9 +92,12 @@ export default function ApplyPage() {
     const COL_COUNT = 8;
     const [boxes, setBoxes] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // 추가하기 모달용
     const [modalTitle, setModalTitle] = useState("");
     const [modalContent, setModalContent] = useState("");
     const [modalColor, setModalColor] = useState("#ffffff");
+
+    // 설정 모달용
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [editingBox, setEditingBox] = useState(null);
 
@@ -111,7 +122,7 @@ export default function ApplyPage() {
         setIsSettingsModalOpen(false);
     };
 
-    // 추가하기 모달 제출: 새로운 박스를 인벤토리에 추가
+    // 추가하기 모달 → 박스 생성
     const handleModalSubmit = () => {
         if (!modalTitle.trim()) {
             alert("제목을 입력하세요.");
@@ -130,7 +141,7 @@ export default function ApplyPage() {
         closeModal();
     };
 
-    // 설정 모달 제출: 수정된 값으로 박스 업데이트
+    // 설정 모달 → 박스 수정
     const handleSettingsSubmit = () => {
         if (!editingBox.title.trim()) {
             alert("제목을 입력하세요.");
@@ -142,7 +153,7 @@ export default function ApplyPage() {
         closeSettingsModal();
     };
 
-    // onDropToGrid: 박스를 드롭했을 때 호출 (자리 교환 포함)
+    // 그리드 드롭 로직 (자리 교환 포함)
     const onDropToGrid = (boxId, row, col) => {
         setBoxes((prev) => {
             const droppedBox = prev.find((b) => b.id === boxId);
@@ -150,7 +161,7 @@ export default function ApplyPage() {
                 (b) => b.placed && b.row === row && b.col === col
             );
             if (targetBox && droppedBox.placed) {
-                // 서로 자리 교환(swap)
+                // 자리 교환
                 return prev.map((b) => {
                     if (b.id === boxId) {
                         return { ...b, row, col };
@@ -160,7 +171,7 @@ export default function ApplyPage() {
                     return b;
                 });
             } else if (!targetBox) {
-                // 빈 칸이면 단순 배치
+                // 빈 칸이면 배치
                 return prev.map((b) =>
                     b.id === boxId ? { ...b, placed: true, row, col } : b
                 );
@@ -171,7 +182,7 @@ export default function ApplyPage() {
         });
     };
 
-    // joinList 이동하기 버튼 핸들러
+    // joinList 이동
     const handleJoinListNavigate = () => {
         navigate("/joinList");
     };
@@ -202,7 +213,7 @@ export default function ApplyPage() {
                     )}
                 </div>
 
-                {/* 하단 영역: 인벤토리 및 버튼 영역 */}
+                {/* 하단 영역 */}
                 <div className="flex justify-between items-start mt-4">
                     {/* 인벤토리 */}
                     <div>
@@ -222,7 +233,7 @@ export default function ApplyPage() {
                         </div>
                     </div>
 
-                    {/* 버튼 영역: 추가하기, joinList 이동하기 */}
+                    {/* 버튼 영역 */}
                     <div className="flex flex-col space-y-2">
                         <button
                             onClick={openModal}
@@ -258,16 +269,26 @@ export default function ApplyPage() {
                                 value={modalContent}
                                 onChange={(e) => setModalContent(e.target.value)}
                             />
+
+                            {/* 색상 팔레트 */}
                             <label className="block text-sm font-semibold mb-1">박스 색상</label>
-                            <input
-                                type="color"
-                                className="w-full border p-2 rounded mb-3"
-                                value={modalColor}
-                                onChange={(e) => setModalColor(e.target.value)}
-                            />
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {COLOR_PALETTE.map((c) => (
+                                    <button
+                                        key={c}
+                                        type="button"
+                                        onClick={() => setModalColor(c)}
+                                        className={`w-6 h-6 rounded-full border ${
+                                            modalColor === c ? "border-black" : "border-transparent"
+                                        }`}
+                                        style={{ backgroundColor: c }}
+                                    />
+                                ))}
+                            </div>
+
                             <div className="flex justify-end space-x-2">
                                 <button
-                                    onClick={closeModal}
+                                    onClick={() => setIsModalOpen(false)}
                                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
                                 >
                                     취소
@@ -306,15 +327,25 @@ export default function ApplyPage() {
                                     setEditingBox({ ...editingBox, content: e.target.value })
                                 }
                             />
+
+                            {/* 색상 팔레트 */}
                             <label className="block text-sm font-semibold mb-1">박스 색상</label>
-                            <input
-                                type="color"
-                                className="w-full border p-2 rounded mb-3"
-                                value={editingBox.color || "#ffffff"}
-                                onChange={(e) =>
-                                    setEditingBox({ ...editingBox, color: e.target.value })
-                                }
-                            />
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {COLOR_PALETTE.map((c) => (
+                                    <button
+                                        key={c}
+                                        type="button"
+                                        onClick={() =>
+                                            setEditingBox({ ...editingBox, color: c })
+                                        }
+                                        className={`w-6 h-6 rounded-full border ${
+                                            editingBox.color === c ? "border-black" : "border-transparent"
+                                        }`}
+                                        style={{ backgroundColor: c }}
+                                    />
+                                ))}
+                            </div>
+
                             <div className="flex justify-end space-x-2">
                                 <button
                                     onClick={closeSettingsModal}
