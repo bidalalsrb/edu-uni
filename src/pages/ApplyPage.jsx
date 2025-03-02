@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { CogIcon } from "@heroicons/react/24/solid";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const ItemTypes = {
     BOX: "box",
 };
 
+// 드래그 가능한 박스 컴포넌트
 function DraggableBox({ box, onDropToGrid }) {
     const [{ isDragging }, dragRef] = useDrag({
         type: ItemTypes.BOX,
@@ -29,7 +30,11 @@ function DraggableBox({ box, onDropToGrid }) {
         <div
             ref={dragRef}
             className="border rounded p-2 shadow cursor-move w-full h-full flex flex-col items-center justify-center"
-            style={{ opacity, "--box-color": box.color || "#ffffff", backgroundColor: "var(--box-color)" }}
+            style={{
+                opacity,
+                "--box-color": box.color || "#ffffff",
+                backgroundColor: "var(--box-color)",
+            }}
         >
             <div className="font-semibold text-sm">{box.title}</div>
             <div className="text-xs text-gray-600">{box.content}</div>
@@ -37,11 +42,13 @@ function DraggableBox({ box, onDropToGrid }) {
     );
 }
 
+// 격자 셀 컴포넌트 (드롭 대상)
+// canDrop 조건을 제거해서, 모든 칸에서 드롭이 가능하도록 수정
 function GridCell({ row, col, box, onDropToGrid, onOpenSettings }) {
     const [{ isOver }, dropRef] = useDrop({
         accept: ItemTypes.BOX,
         drop: () => ({ row, col }),
-        canDrop: (item) => !box || box.id === item.id,
+        // 모든 칸에서 드롭 가능하도록 canDrop 조건 제거
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
@@ -83,7 +90,9 @@ export default function ApplyPage() {
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [editingBox, setEditingBox] = useState(null);
 
-    // 추가하기 모달
+    const navigate = useNavigate();
+
+    // 추가하기 모달 열기/닫기
     const openModal = () => {
         setModalTitle("");
         setModalContent("");
@@ -92,7 +101,7 @@ export default function ApplyPage() {
     };
     const closeModal = () => setIsModalOpen(false);
 
-    // 박스 설정 모달
+    // 박스 설정 모달 열기/닫기
     const openSettingsModal = (box) => {
         setEditingBox(box);
         setIsSettingsModalOpen(true);
@@ -102,6 +111,7 @@ export default function ApplyPage() {
         setIsSettingsModalOpen(false);
     };
 
+    // 추가하기 모달 제출: 새로운 박스를 인벤토리에 추가
     const handleModalSubmit = () => {
         if (!modalTitle.trim()) {
             alert("제목을 입력하세요.");
@@ -120,6 +130,7 @@ export default function ApplyPage() {
         closeModal();
     };
 
+    // 설정 모달 제출: 수정된 값으로 박스 업데이트
     const handleSettingsSubmit = () => {
         if (!editingBox.title.trim()) {
             alert("제목을 입력하세요.");
@@ -131,6 +142,7 @@ export default function ApplyPage() {
         closeSettingsModal();
     };
 
+    // onDropToGrid: 박스를 드롭했을 때 호출 (자리 교환 포함)
     const onDropToGrid = (boxId, row, col) => {
         setBoxes((prev) => {
             const droppedBox = prev.find((b) => b.id === boxId);
@@ -138,6 +150,7 @@ export default function ApplyPage() {
                 (b) => b.placed && b.row === row && b.col === col
             );
             if (targetBox && droppedBox.placed) {
+                // 서로 자리 교환(swap)
                 return prev.map((b) => {
                     if (b.id === boxId) {
                         return { ...b, row, col };
@@ -147,6 +160,7 @@ export default function ApplyPage() {
                     return b;
                 });
             } else if (!targetBox) {
+                // 빈 칸이면 단순 배치
                 return prev.map((b) =>
                     b.id === boxId ? { ...b, placed: true, row, col } : b
                 );
@@ -157,8 +171,7 @@ export default function ApplyPage() {
         });
     };
 
-    // 추가: joinList 이동하기 버튼 핸들러 (useNavigate)
-    const navigate = useNavigate();
+    // joinList 이동하기 버튼 핸들러
     const handleJoinListNavigate = () => {
         navigate("/joinList");
     };
@@ -189,7 +202,7 @@ export default function ApplyPage() {
                     )}
                 </div>
 
-                {/* 하단 영역 */}
+                {/* 하단 영역: 인벤토리 및 버튼 영역 */}
                 <div className="flex justify-between items-start mt-4">
                     {/* 인벤토리 */}
                     <div>
