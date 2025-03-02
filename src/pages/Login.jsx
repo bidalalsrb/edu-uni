@@ -10,7 +10,7 @@ function Login() {
         if (storedUser && storedUser.id === data.id && storedUser.password === data.password) {
             alert("로그인 성공!");
             // 로그인 성공 후 신용 점수 화면으로 이동
-            navigate("/credit");
+            navigate("/joinlist");
         } else {
             alert("아이디 또는 비밀번호가 올바르지 않습니다.");
         }
@@ -43,7 +43,7 @@ function Login() {
                 <button
                     type="button"
                     className="w-full bg-blue-100 text-blue-500 p-3 rounded-md font-semibold cursor-pointer"
-                    onClick={() => navigate("/joinlist")}
+                    onClick={() => navigate("/register")}
                 >
                     회원가입
                 </button>
