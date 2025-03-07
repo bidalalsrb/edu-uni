@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useNavigate } from "react-router-dom";
@@ -6,8 +6,8 @@ import { COLOR_PALETTE } from "../../components/admin/ApplyPage/constants.js";
 import GridCell from "../../components/admin/ApplyPage/GridCell.jsx";
 import DraggableBox from "../../components/admin/ApplyPage/DraggableBox.jsx";
 import CreateCompanyBoxModal from "../../components/admin/ApplyPage/CreateCompanyBoxModal.jsx";
-import EditBoxModal from "../../components/admin/ApplyPage/EditBoxModal.jsx";
-import CompanyListModal from "../../components/admin/ApplyPage/CompanyListModal.jsx";
+import EditBoxModal from "../../components/admin/ApplyPage/modal/EditBoxModal.jsx";
+import CompanyListModal from "../../components/admin/ApplyPage/modal/CompanyListModal.jsx";
 
 // 저장된 레이아웃(박스와 행/열 수)를 불러오면서 Date 필드를 복원하는 함수
 const loadLayout = () => {
@@ -16,7 +16,6 @@ const loadLayout = () => {
         const savedLayout = localStorage.getItem("layout_" + storedUser.id);
         if (savedLayout) {
             const layout = JSON.parse(savedLayout);
-            // layout에 boxes가 없으면 기본값([])을 할당
             const boxes = layout.boxes || [];
             const rowCount = layout.rowCount || 5;
             const colCount = layout.colCount || 8;
@@ -35,9 +34,83 @@ const loadLayout = () => {
     return { boxes: [], rowCount: 5, colCount: 8 };
 };
 
+// 셀 추가/삭제 모달 (내부 임시 상태 사용)
+// 부모의 값이 변경되거나 모달이 열릴 때마다 초기값으로 재설정하여 취소 시 변경사항이 반영되지 않도록 함.
+function CellAdjustModal({ initialRowCount, initialColCount, onApply, onCancel }) {
+    const [tempRowCount, setTempRowCount] = useState(initialRowCount);
+    const [tempColCount, setTempColCount] = useState(initialColCount);
+
+    useEffect(() => {
+        setTempRowCount(initialRowCount);
+    }, [initialRowCount]);
+
+    useEffect(() => {
+        setTempColCount(initialColCount);
+    }, [initialColCount]);
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow-md w-80">
+                <h3 className="text-lg font-bold mb-4">셀 추가/삭제</h3>
+                <div className="mb-4">
+                    <div className="flex items-center justify-between">
+                        <span>행 개수: {tempRowCount}</span>
+                        <div>
+                            <button
+                                onClick={() => setTempRowCount(tempRowCount + 1)}
+                                className="px-2 py-1 bg-blue-500 text-white rounded"
+                            >
+                                +
+                            </button>
+                            <button
+                                onClick={() => setTempRowCount(Math.max(tempRowCount - 1, 1))}
+                                className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
+                            >
+                                -
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div className="mb-4">
+                    <div className="flex items-center justify-between">
+                        <span>열 개수: {tempColCount}</span>
+                        <div>
+                            <button
+                                onClick={() => setTempColCount(tempColCount + 1)}
+                                className="px-2 py-1 bg-blue-500 text-white rounded"
+                            >
+                                +
+                            </button>
+                            <button
+                                onClick={() => setTempColCount(Math.max(tempColCount - 1, 1))}
+                                className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
+                            >
+                                -
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex justify-end space-x-2">
+                    <button
+                        onClick={onCancel}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                    >
+                        취소
+                    </button>
+                    <button
+                        onClick={() => onApply(tempRowCount, tempColCount)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                        적용
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function ApplyPage() {
     const navigate = useNavigate();
-
     const initialLayout = loadLayout();
     const [boxes, setBoxes] = useState(initialLayout.boxes);
     const [rowCount, setRowCount] = useState(initialLayout.rowCount);
@@ -238,63 +311,16 @@ export default function ApplyPage() {
 
                 {/* 셀 추가/삭제 모달 */}
                 {isCellAdjustModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-                        <div className="bg-white p-6 rounded shadow-md w-80">
-                            <h3 className="text-lg font-bold mb-4">셀 추가/삭제</h3>
-                            <div className="mb-4">
-                                <div className="flex items-center justify-between">
-                                    <span>행 개수: {rowCount}</span>
-                                    <div>
-                                        <button
-                                            onClick={() => setRowCount(rowCount + 1)}
-                                            className="px-2 py-1 bg-blue-500 text-white rounded"
-                                        >
-                                            +
-                                        </button>
-                                        <button
-                                            onClick={() => setRowCount(Math.max(rowCount - 1, 1))}
-                                            className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
-                                        >
-                                            -
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mb-4">
-                                <div className="flex items-center justify-between">
-                                    <span>열 개수: {colCount}</span>
-                                    <div>
-                                        <button
-                                            onClick={() => setColCount(colCount + 1)}
-                                            className="px-2 py-1 bg-blue-500 text-white rounded"
-                                        >
-                                            +
-                                        </button>
-                                        <button
-                                            onClick={() => setColCount(Math.max(colCount - 1, 1))}
-                                            className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
-                                        >
-                                            -
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex justify-end space-x-2">
-                                <button
-                                    onClick={() => setIsCellAdjustModalOpen(false)}
-                                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
-                                >
-                                    취소
-                                </button>
-                                <button
-                                    onClick={() => setIsCellAdjustModalOpen(false)}
-                                    className="px-4 py-2 bg-blue-500 text-white rounded"
-                                >
-                                    적용
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <CellAdjustModal
+                        initialRowCount={rowCount}
+                        initialColCount={colCount}
+                        onApply={(newRow, newCol) => {
+                            setRowCount(newRow);
+                            setColCount(newCol);
+                            setIsCellAdjustModalOpen(false);
+                        }}
+                        onCancel={() => setIsCellAdjustModalOpen(false)}
+                    />
                 )}
 
                 {/* 기업 박스 생성 모달 */}
@@ -337,4 +363,3 @@ export default function ApplyPage() {
         </DndProvider>
     );
 }
-
