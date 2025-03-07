@@ -1,143 +1,100 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ApplyFormModal from "./ApplyFormModal.jsx";
 
 function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) {
-    const [isApplyFormModalOpen, setIsApplyFormModalOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-
-    // 박스가 바뀔 때마다 현재 페이지를 1로 초기화
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [companyBox]);
+    const [isApplyFormModalOpen, setIsApplyFormModalOpen] = React.useState(false);
 
     if (!isOpen || !companyBox) return null;
 
-    const formatTime = (date) => {
-        if (!(date instanceof Date)) return "";
-        const hours = date.getHours().toString().padStart(2, "0");
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-        return `${hours}:${minutes}`;
-    };
-
-    const handleOpenApplyForm = () => {
-        setIsApplyFormModalOpen(true);
-    };
+    const openApplyForm = () => setIsApplyFormModalOpen(true);
+    const closeApplyForm = () => setIsApplyFormModalOpen(false);
 
     const handleSubmitApplication = (newApp) => {
         onSubmitApplication(companyBox.id, {
             id: Date.now(),
-            startTime: newApp.startTime, // Date 객체
-            endTime: newApp.endTime,     // Date 객체
+            startTime: newApp.startTime,
+            endTime: newApp.endTime,
             name: newApp.name,
         });
         setIsApplyFormModalOpen(false);
     };
 
-    const totalApplications = companyBox.applications ? companyBox.applications.length : 0;
-    const totalPages = Math.ceil(totalApplications / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const displayedApplications = companyBox.applications.slice(startIndex, startIndex + itemsPerPage);
-
-    const handlePrevPage = () => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1));
-    };
-
-    const handleNextPage = () => {
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    // 시간을 포맷하는 함수
+    const formatTime = (time) => {
+        const d = time instanceof Date ? time : new Date(time);
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-            <div className="bg-white p-6 rounded shadow-md w-96 max-h-[80vh] overflow-y-auto">
-                <h3 className="text-xl font-bold mb-4">
-                    {companyBox.companyName}의 등록 리스트
-                </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+            <div className="w-[90%] max-w-md bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
+                {/* 상단 헤더 */}
+                <div className="flex items-center justify-between px-4 py-3 border-b">
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        {companyBox.companyName} 등록 리스트
+                    </h2>
+                    <div className="w-6 h-6" />
+                </div>
 
-                {/* 신청 내역을 카드 형태로 출력 (5개씩) */}
-                {totalApplications > 0 ? (
-                    displayedApplications.map((app) => (
-                        <div
-                            key={app.id}
-                            className="border rounded p-4 mb-4 shadow-sm"
-                        >
-                            {/* 상단 영역 */}
-                            <div className="flex justify-between items-center">
-                                <h4 className="text-lg font-semibold">
-                                    {companyBox.companyName}
-                                </h4>
-                                <span className="text-sm text-gray-700">
-                  신청여부: 신청 가능
-                </span>
-                            </div>
-
-                            {/* 하단 영역 */}
-                            <div className="flex justify-between items-center mt-2">
-                                <p className="text-sm text-gray-700">
-                                    시간: {formatTime(app.startTime)} ~ {formatTime(app.endTime)}{" "}
-                                    | 강사: {app.name}
-                                </p>
-                                <button
-                                    className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
-                                    onClick={() => alert("신청하기 버튼 클릭")}
+                {/* 본문 영역 */}
+                <div className="flex-1 overflow-y-auto px-4 py-5">
+                    {companyBox.applications && companyBox.applications.length > 0 ? (
+                        <div className="space-y-3">
+                            {companyBox.applications.map((app) => (
+                                <div
+                                    key={app.id}
+                                    className="border rounded-md p-3 bg-white shadow-sm flex items-center justify-between"
                                 >
-                                    신청하기
-                                </button>
-                            </div>
+                                    <div>
+                                        <div className="text-sm text-gray-500">
+                                            {formatTime(app.startTime)} ~ {formatTime(app.endTime)}
+                                        </div>
+                                        <div className="text-base font-medium text-gray-700">{app.name}</div>
+                                    </div>
+                                    <button
+                                        className="cursor-pointer px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                        onClick={() => alert("신청하기 버튼 클릭")}
+                                    >
+                                        신청하기
+                                    </button>
+                                </div>
+                            ))}
                         </div>
-                    ))
-                ) : (
-                    <p className="mb-4 text-sm text-gray-500">신청된 내역이 없습니다.</p>
-                )}
+                    ) : (
+                        <p className="text-gray-500 text-sm">신청된 내역이 없습니다.</p>
+                    )}
+                </div>
 
-                {/* 페이징 컨트롤 */}
-                {totalApplications > itemsPerPage && (
-                    <div className="flex justify-between items-center mb-4">
-                        <button
-                            onClick={handlePrevPage}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
-                        >
-                            이전
-                        </button>
-                        <span className="text-sm text-gray-700">
-              {currentPage} / {totalPages}
-            </span>
-                        <button
-                            onClick={handleNextPage}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
-                        >
-                            다음
-                        </button>
-                    </div>
-                )}
-
-                {/* 하단 버튼들 */}
-                <div className="flex justify-end space-x-2">
+                {/* 하단 버튼 영역 */}
+                <div className="border-t px-4 py-3 flex justify-between items-center bg-gray-50">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                        className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-100"
                     >
                         닫기
                     </button>
                     <button
-                        onClick={handleOpenApplyForm}
-                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                        onClick={openApplyForm}
+                        className="cursor-pointer px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
                     >
                         신청하기
                     </button>
                 </div>
-
-                {/* 신청 폼 모달 */}
-                {isApplyFormModalOpen && (
-                    <ApplyFormModal
-                        isOpen={isApplyFormModalOpen}
-                        onClose={() => setIsApplyFormModalOpen(false)}
-                        onSubmit={handleSubmitApplication}
-                    />
-                )}
             </div>
+
+            {/* 신청 폼 모달 */}
+            {isApplyFormModalOpen && (
+                <ApplyFormModal
+                    isOpen={isApplyFormModalOpen}
+                    onClose={closeApplyForm}
+                    onSubmit={handleSubmitApplication}
+                />
+            )}
         </div>
     );
 }

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 
-function EditBoxModal({ isOpen, onClose, box, onSubmit, colorPalette }) {
+function EditBoxModal({ isOpen, onClose, box, onSubmit, colorPalette = [] }) {
     const [name, setName] = useState("");
     const [color, setColor] = useState("#ffffff");
 
     useEffect(() => {
         if (isOpen && box) {
-            // 회사 박스면 companyName, 아니면 school 값을 기본값으로 사용
             setName(box.companyName || box.school || "");
             setColor(box.color || "#ffffff");
         }
@@ -17,7 +16,6 @@ function EditBoxModal({ isOpen, onClose, box, onSubmit, colorPalette }) {
             alert("이름을 입력하세요.");
             return;
         }
-        // 업데이트할 때, 회사박스와 학교박스 모두 호환되도록 두 필드를 함께 업데이트
         onSubmit({
             ...box,
             companyName: name,
@@ -29,33 +27,65 @@ function EditBoxModal({ isOpen, onClose, box, onSubmit, colorPalette }) {
     if (!isOpen || !box) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow-md w-80">
-                <h3 className="text-lg font-bold mb-2">박스 설정</h3>
-                <label className="block text-sm font-semibold mb-1">이름</label>
-                <input
-                    type="text"
-                    className="w-full border p-2 rounded mb-3 focus:outline-none focus:border-blue-500"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-                <label className="block text-sm font-semibold mb-1">박스 색상</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                    {colorPalette.map((c) => (
-                        <button
-                            key={c}
-                            type="button"
-                            onClick={() => setColor(c)}
-                            className={`w-6 h-6 rounded-full border ${color === c ? "border-black" : "border-transparent"}`}
-                            style={{ backgroundColor: c }}
-                        />
-                    ))}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+            <div className="w-[90%] max-w-md bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
+                {/* 상단 헤더 */}
+                <div className="flex items-center justify-between px-4 py-3 border-b">
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <h2 className="text-lg font-semibold text-gray-800">박스 설정</h2>
+                    <div className="w-6 h-6" />
                 </div>
-                <div className="flex justify-end space-x-2">
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-300 text-gray-700 rounded">
+                {/* 본문 영역 */}
+                <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="회사명 또는 학교명"
+                            className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">박스 색상</label>
+                        <div className="flex flex-wrap gap-2">
+                            {colorPalette.map((c) => (
+                                <button
+                                    key={c}
+                                    type="button"
+                                    onClick={() => setColor(c)}
+                                    className={`w-8 h-8 rounded-full border-2 transition ${
+                                        color === c ? "border-blue-500" : "border-transparent"
+                                    }`}
+                                    style={{ backgroundColor: c }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                {/* 하단 버튼 영역 */}
+                <div className="border-t px-4 py-3 flex justify-between items-center bg-gray-50">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-100"
+                    >
                         취소
                     </button>
-                    <button onClick={handleSubmit} className="px-4 py-2 bg-blue-500 text-white rounded">
+                    <button
+                        onClick={handleSubmit}
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                    >
                         완료하기
                     </button>
                 </div>
