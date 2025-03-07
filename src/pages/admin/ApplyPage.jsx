@@ -9,13 +9,17 @@ import CreateCompanyBoxModal from "../../components/admin/ApplyPage/CreateCompan
 import EditBoxModal from "../../components/admin/ApplyPage/EditBoxModal.jsx";
 import CompanyListModal from "../../components/admin/ApplyPage/CompanyListModal.jsx";
 
-// 저장된 레이아웃을 불러오면서 Date 필드를 복원하는 함수
-const loadBoxes = () => {
+// 저장된 레이아웃(박스와 행/열 수)를 불러오면서 Date 필드를 복원하는 함수
+const loadLayout = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
         const savedLayout = localStorage.getItem("layout_" + storedUser.id);
         if (savedLayout) {
-            let boxes = JSON.parse(savedLayout);
+            const layout = JSON.parse(savedLayout);
+            // layout에 boxes가 없으면 기본값([])을 할당
+            const boxes = layout.boxes || [];
+            const rowCount = layout.rowCount || 5;
+            const colCount = layout.colCount || 8;
             boxes.forEach((box) => {
                 if (box.applications && Array.isArray(box.applications)) {
                     box.applications = box.applications.map((app) => ({
@@ -25,19 +29,20 @@ const loadBoxes = () => {
                     }));
                 }
             });
-            return boxes;
+            return { boxes, rowCount, colCount };
         }
     }
-    return [];
+    return { boxes: [], rowCount: 5, colCount: 8 };
 };
 
 export default function ApplyPage() {
-    const ROW_COUNT = 5;
-    const COL_COUNT = 8;
     const navigate = useNavigate();
 
-    // 초기 상태에서 저장된 레이아웃을 불러옴
-    const [boxes, setBoxes] = useState(loadBoxes);
+    const initialLayout = loadLayout();
+    const [boxes, setBoxes] = useState(initialLayout.boxes);
+    const [rowCount, setRowCount] = useState(initialLayout.rowCount);
+    const [colCount, setColCount] = useState(initialLayout.colCount);
+
     const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
     const [isEditBoxModalOpen, setIsEditBoxModalOpen] = useState(false);
     const [selectedBoxForEdit, setSelectedBoxForEdit] = useState(null);
@@ -45,6 +50,9 @@ export default function ApplyPage() {
     // 리스트 모달은 선택된 박스의 id만 저장
     const [selectedListBoxId, setSelectedListBoxId] = useState(null);
     const [isListModalOpen, setIsListModalOpen] = useState(false);
+
+    // 셀 추가/삭제 모달 상태
+    const [isCellAdjustModalOpen, setIsCellAdjustModalOpen] = useState(false);
 
     const openCreateCompanyModal = () => setIsCreateCompanyOpen(true);
     const closeCreateCompanyModal = () => setIsCreateCompanyOpen(false);
@@ -57,7 +65,7 @@ export default function ApplyPage() {
             col: null,
             companyName,
             color,
-            applications: []
+            applications: [],
         };
         setBoxes((prev) => [...prev, newBox]);
         closeCreateCompanyModal();
@@ -114,11 +122,12 @@ export default function ApplyPage() {
         navigate("/joinList");
     };
 
-    // "완료" 버튼: 현재 배치 상태를 해당 계정에 저장
+    // "완료" 버튼: 현재 배치 상태와 그리드 행/열 수를 해당 계정에 저장
     const handleSaveLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
-            localStorage.setItem("layout_" + storedUser.id, JSON.stringify(boxes));
+            const layoutData = { boxes, rowCount, colCount };
+            localStorage.setItem("layout_" + storedUser.id, JSON.stringify(layoutData));
             alert("배치도가 저장되었습니다.");
         } else {
             alert("로그인 정보가 없습니다.");
@@ -146,10 +155,17 @@ export default function ApplyPage() {
                     박스 배치도 관리자 전용
                 </h2>
 
-                {/* 격자 레이아웃 */}
-                <div className="grid grid-rows-5 grid-cols-8 gap-1 border">
-                    {Array.from({ length: ROW_COUNT }).map((_, row) =>
-                        Array.from({ length: COL_COUNT }).map((__, col) => {
+                {/* 그리드 레이아웃: 행/열 수는 rowCount, colCount 상태로 결정 */}
+                <div
+                    className="gap-1 border"
+                    style={{
+                        display: "grid",
+                        gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`,
+                        gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))`,
+                    }}
+                >
+                    {Array.from({ length: rowCount }).map((_, row) =>
+                        Array.from({ length: colCount }).map((__, col) => {
                             const placedBox = boxes.find(
                                 (b) => b.placed && b.row === row && b.col === col
                             );
@@ -202,7 +218,13 @@ export default function ApplyPage() {
                                 onClick={handleSaveLayout}
                                 className="px-4 py-2 bg-indigo-500 text-white font-semibold rounded shadow"
                             >
-                                완료
+                                저장
+                            </button>
+                            <button
+                                onClick={() => setIsCellAdjustModalOpen(true)}
+                                className="px-4 py-2 bg-purple-500 text-white font-semibold rounded shadow"
+                            >
+                                셀 추가/삭제
                             </button>
                         </div>
                         <button
@@ -213,6 +235,67 @@ export default function ApplyPage() {
                         </button>
                     </div>
                 </div>
+
+                {/* 셀 추가/삭제 모달 */}
+                {isCellAdjustModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded shadow-md w-80">
+                            <h3 className="text-lg font-bold mb-4">셀 추가/삭제</h3>
+                            <div className="mb-4">
+                                <div className="flex items-center justify-between">
+                                    <span>행 개수: {rowCount}</span>
+                                    <div>
+                                        <button
+                                            onClick={() => setRowCount(rowCount + 1)}
+                                            className="px-2 py-1 bg-blue-500 text-white rounded"
+                                        >
+                                            +
+                                        </button>
+                                        <button
+                                            onClick={() => setRowCount(Math.max(rowCount - 1, 1))}
+                                            className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
+                                        >
+                                            -
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mb-4">
+                                <div className="flex items-center justify-between">
+                                    <span>열 개수: {colCount}</span>
+                                    <div>
+                                        <button
+                                            onClick={() => setColCount(colCount + 1)}
+                                            className="px-2 py-1 bg-blue-500 text-white rounded"
+                                        >
+                                            +
+                                        </button>
+                                        <button
+                                            onClick={() => setColCount(Math.max(colCount - 1, 1))}
+                                            className="px-2 py-1 bg-blue-500 text-white rounded ml-2"
+                                        >
+                                            -
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    onClick={() => setIsCellAdjustModalOpen(false)}
+                                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                                >
+                                    취소
+                                </button>
+                                <button
+                                    onClick={() => setIsCellAdjustModalOpen(false)}
+                                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                                >
+                                    적용
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* 기업 박스 생성 모달 */}
                 <CreateCompanyBoxModal
