@@ -7,17 +7,44 @@ import GridCell from "../../components/admin/ApplyPage/GridCell.jsx";
 import DraggableBox from "../../components/admin/ApplyPage/DraggableBox.jsx";
 import CreateCompanyBoxModal from "../../components/admin/ApplyPage/CreateCompanyBoxModal.jsx";
 import EditBoxModal from "../../components/admin/ApplyPage/EditBoxModal.jsx";
+import CompanyListModal from "../../components/admin/ApplyPage/CompanyListModal.jsx";
+
+// 저장된 레이아웃을 불러오면서 Date 필드를 복원하는 함수
+const loadBoxes = () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+        const savedLayout = localStorage.getItem("layout_" + storedUser.id);
+        if (savedLayout) {
+            let boxes = JSON.parse(savedLayout);
+            boxes.forEach((box) => {
+                if (box.applications && Array.isArray(box.applications)) {
+                    box.applications = box.applications.map((app) => ({
+                        ...app,
+                        startTime: app.startTime ? new Date(app.startTime) : null,
+                        endTime: app.endTime ? new Date(app.endTime) : null,
+                    }));
+                }
+            });
+            return boxes;
+        }
+    }
+    return [];
+};
 
 export default function ApplyPage() {
     const ROW_COUNT = 5;
     const COL_COUNT = 8;
-    const [boxes, setBoxes] = useState([]);
-    const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
+    const navigate = useNavigate();
 
+    // 초기 상태에서 저장된 레이아웃을 불러옴
+    const [boxes, setBoxes] = useState(loadBoxes);
+    const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
     const [isEditBoxModalOpen, setIsEditBoxModalOpen] = useState(false);
     const [selectedBoxForEdit, setSelectedBoxForEdit] = useState(null);
 
-    const navigate = useNavigate();
+    // 리스트 모달은 선택된 박스의 id만 저장
+    const [selectedListBoxId, setSelectedListBoxId] = useState(null);
+    const [isListModalOpen, setIsListModalOpen] = useState(false);
 
     const openCreateCompanyModal = () => setIsCreateCompanyOpen(true);
     const closeCreateCompanyModal = () => setIsCreateCompanyOpen(false);
@@ -87,6 +114,31 @@ export default function ApplyPage() {
         navigate("/joinList");
     };
 
+    // "완료" 버튼: 현재 배치 상태를 해당 계정에 저장
+    const handleSaveLayout = () => {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) {
+            localStorage.setItem("layout_" + storedUser.id, JSON.stringify(boxes));
+            alert("배치도가 저장되었습니다.");
+        } else {
+            alert("로그인 정보가 없습니다.");
+        }
+    };
+
+    // 박스 클릭 시 리스트 모달을 열기 위해 박스의 id 저장
+    const openListModal = (box) => {
+        setSelectedListBoxId(box.id);
+        setIsListModalOpen(true);
+    };
+
+    const closeListModal = () => {
+        setSelectedListBoxId(null);
+        setIsListModalOpen(false);
+    };
+
+    // 선택된 박스의 최신 데이터를 boxes 배열에서 가져옴
+    const selectedBoxForList = boxes.find((box) => box.id === selectedListBoxId);
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="bg-gray-100 min-h-screen p-6">
@@ -109,6 +161,7 @@ export default function ApplyPage() {
                                     box={placedBox}
                                     onDropToGrid={onDropToGrid}
                                     onOpenEdit={openEditBoxModal}
+                                    onOpenList={openListModal}
                                     onDelete={handleDeleteBox}
                                 />
                             );
@@ -138,12 +191,20 @@ export default function ApplyPage() {
 
                     {/* 버튼 영역 */}
                     <div className="flex flex-col space-y-2">
-                        <button
-                            onClick={openCreateCompanyModal}
-                            className="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow"
-                        >
-                            추가하기
-                        </button>
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={openCreateCompanyModal}
+                                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow"
+                            >
+                                추가하기
+                            </button>
+                            <button
+                                onClick={handleSaveLayout}
+                                className="px-4 py-2 bg-indigo-500 text-white font-semibold rounded shadow"
+                            >
+                                완료
+                            </button>
+                        </div>
                         <button
                             onClick={handleJoinListNavigate}
                             className="px-4 py-2 bg-green-500 text-white font-semibold rounded shadow"
@@ -169,6 +230,24 @@ export default function ApplyPage() {
                         box={selectedBoxForEdit}
                         onSubmit={handleEditBoxSubmit}
                         colorPalette={COLOR_PALETTE}
+                    />
+                )}
+
+                {/* 박스 신청 내역 리스트 모달 */}
+                {isListModalOpen && selectedBoxForList && (
+                    <CompanyListModal
+                        isOpen={isListModalOpen}
+                        onClose={closeListModal}
+                        companyBox={selectedBoxForList}
+                        onSubmitApplication={(boxId, newApp) => {
+                            setBoxes((prev) =>
+                                prev.map((box) =>
+                                    box.id === boxId
+                                        ? { ...box, applications: [...(box.applications || []), newApp] }
+                                        : box
+                                )
+                            );
+                        }}
                     />
                 )}
             </div>

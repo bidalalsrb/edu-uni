@@ -4,7 +4,7 @@ import DraggableBox from "./DraggableBox.jsx";
 import { ItemTypes } from "./constants.js";
 import { XMarkIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
 
-function GridCell({ row, col, box, onDropToGrid, onOpenEdit, onDelete }) {
+function GridCell({ row, col, box, onDropToGrid, onOpenEdit, onOpenList, onDelete }) {
     const [{ isOver }, dropRef] = useDrop({
         accept: ItemTypes.BOX,
         drop: () => ({ row, col }),
@@ -18,6 +18,9 @@ function GridCell({ row, col, box, onDropToGrid, onOpenEdit, onDelete }) {
     return (
         <div
             ref={dropRef}
+            onClick={() => {
+                if (box) onOpenList(box);
+            }}
             className={`border-dotted border border-gray-300 h-20 w-full flex items-center justify-center relative ${bgColor}`}
         >
             {box && (
