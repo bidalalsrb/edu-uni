@@ -12,8 +12,8 @@ function ExpoAttendance() {
                 expoName: "코엑스웨딩박람회",
                 teacher: "남상민",
                 time: "2025-02-14",
-                attendance: "참석"
-            }
+                attendance: "참석",
+            },
         },
         {
             id: 2,
@@ -23,8 +23,8 @@ function ExpoAttendance() {
                 expoName: "인터컨, 웨딩",
                 teacher: "김하나",
                 time: "2025-03-20",
-                attendance: "참석"
-            }
+                attendance: "참석",
+            },
         },
         {
             id: 3,
@@ -34,41 +34,30 @@ function ExpoAttendance() {
                 expoName: "웨딩박람회3",
                 teacher: "이둘",
                 time: "2025-04-01",
-                attendance: "불참석"
-            }
+                attendance: "불참석",
+            },
         },
         {
             id: 4,
-            title: "맞춤 신4",
+            title: "맞춤 신청4",
             accordion: true,
             details: {
                 expoName: "웨딩박람회4",
                 teacher: "박셋",
                 time: "2025-04-10",
-                attendance: "참석"
-            }
-        }
+                attendance: "참석",
+            },
+        },
     ];
 
     return (
-        <>
-            {/* 가운데 타이틀 */}
-            <h2 className="text-center text-xl font-semibold mt-4">
-                박람회 참석 내역
-            </h2>
-
+        <div className="p-4 bg-white rounded-md shadow-md">
+            <h2 className="text-center text-2xl font-bold mb-4">박람회 참석 내역</h2>
             {/* 게이지 & 점수 영역 */}
-            <div className="flex flex-col items-center mt-6">
+            <div className="flex flex-col items-center mb-6">
                 <div className="relative">
                     <svg className="w-40 h-40" viewBox="0 0 120 120">
-                        <circle
-                            cx="60"
-                            cy="60"
-                            r="50"
-                            fill="none"
-                            stroke="#e5e7eb"
-                            strokeWidth="10"
-                        />
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" strokeWidth="10" />
                         <circle
                             cx="60"
                             cy="60"
@@ -94,14 +83,13 @@ function ExpoAttendance() {
                     </div>
                 </div>
             </div>
-
             {/* 아코디언 목록 */}
-            <div className="mt-6 space-y-2 px-4">
+            <div className="mt-6 space-y-2">
                 {joinItems.map((item) => (
                     <JoinItem key={item.id} item={item} />
                 ))}
             </div>
-        </>
+        </div>
     );
 }
 

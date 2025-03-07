@@ -22,17 +22,16 @@ function DraggableBox({ box, onDropToGrid }) {
     return (
         <div
             ref={dragRef}
-            className="border rounded p-2 shadow cursor-move w-full h-full flex flex-col items-center justify-center"
+            className="border rounded-lg p-2 shadow-md cursor-move w-full h-full flex flex-col items-center justify-center bg-white"
             style={{
                 opacity,
-                "--box-color": box.color || "#ffffff",
-                backgroundColor: "var(--box-color)",
+                backgroundColor: box.color || "#ffffff",
             }}
         >
-            <div className="font-semibold text-sm">
+            <div className="text-sm font-semibold text-gray-800">
                 {box.companyName || box.school}
             </div>
-            {/* 추가 정보가 필요하면 여기에 표시 */}
+            {/* 필요 시 추가 정보 영역 */}
         </div>
     );
 }

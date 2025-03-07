@@ -10,7 +10,7 @@ import EditBoxModal from "../../components/admin/ApplyPage/modal/EditBoxModal.js
 import CompanyListModal from "../../components/admin/ApplyPage/modal/CompanyListModal.jsx";
 import CellAdjustModal from "../../components/admin/ApplyPage/modal/CellAdjustModal.jsx";
 
-// 저장된 레이아웃을 불러오면서 Date 필드를 복원하는 함수
+// 저장된 레이아웃(박스와 행/열 수)를 불러오면서 Date 필드를 복원하는 함수
 const loadLayout = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
@@ -212,7 +212,7 @@ export default function ApplyPage() {
         navigate("/joinList");
     };
 
-    // "저장" 버튼: 현재 배치 상태와 그리드 행/열 수를 저장
+    // "저장" 버튼: 현재 배치 상태와 그리드 행/열 수를 해당 계정에 저장
     const handleSaveLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
@@ -224,7 +224,7 @@ export default function ApplyPage() {
         }
     };
 
-    // 박스 클릭 시 리스트 모달 열기
+    // 박스 클릭 시 리스트 모달을 열기 위해 선택된 박스 id 저장
     const openListModal = (box) => {
         setSelectedListBoxId(box.id);
         setIsListModalOpen(true);
