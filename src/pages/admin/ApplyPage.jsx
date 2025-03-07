@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useNavigate } from "react-router-dom";
@@ -9,49 +9,39 @@ import CreateBoxModal from "../../components/admin/ApplyPage/modal/CreateBoxModa
 import EditBoxModal from "../../components/admin/ApplyPage/modal/EditBoxModal.jsx";
 import CompanyListModal from "../../components/admin/ApplyPage/modal/CompanyListModal.jsx";
 import CellAdjustModal from "../../components/admin/ApplyPage/modal/CellAdjustModal.jsx";
-
-// 저장된 레이아웃(박스와 행/열 수)를 불러오면서 Date 필드를 복원하는 함수
-const loadLayout = () => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-        const savedLayout = localStorage.getItem("layout_" + storedUser.id);
-        if (savedLayout) {
-            const layout = JSON.parse(savedLayout);
-            const boxes = layout.boxes || [];
-            const rowCount = layout.rowCount || 5;
-            const colCount = layout.colCount || 8;
-            boxes.forEach((box) => {
-                if (box.applications && Array.isArray(box.applications)) {
-                    box.applications = box.applications.map((app) => ({
-                        ...app,
-                        startTime: app.startTime ? new Date(app.startTime) : null,
-                        endTime: app.endTime ? new Date(app.endTime) : null,
-                    }));
-                }
-            });
-            return { boxes, rowCount, colCount };
-        }
-    }
-    return { boxes: [], rowCount: 5, colCount: 8 };
-};
+import useLayoutStore from "../../store/layoutStore";
 
 export default function ApplyPage() {
     const navigate = useNavigate();
-    const initialLayout = loadLayout();
-    const [boxes, setBoxes] = useState(initialLayout.boxes);
-    const [rowCount, setRowCount] = useState(initialLayout.rowCount);
-    const [colCount, setColCount] = useState(initialLayout.colCount);
+    const {
+        boxes,
+        rowCount,
+        colCount,
+        initializeLayout,
+        addBox,
+        updateBox,
+        removeBox,
+        setRowCount,
+        setColCount,
+        saveLayout,
+        setBoxes,
+    } = useLayoutStore();
 
-    const [isCreateCompanyBoxOpen, setIsCreateCompanyBoxOpen] = useState(false);
-    const [isEditBoxModalOpen, setIsEditBoxModalOpen] = useState(false);
-    const [selectedBoxForEdit, setSelectedBoxForEdit] = useState(null);
+    // 로컬 상태(모달 제어 등)는 컴포넌트 내부에서 관리
+    const [isCreateCompanyBoxOpen, setIsCreateCompanyBoxOpen] = React.useState(false);
+    const [isEditBoxModalOpen, setIsEditBoxModalOpen] = React.useState(false);
+    const [selectedBoxForEdit, setSelectedBoxForEdit] = React.useState(null);
+    const [selectedListBoxId, setSelectedListBoxId] = React.useState(null);
+    const [isListModalOpen, setIsListModalOpen] = React.useState(false);
+    const [isCellAdjustModalOpen, setIsCellAdjustModalOpen] = React.useState(false);
 
-    // 리스트 모달: 선택된 박스의 id 저장
-    const [selectedListBoxId, setSelectedListBoxId] = useState(null);
-    const [isListModalOpen, setIsListModalOpen] = useState(false);
-
-    // 셀 추가/삭제 모달 상태
-    const [isCellAdjustModalOpen, setIsCellAdjustModalOpen] = useState(false);
+    // 컴포넌트 마운트 시 로컬 스토리지에서 레이아웃 초기화
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) {
+            initializeLayout(storedUser.id);
+        }
+    }, [initializeLayout]);
 
     // Header 영역
     const Header = () => (
@@ -60,7 +50,7 @@ export default function ApplyPage() {
         </header>
     );
 
-    // GridLayout 영역
+    // GridLayout 영역: 행/열에 따라 그리드 셀 생성
     const GridLayout = () => (
         <div
             className="gap-1 border p-2 bg-white rounded-md shadow"
@@ -92,7 +82,7 @@ export default function ApplyPage() {
         </div>
     );
 
-    // Inventory 영역
+    // 인벤토리: 배치되지 않은 박스 목록
     const Inventory = () => {
         const unplacedBoxes = boxes.filter((b) => !b.placed);
         return (
@@ -111,7 +101,7 @@ export default function ApplyPage() {
         );
     };
 
-    // ButtonBar 영역 (기업 박스 추가 버튼 포함)
+    // ButtonBar: 셀 추가/삭제, 기업 추가, 저장, joinList 이동 버튼
     const ButtonBar = () => (
         <div className="flex flex-col space-y-4">
             <div className="flex space-x-4">
@@ -143,110 +133,106 @@ export default function ApplyPage() {
         </div>
     );
 
-    // 이벤트 핸들러들
-    const closeCreateCompanyBoxModal = () => setIsCreateCompanyBoxOpen(false);
-
-    // 기업 박스 생성 함수 (기업명과 색상만 저장)
+    // 기업 박스 생성 함수
     const handleCreateCompanyBox = ({ companyName, color }) => {
         const newBox = {
             id: Date.now(),
             placed: false,
             row: null,
             col: null,
-            companyName, // 기업명 저장
+            companyName,
             color,
             applications: [],
         };
-        setBoxes((prev) => [...prev, newBox]);
-        closeCreateCompanyBoxModal();
+        addBox(newBox);
+        setIsCreateCompanyBoxOpen(false);
     };
 
-    // 셀 추가/삭제 적용 함수: 새 그리드 크기로 변경하면서 범위 밖에 배치된 박스 삭제
+    // 셀 추가/삭제 적용: 새 그리드 크기로 변경하고, 범위를 벗어난 박스 제거
     const handleCellAdjustApply = (newRow, newCol) => {
         setRowCount(newRow);
         setColCount(newCol);
-        setBoxes((prev) =>
-            prev.filter(
+        setBoxes(
+            boxes.filter(
                 (box) => !box.placed || (box.row < newRow && box.col < newCol)
             )
         );
         setIsCellAdjustModalOpen(false);
     };
 
+    // 그리드 셀에 박스 드롭 시 처리
     const onDropToGrid = (boxId, row, col) => {
-        setBoxes((prev) => {
-            const droppedBox = prev.find((b) => b.id === boxId);
-            const targetBox = prev.find(
-                (b) => b.placed && b.row === row && b.col === col
-            );
-            if (targetBox && droppedBox.placed) {
-                return prev.map((b) => {
-                    if (b.id === boxId) {
-                        return { ...b, row, col };
-                    } else if (b.id === targetBox.id) {
-                        return { ...b, row: droppedBox.row, col: droppedBox.col };
-                    }
-                    return b;
-                });
-            } else if (!targetBox) {
-                return prev.map((b) =>
-                    b.id === boxId ? { ...b, placed: true, row, col } : b
-                );
-            } else {
-                alert("해당 칸은 이미 박스가 있습니다.");
-                return prev;
-            }
-        });
+        const droppedBox = boxes.find((b) => b.id === boxId);
+        const targetBox = boxes.find(
+            (b) => b.placed && b.row === row && b.col === col
+        );
+        if (targetBox && droppedBox.placed) {
+            updateBox({
+                ...droppedBox,
+                row,
+                col,
+            });
+            updateBox({
+                ...targetBox,
+                row: droppedBox.row,
+                col: droppedBox.col,
+            });
+        } else if (!targetBox) {
+            updateBox({
+                ...droppedBox,
+                placed: true,
+                row,
+                col,
+            });
+        } else {
+            alert("해당 칸은 이미 박스가 있습니다.");
+        }
     };
 
+    // 박스 수정 모달 열기/닫기
     const openEditBoxModal = (box) => {
         setSelectedBoxForEdit(box);
         setIsEditBoxModalOpen(true);
     };
-
     const closeEditBoxModal = () => {
         setSelectedBoxForEdit(null);
         setIsEditBoxModalOpen(false);
     };
-
     const handleEditBoxSubmit = (updatedBox) => {
-        setBoxes((prev) =>
-            prev.map((box) => (box.id === updatedBox.id ? updatedBox : box))
-        );
+        updateBox(updatedBox);
         closeEditBoxModal();
     };
 
+    // 박스 삭제
     const handleDeleteBox = (boxId) => {
-        setBoxes((prev) => prev.filter((box) => box.id !== boxId));
+        removeBox(boxId);
     };
 
+    // joinList 페이지로 이동
     const handleJoinListNavigate = () => {
         navigate("/joinList");
     };
 
-    // "저장" 버튼: 현재 배치 상태와 그리드 행/열 수를 해당 계정에 저장
+    // 레이아웃 저장
     const handleSaveLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
-            const layoutData = { boxes, rowCount, colCount };
-            localStorage.setItem("layout_" + storedUser.id, JSON.stringify(layoutData));
+            saveLayout(storedUser.id);
             alert("배치도가 저장되었습니다.");
         } else {
             alert("로그인 정보가 없습니다.");
         }
     };
 
-    // 박스 클릭 시 리스트 모달을 열기 위해 선택된 박스 id 저장
+    // 리스트 모달 관련
     const openListModal = (box) => {
         setSelectedListBoxId(box.id);
         setIsListModalOpen(true);
     };
-
     const closeListModal = () => {
         setSelectedListBoxId(null);
         setIsListModalOpen(false);
     };
-
     const selectedBoxForList = boxes.find((box) => box.id === selectedListBoxId);
 
     return (
@@ -266,10 +252,9 @@ export default function ApplyPage() {
                         onCancel={() => setIsCellAdjustModalOpen(false)}
                     />
                 )}
-                {/* 기업 박스 생성 모달 */}
                 <CreateBoxModal
                     isOpen={isCreateCompanyBoxOpen}
-                    onClose={closeCreateCompanyBoxModal}
+                    onClose={() => setIsCreateCompanyBoxOpen(false)}
                     onSubmit={handleCreateCompanyBox}
                     colorPalette={COLOR_PALETTE}
                 />
@@ -288,13 +273,13 @@ export default function ApplyPage() {
                         onClose={closeListModal}
                         companyBox={selectedBoxForList}
                         onSubmitApplication={(boxId, newApp) => {
-                            setBoxes((prev) =>
-                                prev.map((box) =>
-                                    box.id === boxId
-                                        ? { ...box, applications: [...(box.applications || []), newApp] }
-                                        : box
-                                )
-                            );
+                            updateBox({
+                                ...selectedBoxForList,
+                                applications: [
+                                    ...(selectedBoxForList.applications || []),
+                                    newApp,
+                                ],
+                            });
                         }}
                     />
                 )}
