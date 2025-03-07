@@ -7,10 +7,16 @@ function Login() {
     const navigate = useNavigate();
 
     const onSubmit = (data) => {
+        // admin 계정이면 바로 로그인
+        if (data.id === "admin" && data.password === "1q2w3e4r1!") {
+            alert("로그인 성공!");
+            navigate("/joinlist");
+            return;
+        }
+        // 그렇지 않으면 로컬 스토리지에 저장된 사용자 정보 확인
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser && storedUser.id === data.id && storedUser.password === data.password) {
             alert("로그인 성공!");
-            // 로그인 성공 후 신용 점수 화면으로 이동
             navigate("/joinlist");
         } else {
             alert("아이디 또는 비밀번호가 올바르지 않습니다.");
@@ -26,6 +32,7 @@ function Login() {
 
             {/* 로그인 폼 */}
             <form onSubmit={handleSubmit(onSubmit)} className="w-96 space-y-4">
+                <p>id : admin | pwd : 1q2w3e4r1! </p>
                 <input
                     {...register("id")}
                     type="text"
