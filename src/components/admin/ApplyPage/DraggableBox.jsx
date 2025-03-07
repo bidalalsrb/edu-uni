@@ -1,7 +1,6 @@
-// DraggableBox.jsx
 import React from "react";
 import { useDrag } from "react-dnd";
-import { ItemTypes } from "./constants";
+import { ItemTypes } from "./constants.js";
 
 function DraggableBox({ box, onDropToGrid }) {
     const [{ isDragging }, dragRef] = useDrag({
@@ -30,10 +29,10 @@ function DraggableBox({ box, onDropToGrid }) {
                 backgroundColor: "var(--box-color)",
             }}
         >
-            <div className="font-semibold text-sm">{box.school}</div>
-            <div className="text-xs text-gray-700">
-                날짜: {box.time} / 강사: {box.teacher}
+            <div className="font-semibold text-sm">
+                {box.companyName || box.school}
             </div>
+            {/* 추가 정보가 필요하면 여기에 표시 */}
         </div>
     );
 }

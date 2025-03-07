@@ -153,6 +153,7 @@ function OpenExpo() {
                                         <button
                                             onClick={() => handleApply(item.id)}
                                             className="mt-1 px-3 py-1 text-sm bg-blue-500 text-white rounded"
+                                            cursor="pointer"
                                         >
                                             신청하기
                                         </button>

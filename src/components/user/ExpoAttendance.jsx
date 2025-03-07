@@ -1,5 +1,5 @@
 import React from "react";
-import JoinItem from "./JoinItem";
+import JoinItem from "../../pages/user/JoinItem.jsx";
 
 function ExpoAttendance() {
     // 예시 데이터

@@ -2,69 +2,44 @@ import React, { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useNavigate } from "react-router-dom";
-import { COLOR_PALETTE } from "../components/ApplyPage/constants";
-import GridCell from "../components/ApplyPage/GridCell";
-import DraggableBox from "../components/ApplyPage/DraggableBox";
-import CreateBoxModal from "../components/ApplyPage/CreateBoxModal";
-import EditBoxModal from "../components/ApplyPage/EditBoxModal";
+import { COLOR_PALETTE } from "../../components/admin/ApplyPage/constants.js";
+import GridCell from "../../components/admin/ApplyPage/GridCell.jsx";
+import DraggableBox from "../../components/admin/ApplyPage/DraggableBox.jsx";
+import CreateCompanyBoxModal from "../../components/admin/ApplyPage/CreateCompanyBoxModal.jsx";
+import CompanyListModal from "../../components/admin/ApplyPage/CompanyListModal.jsx";
 
 export default function ApplyPage() {
     const ROW_COUNT = 5;
     const COL_COUNT = 8;
     const [boxes, setBoxes] = useState([]);
 
-    // 생성 모달 상태
-    const [isCreateOpen, setIsCreateOpen] = useState(false);
-    // 수정 모달 상태
-    const [isEditOpen, setIsEditOpen] = useState(false);
-    const [editingBox, setEditingBox] = useState(null);
+    // 기업 박스 생성 모달 상태
+    const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
+    // 기업 리스트 모달 상태
+    const [selectedCompanyBox, setSelectedCompanyBox] = useState(null);
+    const [isCompanyListModalOpen, setIsCompanyListModalOpen] = useState(false);
 
     const navigate = useNavigate();
 
-    // 생성 모달 열기/닫기
-    const openCreateModal = () => setIsCreateOpen(true);
-    const closeCreateModal = () => setIsCreateOpen(false);
+    // 기업 박스 생성 모달 열기/닫기
+    const openCreateCompanyModal = () => setIsCreateCompanyOpen(true);
+    const closeCreateCompanyModal = () => setIsCreateCompanyOpen(false);
 
-    // 수정 모달 열기/닫기
-    const openEditModal = (box) => {
-        setEditingBox(box);
-        setIsEditOpen(true);
-    };
-    const closeEditModal = () => {
-        setEditingBox(null);
-        setIsEditOpen(false);
-    };
-
-    // 새 박스 생성
-    const handleCreateBox = ({ school, time, teacher, color }) => {
+    // 새 기업 박스 생성
+    const handleCreateCompanyBox = ({ companyName, color }) => {
         const newBox = {
             id: Date.now(),
             placed: false,
             row: null,
             col: null,
-            school,
-            time,
-            teacher,
+            companyName,
             color,
         };
         setBoxes((prev) => [...prev, newBox]);
-        closeCreateModal();
+        closeCreateCompanyModal();
     };
 
-    // 박스 수정
-    const handleUpdateBox = (updated) => {
-        setBoxes((prev) =>
-            prev.map((b) => (b.id === updated.id ? updated : b))
-        );
-        closeEditModal();
-    };
-
-    // 박스 삭제
-    const handleDeleteBox = (boxId) => {
-        setBoxes((prev) => prev.filter((b) => b.id !== boxId));
-    };
-
-    // 그리드 드롭 (자리 교환 포함)
+    // 그리드 드롭 (자리 배치 및 교환)
     const onDropToGrid = (boxId, row, col) => {
         setBoxes((prev) => {
             const droppedBox = prev.find((b) => b.id === boxId);
@@ -93,6 +68,16 @@ export default function ApplyPage() {
         });
     };
 
+    // 기업 리스트 모달 열기/닫기 (더블클릭 시)
+    const openCompanyListModal = (box) => {
+        setSelectedCompanyBox(box);
+        setIsCompanyListModalOpen(true);
+    };
+    const closeCompanyListModal = () => {
+        setSelectedCompanyBox(null);
+        setIsCompanyListModalOpen(false);
+    };
+
     // joinList 이동
     const handleJoinListNavigate = () => {
         navigate("/joinList");
@@ -101,7 +86,9 @@ export default function ApplyPage() {
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="bg-gray-100 min-h-screen p-6">
-                <h2 className="text-xl font-bold text-center mb-4">박스 배치도 관리자전용</h2>
+                <h2 className="text-xl font-bold text-center mb-4">
+                    박스 배치도 관리자 전용
+                </h2>
 
                 {/* 격자 레이아웃 */}
                 <div className="grid grid-rows-5 grid-cols-8 gap-1 border">
@@ -117,8 +104,8 @@ export default function ApplyPage() {
                                     col={col}
                                     box={placedBox}
                                     onDropToGrid={onDropToGrid}
-                                    onOpenSettings={openEditModal}
-                                    onDelete={handleDeleteBox}
+                                    // 그리드 셀 내 박스 더블클릭 시 기업 리스트 모달 열기
+                                    onOpenSettings={openCompanyListModal}
                                 />
                             );
                         })
@@ -148,7 +135,7 @@ export default function ApplyPage() {
                     {/* 버튼 영역 */}
                     <div className="flex flex-col space-y-2">
                         <button
-                            onClick={openCreateModal}
+                            onClick={openCreateCompanyModal}
                             className="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow"
                         >
                             추가하기
@@ -162,21 +149,19 @@ export default function ApplyPage() {
                     </div>
                 </div>
 
-                {/* 박스 생성 모달 */}
-                <CreateBoxModal
-                    isOpen={isCreateOpen}
-                    onClose={closeCreateModal}
-                    onSubmit={handleCreateBox}
+                {/* 기업 박스 생성 모달 */}
+                <CreateCompanyBoxModal
+                    isOpen={isCreateCompanyOpen}
+                    onClose={closeCreateCompanyModal}
+                    onSubmit={handleCreateCompanyBox}
                     colorPalette={COLOR_PALETTE}
                 />
 
-                {/* 박스 설정 모달 */}
-                <EditBoxModal
-                    isOpen={isEditOpen}
-                    onClose={closeEditModal}
-                    box={editingBox}
-                    onSubmit={handleUpdateBox}
-                    colorPalette={COLOR_PALETTE}
+                {/* 기업 리스트 모달 (더블클릭 시) */}
+                <CompanyListModal
+                    isOpen={isCompanyListModalOpen}
+                    onClose={closeCompanyListModal}
+                    companyBox={selectedCompanyBox}
                 />
             </div>
         </DndProvider>

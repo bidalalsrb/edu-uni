@@ -1,7 +1,7 @@
 import React from "react";
 import {useNavigate} from "react-router-dom";
-import ExpoAttendance from "./ExpoAttendance";
-import OpenExpo from "./OpenExpo";
+import ExpoAttendance from "../../components/user/ExpoAttendance.jsx";
+import OpenExpo from "../../components/user/OpenExpo.jsx";
 import logo from "/public/bultiger.png";
 
 function JoinList() {

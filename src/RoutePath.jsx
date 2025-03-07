@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import JoinList from "./pages/JoinList.jsx";
-import ApplyPage from "./pages/ApplyPage.jsx"; // 신용 점수 화면
+import Login from "./pages/login/Login.jsx";
+import Register from "./pages/login/Register.jsx";
+import JoinList from "./items/user/JoinList.jsx";
+import ApplyPage from "./pages/admin/ApplyPage.jsx"; // 신용 점수 화면
 
 export default function RoutePath() {
     return (
