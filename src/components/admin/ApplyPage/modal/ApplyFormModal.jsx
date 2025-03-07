@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from "react";
+import TimePicker from "../../../noti/TimePicker.jsx";
 
 function ApplyFormModal({ isOpen, onClose, onSubmit }) {
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
+    const [startHour, setStartHour] = useState("09");
+    const [startMinute, setStartMinute] = useState("00");
+    const [endHour, setEndHour] = useState("09");
+    const [endMinute, setEndMinute] = useState("10");
     const [nameInput, setNameInput] = useState("");
 
     useEffect(() => {
         if (isOpen) {
-            setStartTime("");
-            setEndTime("");
+            setStartHour("09");
+            setStartMinute("00");
+            setEndHour("09");
+            setEndMinute("10");
             setNameInput("");
         }
     }, [isOpen]);
 
     const handleSubmit = () => {
-        if (!startTime.trim() || !endTime.trim() || !nameInput.trim()) {
-            alert("모든 필드를 입력하세요.");
+        if (!nameInput.trim()) {
+            alert("이름을 입력하세요.");
             return;
         }
-        // 시간 문자열을 현재 날짜 기준 Date 객체로 변환
+        // 오늘 날짜를 기준으로 선택한 시간으로 Date 객체 생성
         const now = new Date();
-        const [startHour, startMinute] = startTime.split(":");
-        const [endHour, endMinute] = endTime.split(":");
         const startDate = new Date(
             now.getFullYear(),
             now.getMonth(),
@@ -47,13 +50,7 @@ function ApplyFormModal({ isOpen, onClose, onSubmit }) {
                 {/* 상단 헤더 */}
                 <div className="flex items-center justify-between px-4 py-3 border-b">
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -62,32 +59,22 @@ function ApplyFormModal({ isOpen, onClose, onSubmit }) {
                 </div>
                 {/* 본문 영역 */}
                 <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+                    <TimePicker
+                        label="시작시간"
+                        selectedHour={startHour}
+                        selectedMinute={startMinute}
+                        onHourChange={setStartHour}
+                        onMinuteChange={setStartMinute}
+                    />
+                    <TimePicker
+                        label="종료시간"
+                        selectedHour={endHour}
+                        selectedMinute={endMinute}
+                        onHourChange={setEndHour}
+                        onMinuteChange={setEndMinute}
+                    />
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            시작 시간
-                        </label>
-                        <input
-                            type="time"
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            끝 시간
-                        </label>
-                        <input
-                            type="time"
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            이름
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
                         <input
                             type="text"
                             value={nameInput}
