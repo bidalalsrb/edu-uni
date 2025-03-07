@@ -118,7 +118,7 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
                         onClick={openApplyForm}
                         className="cursor-pointer px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
                     >
-                        신청하기
+                        추가하기
                     </button>
                 </div>
             </div>

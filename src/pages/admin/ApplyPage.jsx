@@ -148,6 +148,8 @@ export default function ApplyPage() {
         };
         addBox(newBox);
         setIsCreateCompanyBoxOpen(false);
+        // 기업 추가 완료 알림 호출
+        setAlert({ message: "기업 추가가 완료되었습니다.", type: "success" });
     };
 
     // 셀 추가/삭제 적용 함수
@@ -160,6 +162,8 @@ export default function ApplyPage() {
             )
         );
         setIsCellAdjustModalOpen(false);
+        // 셀 추가/삭제 적용 완료 알림 호출
+        setAlert({ message: "셀 추가/삭제가 적용되었습니다.", type: "success" });
     };
 
     // 박스 드롭 핸들러
