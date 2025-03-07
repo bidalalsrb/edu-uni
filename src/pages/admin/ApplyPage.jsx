@@ -6,24 +6,22 @@ import { COLOR_PALETTE } from "../../components/admin/ApplyPage/constants.js";
 import GridCell from "../../components/admin/ApplyPage/GridCell.jsx";
 import DraggableBox from "../../components/admin/ApplyPage/DraggableBox.jsx";
 import CreateCompanyBoxModal from "../../components/admin/ApplyPage/CreateCompanyBoxModal.jsx";
-import CompanyListModal from "../../components/admin/ApplyPage/CompanyListModal.jsx";
+import EditBoxModal from "../../components/admin/ApplyPage/EditBoxModal.jsx";
 
 export default function ApplyPage() {
     const ROW_COUNT = 5;
     const COL_COUNT = 8;
     const [boxes, setBoxes] = useState([]);
-    // 선택된 박스의 id만 저장
-    const [selectedBoxId, setSelectedBoxId] = useState(null);
     const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
-    const [isCompanyListModalOpen, setIsCompanyListModalOpen] = useState(false);
+
+    const [isEditBoxModalOpen, setIsEditBoxModalOpen] = useState(false);
+    const [selectedBoxForEdit, setSelectedBoxForEdit] = useState(null);
 
     const navigate = useNavigate();
 
-    // 기업 박스 생성 모달 열기/닫기
     const openCreateCompanyModal = () => setIsCreateCompanyOpen(true);
     const closeCreateCompanyModal = () => setIsCreateCompanyOpen(false);
 
-    // 새 기업 박스 생성 시 각 박스에 개별 신청 내역 배열을 초기값으로 추가
     const handleCreateCompanyBox = ({ companyName, color }) => {
         const newBox = {
             id: Date.now(),
@@ -32,13 +30,12 @@ export default function ApplyPage() {
             col: null,
             companyName,
             color,
-            applications: [] // 각 박스별 신청 내역
+            applications: []
         };
         setBoxes((prev) => [...prev, newBox]);
         closeCreateCompanyModal();
     };
 
-    // 그리드 드롭 (자리 배치 및 교환)
     const onDropToGrid = (boxId, row, col) => {
         setBoxes((prev) => {
             const droppedBox = prev.find((b) => b.id === boxId);
@@ -46,7 +43,6 @@ export default function ApplyPage() {
                 (b) => b.placed && b.row === row && b.col === col
             );
             if (targetBox && droppedBox.placed) {
-                // 두 박스 자리 교환
                 return prev.map((b) => {
                     if (b.id === boxId) {
                         return { ...b, row, col };
@@ -56,7 +52,6 @@ export default function ApplyPage() {
                     return b;
                 });
             } else if (!targetBox) {
-                // 빈 칸이면 배치
                 return prev.map((b) =>
                     b.id === boxId ? { ...b, placed: true, row, col } : b
                 );
@@ -67,34 +62,30 @@ export default function ApplyPage() {
         });
     };
 
-    // 기업 리스트 모달 열기 (더블클릭 시, 해당 박스의 id 저장)
-    const openCompanyListModal = (box) => {
-        setSelectedBoxId(box.id);
-        setIsCompanyListModalOpen(true);
-    };
-    const closeCompanyListModal = () => {
-        setSelectedBoxId(null);
-        setIsCompanyListModalOpen(false);
+    const openEditBoxModal = (box) => {
+        setSelectedBoxForEdit(box);
+        setIsEditBoxModalOpen(true);
     };
 
-    // 특정 박스의 신청 내역 업데이트 (박스의 id를 기준으로 업데이트)
-    const handleSubmitApplication = (boxId, newApplication) => {
+    const closeEditBoxModal = () => {
+        setSelectedBoxForEdit(null);
+        setIsEditBoxModalOpen(false);
+    };
+
+    const handleEditBoxSubmit = (updatedBox) => {
         setBoxes((prev) =>
-            prev.map((box) =>
-                box.id === boxId
-                    ? { ...box, applications: [...(box.applications || []), newApplication] }
-                    : box
-            )
+            prev.map((box) => (box.id === updatedBox.id ? updatedBox : box))
         );
+        closeEditBoxModal();
     };
 
-    // joinList 이동
+    const handleDeleteBox = (boxId) => {
+        setBoxes((prev) => prev.filter((box) => box.id !== boxId));
+    };
+
     const handleJoinListNavigate = () => {
         navigate("/joinList");
     };
-
-    // 선택된 박스 데이터를 항상 최신 상태로 가져오기
-    const selectedCompanyBox = boxes.find((box) => box.id === selectedBoxId);
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -117,7 +108,8 @@ export default function ApplyPage() {
                                     col={col}
                                     box={placedBox}
                                     onDropToGrid={onDropToGrid}
-                                    onOpenSettings={openCompanyListModal} // 더블클릭 시 해당 박스의 id를 저장
+                                    onOpenEdit={openEditBoxModal}
+                                    onDelete={handleDeleteBox}
                                 />
                             );
                         })
@@ -169,16 +161,18 @@ export default function ApplyPage() {
                     colorPalette={COLOR_PALETTE}
                 />
 
-                {/* 기업 리스트 모달 (선택된 박스의 신청 내역 표시) */}
-                {selectedCompanyBox && (
-                    <CompanyListModal
-                        isOpen={isCompanyListModalOpen}
-                        onClose={closeCompanyListModal}
-                        companyBox={selectedCompanyBox}
-                        onSubmitApplication={handleSubmitApplication}
+                {/* 박스 설정(편집) 모달 */}
+                {isEditBoxModalOpen && selectedBoxForEdit && (
+                    <EditBoxModal
+                        isOpen={isEditBoxModalOpen}
+                        onClose={closeEditBoxModal}
+                        box={selectedBoxForEdit}
+                        onSubmit={handleEditBoxSubmit}
+                        colorPalette={COLOR_PALETTE}
                     />
                 )}
             </div>
         </DndProvider>
     );
 }
+
