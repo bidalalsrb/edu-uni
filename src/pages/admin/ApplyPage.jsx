@@ -9,6 +9,7 @@ import CreateBoxModal from "../../components/admin/ApplyPage/modal/CreateBoxModa
 import EditBoxModal from "../../components/admin/ApplyPage/modal/EditBoxModal.jsx";
 import CompanyListModal from "../../components/admin/ApplyPage/modal/CompanyListModal.jsx";
 import CellAdjustModal from "../../components/admin/ApplyPage/modal/CellAdjustModal.jsx";
+import AlertNotification from "../../components/noti/AlertNotification.jsx";
 import useLayoutStore from "../../store/layoutStore";
 
 export default function ApplyPage() {
@@ -27,15 +28,16 @@ export default function ApplyPage() {
         setBoxes,
     } = useLayoutStore();
 
-    // 로컬 상태(모달 제어 등)는 컴포넌트 내부에서 관리
+    // 모달 및 알림 상태
     const [isCreateCompanyBoxOpen, setIsCreateCompanyBoxOpen] = React.useState(false);
     const [isEditBoxModalOpen, setIsEditBoxModalOpen] = React.useState(false);
     const [selectedBoxForEdit, setSelectedBoxForEdit] = React.useState(null);
     const [selectedListBoxId, setSelectedListBoxId] = React.useState(null);
     const [isListModalOpen, setIsListModalOpen] = React.useState(false);
     const [isCellAdjustModalOpen, setIsCellAdjustModalOpen] = React.useState(false);
+    const [alert, setAlert] = React.useState(null);
 
-    // 컴포넌트 마운트 시 로컬 스토리지에서 레이아웃 초기화
+    // 컴포넌트 마운트 시 레이아웃 초기화
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
@@ -50,7 +52,7 @@ export default function ApplyPage() {
         </header>
     );
 
-    // GridLayout 영역: 행/열에 따라 그리드 셀 생성
+    // GridLayout 영역
     const GridLayout = () => (
         <div
             className="gap-1 border p-2 bg-white rounded-md shadow"
@@ -82,7 +84,7 @@ export default function ApplyPage() {
         </div>
     );
 
-    // 인벤토리: 배치되지 않은 박스 목록
+    // Inventory 영역
     const Inventory = () => {
         const unplacedBoxes = boxes.filter((b) => !b.placed);
         return (
@@ -101,7 +103,7 @@ export default function ApplyPage() {
         );
     };
 
-    // ButtonBar: 셀 추가/삭제, 기업 추가, 저장, joinList 이동 버튼
+    // ButtonBar 영역
     const ButtonBar = () => (
         <div className="flex flex-col space-y-4">
             <div className="flex space-x-4">
@@ -148,7 +150,7 @@ export default function ApplyPage() {
         setIsCreateCompanyBoxOpen(false);
     };
 
-    // 셀 추가/삭제 적용: 새 그리드 크기로 변경하고, 범위를 벗어난 박스 제거
+    // 셀 추가/삭제 적용 함수
     const handleCellAdjustApply = (newRow, newCol) => {
         setRowCount(newRow);
         setColCount(newCol);
@@ -160,7 +162,7 @@ export default function ApplyPage() {
         setIsCellAdjustModalOpen(false);
     };
 
-    // 그리드 셀에 박스 드롭 시 처리
+    // 박스 드롭 핸들러
     const onDropToGrid = (boxId, row, col) => {
         const droppedBox = boxes.find((b) => b.id === boxId);
         const targetBox = boxes.find(
@@ -189,7 +191,7 @@ export default function ApplyPage() {
         }
     };
 
-    // 박스 수정 모달 열기/닫기
+    // 박스 수정 모달 관련 함수
     const openEditBoxModal = (box) => {
         setSelectedBoxForEdit(box);
         setIsEditBoxModalOpen(true);
@@ -208,23 +210,23 @@ export default function ApplyPage() {
         removeBox(boxId);
     };
 
-    // joinList 페이지로 이동
+    // joinList 페이지 이동
     const handleJoinListNavigate = () => {
         navigate("/joinList");
     };
 
-    // 레이아웃 저장
+    // 레이아웃 저장 및 알림 처리
     const handleSaveLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
             saveLayout(storedUser.id);
-            alert("배치도가 저장되었습니다.");
+            setAlert({ message: "저장이 완료되었습니다.", type: "success" });
         } else {
             alert("로그인 정보가 없습니다.");
         }
     };
 
-    // 리스트 모달 관련
+    // 리스트 모달 관련 함수
     const openListModal = (box) => {
         setSelectedListBoxId(box.id);
         setIsListModalOpen(true);
@@ -234,6 +236,11 @@ export default function ApplyPage() {
         setIsListModalOpen(false);
     };
     const selectedBoxForList = boxes.find((box) => box.id === selectedListBoxId);
+
+    // 신청 완료(예: 신청 모달 내에서 호출 시)
+    const handleApplicationComplete = () => {
+        setAlert({ message: "신청이 완료되었습니다.", type: "success" });
+    };
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -280,7 +287,15 @@ export default function ApplyPage() {
                                     newApp,
                                 ],
                             });
+                            // 신청 완료 알림 호출
+                            handleApplicationComplete();
                         }}
+                    />
+                )}
+                {alert && (
+                    <AlertNotification
+                        message={alert.message}
+                        onClose={() => setAlert(null)}
                     />
                 )}
             </div>
