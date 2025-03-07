@@ -34,6 +34,7 @@ const loadLayout = () => {
     }
     return { boxes: [], rowCount: 5, colCount: 8 };
 };
+
 export default function ApplyPage() {
     const navigate = useNavigate();
     const initialLayout = loadLayout();
@@ -45,7 +46,7 @@ export default function ApplyPage() {
     const [isEditBoxModalOpen, setIsEditBoxModalOpen] = useState(false);
     const [selectedBoxForEdit, setSelectedBoxForEdit] = useState(null);
 
-    // 리스트 모달: 선택된 박스의 id만 저장
+    // 리스트 모달: 선택된 박스의 id 저장
     const [selectedListBoxId, setSelectedListBoxId] = useState(null);
     const [isListModalOpen, setIsListModalOpen] = useState(false);
 
@@ -145,6 +146,7 @@ export default function ApplyPage() {
     // 이벤트 핸들러들
     const closeCreateCompanyBoxModal = () => setIsCreateCompanyBoxOpen(false);
 
+    // 기업 박스 생성 함수 (기업명과 색상만 저장)
     const handleCreateCompanyBox = ({ companyName, color }) => {
         const newBox = {
             id: Date.now(),
@@ -157,6 +159,18 @@ export default function ApplyPage() {
         };
         setBoxes((prev) => [...prev, newBox]);
         closeCreateCompanyBoxModal();
+    };
+
+    // 셀 추가/삭제 적용 함수: 새 그리드 크기로 변경하면서 범위 밖에 배치된 박스 삭제
+    const handleCellAdjustApply = (newRow, newCol) => {
+        setRowCount(newRow);
+        setColCount(newCol);
+        setBoxes((prev) =>
+            prev.filter(
+                (box) => !box.placed || (box.row < newRow && box.col < newCol)
+            )
+        );
+        setIsCellAdjustModalOpen(false);
     };
 
     const onDropToGrid = (boxId, row, col) => {
@@ -248,11 +262,7 @@ export default function ApplyPage() {
                     <CellAdjustModal
                         initialRowCount={rowCount}
                         initialColCount={colCount}
-                        onApply={(newRow, newCol) => {
-                            setRowCount(newRow);
-                            setColCount(newCol);
-                            setIsCellAdjustModalOpen(false);
-                        }}
+                        onApply={handleCellAdjustApply}
                         onCancel={() => setIsCellAdjustModalOpen(false)}
                     />
                 )}

@@ -4,7 +4,6 @@ function CreateBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] }) {
     const [companyName, setCompanyName] = useState("");
     const [color, setColor] = useState("#ffffff");
 
-    // 모달이 열릴 때 초기화
     useEffect(() => {
         if (isOpen) {
             setCompanyName("");
@@ -35,12 +34,7 @@ function CreateBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] }) {
                             viewBox="0 0 24 24"
                             stroke="currentColor"
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                     <h2 className="text-lg font-semibold text-gray-800">박스 생성</h2>
