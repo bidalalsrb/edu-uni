@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { useNavigate } from "react-router-dom";
-import { COLOR_PALETTE } from "../../components/admin/ApplyPage/constants.js";
+import React, {useState} from "react";
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
+import {useNavigate} from "react-router-dom";
+import {COLOR_PALETTE} from "../../components/admin/ApplyPage/constants.js";
 import GridCell from "../../components/admin/ApplyPage/GridCell.jsx";
 import DraggableBox from "../../components/admin/ApplyPage/DraggableBox.jsx";
 import CreateCompanyBoxModal from "../../components/admin/ApplyPage/CreateCompanyBoxModal.jsx";
 import EditBoxModal from "../../components/admin/ApplyPage/modal/EditBoxModal.jsx";
 import CompanyListModal from "../../components/admin/ApplyPage/modal/CompanyListModal.jsx";
+import CellAdjustModal from "../../components/admin/ApplyPage/modal/CellAdjustModal.jsx";
 
 // 저장된 레이아웃(박스와 행/열 수)를 불러오면서 Date 필드를 복원하는 함수
 const loadLayout = () => {
