@@ -65,7 +65,7 @@ export default function ApplyPage() {
             col: null,
             companyName,
             color,
-            applications: [],
+            applications: []
         };
         setBoxes((prev) => [...prev, newBox]);
         closeCreateCompanyModal();
@@ -122,7 +122,7 @@ export default function ApplyPage() {
         navigate("/joinList");
     };
 
-    // "완료" 버튼: 현재 배치 상태와 그리드 행/열 수를 해당 계정에 저장
+    // "저장" 버튼: 현재 배치 상태와 그리드 행/열 수를 해당 계정에 저장
     const handleSaveLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
