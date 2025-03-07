@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { COLOR_PALETTE } from "../../components/admin/ApplyPage/constants.js";
 import GridCell from "../../components/admin/ApplyPage/GridCell.jsx";
 import DraggableBox from "../../components/admin/ApplyPage/DraggableBox.jsx";
-import CreateCompanyBoxModal from "../../components/admin/ApplyPage/CreateCompanyBoxModal.jsx";
+import CreateBoxModal from "../../components/admin/ApplyPage/modal/CreateBoxModal.jsx";
 import EditBoxModal from "../../components/admin/ApplyPage/modal/EditBoxModal.jsx";
 import CompanyListModal from "../../components/admin/ApplyPage/modal/CompanyListModal.jsx";
 import CellAdjustModal from "../../components/admin/ApplyPage/modal/CellAdjustModal.jsx";
@@ -42,7 +42,7 @@ export default function ApplyPage() {
     const [rowCount, setRowCount] = useState(initialLayout.rowCount);
     const [colCount, setColCount] = useState(initialLayout.colCount);
 
-    const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
+    const [isCreateSchoolBoxOpen, setIsCreateSchoolBoxOpen] = useState(false);
     const [isEditBoxModalOpen, setIsEditBoxModalOpen] = useState(false);
     const [selectedBoxForEdit, setSelectedBoxForEdit] = useState(null);
 
@@ -111,7 +111,7 @@ export default function ApplyPage() {
         );
     };
 
-    // ButtonBar 영역
+    // ButtonBar 영역 (학교 박스 추가 버튼 포함)
     const ButtonBar = () => (
         <div className="flex flex-col space-y-4">
             <div className="flex space-x-4">
@@ -122,10 +122,10 @@ export default function ApplyPage() {
                     셀 추가/삭제
                 </button>
                 <button
-                    onClick={openCreateCompanyModal}
+                    onClick={() => setIsCreateSchoolBoxOpen(true)}
                     className="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow"
                 >
-                    추가하기
+                    기업 추가
                 </button>
                 <button
                     onClick={handleSaveLayout}
@@ -144,21 +144,22 @@ export default function ApplyPage() {
     );
 
     // 이벤트 핸들러들
-    const openCreateCompanyModal = () => setIsCreateCompanyOpen(true);
-    const closeCreateCompanyModal = () => setIsCreateCompanyOpen(false);
+    const closeCreateSchoolBoxModal = () => setIsCreateSchoolBoxOpen(false);
 
-    const handleCreateCompanyBox = ({ companyName, color }) => {
+    const handleCreateSchoolBox = ({ school, time, teacher, color }) => {
         const newBox = {
             id: Date.now(),
             placed: false,
             row: null,
             col: null,
-            companyName,
+            school,      // 학교명 저장
+            time,        // 등록리스트에 표시할 시간
+            teacher,     // 등록리스트에 표시할 강사
             color,
-            applications: []
+            applications: [],
         };
         setBoxes((prev) => [...prev, newBox]);
-        closeCreateCompanyModal();
+        closeCreateSchoolBoxModal();
     };
 
     const onDropToGrid = (boxId, row, col) => {
@@ -241,23 +242,10 @@ export default function ApplyPage() {
         <DndProvider backend={HTML5Backend}>
             <div className="max-w-7xl mx-auto p-6">
                 <Header />
-                <GridLayout
-                    boxes={boxes}
-                    rowCount={rowCount}
-                    colCount={colCount}
-                    onDropToGrid={onDropToGrid}
-                    onOpenEdit={openEditBoxModal}
-                    onOpenList={openListModal}
-                    onDelete={handleDeleteBox}
-                />
+                <GridLayout />
                 <div className="flex justify-between items-start mt-6">
-                    <Inventory boxes={boxes} onDropToGrid={onDropToGrid} />
-                    <ButtonBar
-                        onCreate={openCreateCompanyModal}
-                        onSave={handleSaveLayout}
-                        onCellAdjust={() => setIsCellAdjustModalOpen(true)}
-                        onJoinList={handleJoinListNavigate}
-                    />
+                    <Inventory />
+                    <ButtonBar />
                 </div>
                 {isCellAdjustModalOpen && (
                     <CellAdjustModal
@@ -271,10 +259,11 @@ export default function ApplyPage() {
                         onCancel={() => setIsCellAdjustModalOpen(false)}
                     />
                 )}
-                <CreateCompanyBoxModal
-                    isOpen={isCreateCompanyOpen}
-                    onClose={closeCreateCompanyModal}
-                    onSubmit={handleCreateCompanyBox}
+                {/* 학교 박스 생성 모달 */}
+                <CreateBoxModal
+                    isOpen={isCreateSchoolBoxOpen}
+                    onClose={closeCreateSchoolBoxModal}
+                    onSubmit={handleCreateSchoolBox}
                     colorPalette={COLOR_PALETTE}
                 />
                 {isEditBoxModalOpen && selectedBoxForEdit && (

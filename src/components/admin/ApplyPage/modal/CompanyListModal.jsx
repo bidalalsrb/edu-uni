@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import ApplyFormModal from "./ApplyFormModal.jsx";
 
 function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) {
-    const [isApplyFormModalOpen, setIsApplyFormModalOpen] = React.useState(false);
+    const [isApplyFormModalOpen, setIsApplyFormModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 4;
 
     if (!isOpen || !companyBox) return null;
 
@@ -25,6 +27,19 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
         return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     };
 
+    // 신청 내역 배열에서 현재 페이지에 해당하는 항목만 추출
+    const apps = companyBox.applications || [];
+    const totalPages = Math.ceil(apps.length / itemsPerPage);
+    const displayedApps = apps.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
             <div className="w-[90%] max-w-md bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
@@ -35,36 +50,57 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    <h2 className="text-lg font-semibold text-gray-800">
-                        {companyBox.companyName} 등록 리스트
-                    </h2>
+                    <h2 className="text-lg font-semibold text-gray-800">{companyBox.companyName} 등록 리스트</h2>
                     <div className="w-6 h-6" />
                 </div>
 
                 {/* 본문 영역 */}
                 <div className="flex-1 overflow-y-auto px-4 py-5">
-                    {companyBox.applications && companyBox.applications.length > 0 ? (
-                        <div className="space-y-3">
-                            {companyBox.applications.map((app) => (
-                                <div
-                                    key={app.id}
-                                    className="border rounded-md p-3 bg-white shadow-sm flex items-center justify-between"
-                                >
-                                    <div>
-                                        <div className="text-sm text-gray-500">
-                                            {formatTime(app.startTime)} ~ {formatTime(app.endTime)}
-                                        </div>
-                                        <div className="text-base font-medium text-gray-700">{app.name}</div>
-                                    </div>
-                                    <button
-                                        className="cursor-pointer px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                        onClick={() => alert("신청하기 버튼 클릭")}
+                    {apps.length > 0 ? (
+                        <>
+                            <div className="space-y-3">
+                                {displayedApps.map((app) => (
+                                    <div
+                                        key={app.id}
+                                        className="border rounded-md p-3 bg-white shadow-sm flex items-center justify-between"
                                     >
-                                        신청하기
+                                        <div>
+                                            <div className="text-sm text-gray-500">
+                                                {formatTime(app.startTime)} ~ {formatTime(app.endTime)}
+                                            </div>
+                                            <div className="text-base font-medium text-gray-700">{app.name}</div>
+                                        </div>
+                                        <button
+                                            className="cursor-pointer px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                            onClick={() => alert("신청하기 버튼 클릭")}
+                                        >
+                                            신청하기
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                            {totalPages > 1 && (
+                                <div className="flex items-center justify-center mt-4 space-x-2">
+                                    <button
+                                        onClick={handlePrevPage}
+                                        disabled={currentPage === 1}
+                                        className="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+                                    >
+                                        이전
+                                    </button>
+                                    <span className="text-gray-700">
+                    {currentPage} / {totalPages}
+                  </span>
+                                    <button
+                                        onClick={handleNextPage}
+                                        disabled={currentPage === totalPages}
+                                        className="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+                                    >
+                                        다음
                                     </button>
                                 </div>
-                            ))}
-                        </div>
+                            )}
+                        </>
                     ) : (
                         <p className="text-gray-500 text-sm">신청된 내역이 없습니다.</p>
                     )}

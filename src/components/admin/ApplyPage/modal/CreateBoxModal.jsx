@@ -1,27 +1,23 @@
 import React, { useState, useEffect } from "react";
 
 function CreateBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] }) {
-    const [school, setSchool] = useState("");
-    const [time, setTime] = useState("");
-    const [teacher, setTeacher] = useState("");
+    const [companyName, setCompanyName] = useState("");
     const [color, setColor] = useState("#ffffff");
 
     // 모달이 열릴 때 초기화
     useEffect(() => {
         if (isOpen) {
-            setSchool("");
-            setTime("");
-            setTeacher("");
+            setCompanyName("");
             setColor("#ffffff");
         }
     }, [isOpen]);
 
     const handleSubmit = () => {
-        if (!school.trim()) {
-            alert("학교명을 입력하세요.");
+        if (!companyName.trim()) {
+            alert("기업명을 입력하세요.");
             return;
         }
-        onSubmit({ school, time, teacher, color });
+        onSubmit({ companyName, color });
     };
 
     if (!isOpen) return null;
@@ -29,10 +25,9 @@ function CreateBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
             <div className="w-[90%] max-w-md bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
-                {/* 상단 헤더 영역 */}
+                {/* 상단 헤더 */}
                 <div className="flex items-center justify-between px-4 py-3 border-b">
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                        {/* 닫기 버튼 (X 아이콘) */}
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
@@ -40,7 +35,12 @@ function CreateBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] }) {
                             viewBox="0 0 24 24"
                             stroke="currentColor"
                         >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
                         </svg>
                     </button>
                     <h2 className="text-lg font-semibold text-gray-800">박스 생성</h2>
@@ -49,45 +49,22 @@ function CreateBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] }) {
 
                 {/* 본문 영역 */}
                 <div className="flex-1 overflow-y-auto px-4 py-5">
-                    {/* 학교 */}
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">학교</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            기업명
+                        </label>
                         <input
                             type="text"
                             className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={school}
-                            onChange={(e) => setSchool(e.target.value)}
-                            placeholder="예) 서울대학교"
+                            value={companyName}
+                            onChange={(e) => setCompanyName(e.target.value)}
+                            placeholder="예) (주)타이거"
                         />
                     </div>
-`
-                    {/* 시간 */}
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">시간</label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={time}
-                            onChange={(e) => setTime(e.target.value)}
-                            placeholder="예) 09:00 ~ 11:00"
-                        />
-                    </div>
-
-                    {/* 강사 */}
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">강사</label>
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={teacher}
-                            onChange={(e) => setTeacher(e.target.value)}
-                            placeholder="예) 홍길동"
-                        />
-                    </div>
-
-                    {/* 박스 색상 */}
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">박스 색상</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            박스 색상
+                        </label>
                         <div className="flex flex-wrap gap-2">
                             {colorPalette.map((c) => (
                                 <button

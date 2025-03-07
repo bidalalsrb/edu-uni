@@ -1,152 +1,137 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { HomeIcon } from "@heroicons/react/24/solid"; // 예시 아이콘
-
-const allExpoData = [
-    {
-        id: 1,
-        date: "2025-05-01",
-        location: "서울",
-        school: "서울대",
-        time: "09:00 - 11:00",
-        teacher: "홍길동",
-        status: "신청 가능",
-    },
-    {
-        id: 2,
-        date: "2025-05-01",
-        location: "서울",
-        school: "고려대",
-        time: "11:00 - 13:00",
-        teacher: "김철수",
-        status: "마감",
-    },
-    {
-        id: 3,
-        date: "2025-05-01",
-        location: "서울",
-        school: "연세대",
-        time: "14:00 - 16:00",
-        teacher: "이영희",
-        status: "신청 가능",
-    },
-    {
-        id: 4,
-        date: "2025-05-02",
-        location: "부산",
-        school: "한양대",
-        time: "16:00 - 18:00",
-        teacher: "박지성",
-        status: "신청 가능",
-    },
-    {
-        id: 5,
-        date: "2025-05-02",
-        location: "부산",
-        school: "경희대",
-        time: "18:00 - 20:00",
-        teacher: "최민수",
-        status: "마감",
-    },
-    {
-        id: 6,
-        date: "2025-05-02",
-        location: "대구",
-        school: "서강대",
-        time: "10:00 - 12:00",
-        teacher: "김민정",
-        status: "마감",
-    },
-];
-
-const dateOptions = ["2025-05-01", "2025-05-02"];
-const locationOptions = ["서울", "부산", "대구"];
 
 function OpenExpo() {
     const navigate = useNavigate();
-    const [selectedDate, setSelectedDate] = useState("");
-    const [selectedLocation, setSelectedLocation] = useState("");
+    const [boxes, setBoxes] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
-    const filteredExpoData = allExpoData.filter((item) => {
-        return (
-            (!selectedDate || item.date === selectedDate) &&
-            (!selectedLocation || item.location === selectedLocation)
-        );
+    // 로컬 스토리지에서 박스 데이터를 불러오는 함수
+    const loadLayout = () => {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) {
+            const savedLayout = localStorage.getItem("layout_" + storedUser.id);
+            if (savedLayout) {
+                const layout = JSON.parse(savedLayout);
+                return layout.boxes || [];
+            }
+        }
+        return [];
+    };
+
+    useEffect(() => {
+        setBoxes(loadLayout());
+    }, []);
+
+    // 모든 박스의 신청 내역을 모아서 하나의 배열로 구성
+    const aggregatedApps = boxes.flatMap((box) =>
+        (box.applications || []).map((app) => ({
+            id: app.id,
+            // 기업명이 있으면 기업명, 없으면 학교명 사용
+            company: box.companyName || box.school || "제목없음",
+            startTime: app.startTime ? new Date(app.startTime) : null,
+            endTime: app.endTime ? new Date(app.endTime) : null,
+            // 강사는 박스의 teacher가 있으면 사용, 없으면 신청 항목의 name 사용
+            teacher: box.teacher || app.name || "강사 없음",
+        }))
+    );
+
+    // startTime 기준 오름차순 정렬 (startTime 없는 경우는 뒤로)
+    aggregatedApps.sort((a, b) => {
+        if (a.startTime && b.startTime) {
+            return a.startTime - b.startTime;
+        } else if (a.startTime) {
+            return -1;
+        } else if (b.startTime) {
+            return 1;
+        } else {
+            return 0;
+        }
     });
 
-    const handleApply = (expoId) => {
-        navigate("/apply", { state: { expoId } });
+    const totalPages = Math.ceil(aggregatedApps.length / itemsPerPage);
+    const displayedApps = aggregatedApps.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const formatTime = (dateObj) => {
+        if (!dateObj) return "";
+        return dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
     };
 
     return (
-        <div className="p-4 bg-white rounded-md shadow-md">
-            <h2 className="text-center text-2xl font-bold mb-4">오픈 박람회</h2>
-            {/* 날짜 & 장소 선택 */}
-            <div className="flex flex-col sm:flex-row sm:justify-center gap-4 mb-6">
+        <div className="bg-gray-100 p-4">
+            <h2 className="text-center text-3xl font-semibold text-gray-800 mb-6">
+                상담 리스트
+            </h2>
+            {aggregatedApps.length > 0 ? (
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">날짜</label>
-                    <select
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        className="w-full sm:w-40 border border-gray-300 rounded-md p-2"
-                    >
-                        <option value="">전체</option>
-                        {dateOptions.map((date) => (
-                            <option key={date} value={date}>
-                                {date}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">장소</label>
-                    <select
-                        value={selectedLocation}
-                        onChange={(e) => setSelectedLocation(e.target.value)}
-                        className="w-full sm:w-40 border border-gray-300 rounded-md p-2"
-                    >
-                        <option value="">전체</option>
-                        {locationOptions.map((loc) => (
-                            <option key={loc} value={loc}>
-                                {loc}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-            {/* 박람회 리스트 */}
-            <div className="space-y-4">
-                {filteredExpoData.length > 0 ? (
-                    filteredExpoData.map((item) => (
-                        <div
-                            key={item.id}
-                            className="border rounded-md p-4 hover:bg-gray-50 transition"
-                        >
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-800">{item.school}</h3>
-                                    <p className="text-sm text-gray-600">
-                                        시간: {item.time} | 강사: {item.teacher}
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm font-medium">{item.status}</p>
-                                    {item.status === "신청 가능" && (
-                                        <button
-                                            onClick={() => handleApply(item.id)}
-                                            className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        >
-                                            신청하기
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
+                    <ul className="divide-y divide-gray-200">
+                        {displayedApps.map((app) => {
+                            const timeRange =
+                                app.startTime && app.endTime
+                                    ? `${formatTime(app.startTime)} ~ ${formatTime(app.endTime)}`
+                                    : "시간 없음";
+                            return (
+                                <li key={app.id} className="flex items-center justify-between py-4">
+                                    <div className="flex-1">
+                                        <div className="text-lg font-bold text-gray-900">
+                                            {app.company}
+                                        </div>
+                                        <div className="text-sm text-gray-700">
+                                            {timeRange} | {app.teacher}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() =>
+                                            navigate("/apply", { state: { expoId: app.id } })
+                                        }
+                                        className="ml-4 px-4 py-1 bg-blue-500 rounded-full text-white text-xs font-medium shadow-sm hover:bg-blue-600 focus:outline-none"
+                                    >
+                                        신청하기
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                    {/* aggregatedApps의 항목이 5개 이상이면 항상 페이징 컨트롤 표시 */}
+                    {aggregatedApps.length >= itemsPerPage && (
+                        <div className="flex items-center justify-center mt-6 space-x-4">
+                            <button
+                                onClick={handlePrevPage}
+                                disabled={currentPage === 1}
+                                className="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+                            >
+                                이전
+                            </button>
+                            <span className="text-gray-700">
+                {currentPage} / {totalPages}
+              </span>
+                            <button
+                                onClick={handleNextPage}
+                                disabled={currentPage === totalPages}
+                                className="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+                            >
+                                다음
+                            </button>
                         </div>
-                    ))
-                ) : (
-                    <p className="text-center text-sm text-gray-500">해당 날짜와 장소에 대한 박람회가 없습니다.</p>
-                )}
-            </div>
+                    )}
+                </div>
+            ) : (
+                <p className="text-center text-base text-gray-500">
+                    저장된 박스 배치도가 없습니다.
+                </p>
+            )}
         </div>
     );
 }
