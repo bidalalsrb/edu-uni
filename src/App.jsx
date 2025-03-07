@@ -1,11 +1,11 @@
 import './App.css'
-import RoutePath from "./RoutePath.jsx";
+import AppRoutes from "./routes/AppRoutes.jsx";
 
 function App() {
 
     return (
         <>
-            <RoutePath/>
+            <AppRoutes/>
         </>
     )
 }
