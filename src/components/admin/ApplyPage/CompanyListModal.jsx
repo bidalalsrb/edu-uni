@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import ApplyFormModal from "./ApplyFormModal.jsx";
 
-function CompanyListModal({ isOpen, onClose, companyBox }) {
-    const [applications, setApplications] = useState([]);
+function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) {
     const [isApplyFormModalOpen, setIsApplyFormModalOpen] = useState(false);
 
     if (!isOpen || !companyBox) return null;
@@ -19,20 +18,22 @@ function CompanyListModal({ isOpen, onClose, companyBox }) {
     };
 
     const handleSubmitApplication = (newApp) => {
-        const newApplication = {
+        onSubmitApplication(companyBox.id, {
             id: Date.now(),
-            time: newApp.time, // Date 객체로 저장됨
+            startTime: newApp.startTime, // Date 객체
+            endTime: newApp.endTime,     // Date 객체
             name: newApp.name,
-        };
-        setApplications((prev) => [...prev, newApplication]);
+        });
         setIsApplyFormModalOpen(false);
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center">
             <div className="bg-white p-6 rounded shadow-md w-80">
-                <h3 className="text-lg font-bold mb-2">{companyBox.companyName}의 등록 리스트</h3>
-                {applications.length > 0 ? (
+                <h3 className="text-lg font-bold mb-2">
+                    {companyBox.companyName}의 등록 리스트
+                </h3>
+                {companyBox.applications && companyBox.applications.length > 0 ? (
                     <table className="w-full mb-4">
                         <thead>
                         <tr className="text-sm font-semibold text-gray-700">
@@ -42,9 +43,9 @@ function CompanyListModal({ isOpen, onClose, companyBox }) {
                         </tr>
                         </thead>
                         <tbody>
-                        {applications.map((app) => (
+                        {companyBox.applications.map((app) => (
                             <tr key={app.id} className="text-sm text-gray-600">
-                                <td>{formatTime(app.time)}</td>
+                                <td>{`${formatTime(app.startTime)} ~ ${formatTime(app.endTime)}`}</td>
                                 <td>{app.name}</td>
                                 <td>
                                     <button
@@ -59,13 +60,21 @@ function CompanyListModal({ isOpen, onClose, companyBox }) {
                         </tbody>
                     </table>
                 ) : (
-                    <p className="mb-4 text-sm text-gray-500">신청된 내역이 없습니다.</p>
+                    <p className="mb-4 text-sm text-gray-500">
+                        신청된 내역이 없습니다.
+                    </p>
                 )}
                 <div className="flex justify-end space-x-2">
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-300 text-gray-700 rounded">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                    >
                         닫기
                     </button>
-                    <button onClick={handleOpenApplyForm} className="px-4 py-2 bg-blue-500 text-white rounded">
+                    <button
+                        onClick={handleOpenApplyForm}
+                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                    >
                         신청하기
                     </button>
                 </div>

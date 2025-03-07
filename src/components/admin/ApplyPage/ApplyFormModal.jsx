@@ -1,27 +1,35 @@
 import React, { useState } from "react";
 
 function ApplyFormModal({ isOpen, onClose, onSubmit }) {
-    const [selectedTime, setSelectedTime] = useState("");
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
     const [nameInput, setNameInput] = useState("");
 
     const handleSubmit = () => {
-        if (!selectedTime.trim() || !nameInput.trim()) {
+        if (!startTime.trim() || !endTime.trim() || !nameInput.trim()) {
             alert("모든 필드를 입력하세요.");
             return;
         }
-        // 선택된 시간을 현재 날짜 기준의 Date 객체로 변환
         const now = new Date();
-        const [hour, minute] = selectedTime.split(":");
-        const timeObj = new Date(
+        const [startHour, startMinute] = startTime.split(":");
+        const [endHour, endMinute] = endTime.split(":");
+        const startDate = new Date(
             now.getFullYear(),
             now.getMonth(),
             now.getDate(),
-            hour,
-            minute
+            startHour,
+            startMinute
         );
-        onSubmit({ time: timeObj, name: nameInput });
-        // 입력값 초기화
-        setSelectedTime("");
+        const endDate = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            endHour,
+            endMinute
+        );
+        onSubmit({ startTime: startDate, endTime: endDate, name: nameInput });
+        setStartTime("");
+        setEndTime("");
         setNameInput("");
     };
 
@@ -32,11 +40,22 @@ function ApplyFormModal({ isOpen, onClose, onSubmit }) {
             <div className="bg-white p-6 rounded shadow-md w-80">
                 <h3 className="text-lg font-bold mb-2">신청 정보 입력</h3>
                 <div className="mb-2">
-                    <label className="block text-sm font-semibold">시간</label>
+                    <label className="block text-sm font-semibold">시작 시간</label>
                     <input
                         type="time"
-                        value={selectedTime}
-                        onChange={(e) => setSelectedTime(e.target.value)}
+                        step="600" // 10분(600초) 단위
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
+                        className="w-full border p-2 rounded"
+                    />
+                </div>
+                <div className="mb-2">
+                    <label className="block text-sm font-semibold">끝 시간</label>
+                    <input
+                        type="time"
+                        step="600" // 10분 단위
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
                         className="w-full border p-2 rounded"
                     />
                 </div>
