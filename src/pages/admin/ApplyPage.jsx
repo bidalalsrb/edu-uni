@@ -34,7 +34,6 @@ const loadLayout = () => {
     }
     return { boxes: [], rowCount: 5, colCount: 8 };
 };
-
 export default function ApplyPage() {
     const navigate = useNavigate();
     const initialLayout = loadLayout();
@@ -42,7 +41,7 @@ export default function ApplyPage() {
     const [rowCount, setRowCount] = useState(initialLayout.rowCount);
     const [colCount, setColCount] = useState(initialLayout.colCount);
 
-    const [isCreateSchoolBoxOpen, setIsCreateSchoolBoxOpen] = useState(false);
+    const [isCreateCompanyBoxOpen, setIsCreateCompanyBoxOpen] = useState(false);
     const [isEditBoxModalOpen, setIsEditBoxModalOpen] = useState(false);
     const [selectedBoxForEdit, setSelectedBoxForEdit] = useState(null);
 
@@ -111,7 +110,7 @@ export default function ApplyPage() {
         );
     };
 
-    // ButtonBar 영역 (학교 박스 추가 버튼 포함)
+    // ButtonBar 영역 (기업 박스 추가 버튼 포함)
     const ButtonBar = () => (
         <div className="flex flex-col space-y-4">
             <div className="flex space-x-4">
@@ -122,7 +121,7 @@ export default function ApplyPage() {
                     셀 추가/삭제
                 </button>
                 <button
-                    onClick={() => setIsCreateSchoolBoxOpen(true)}
+                    onClick={() => setIsCreateCompanyBoxOpen(true)}
                     className="px-4 py-2 bg-blue-500 text-white font-semibold rounded shadow"
                 >
                     기업 추가
@@ -144,22 +143,20 @@ export default function ApplyPage() {
     );
 
     // 이벤트 핸들러들
-    const closeCreateSchoolBoxModal = () => setIsCreateSchoolBoxOpen(false);
+    const closeCreateCompanyBoxModal = () => setIsCreateCompanyBoxOpen(false);
 
-    const handleCreateSchoolBox = ({ school, time, teacher, color }) => {
+    const handleCreateCompanyBox = ({ companyName, color }) => {
         const newBox = {
             id: Date.now(),
             placed: false,
             row: null,
             col: null,
-            school,      // 학교명 저장
-            time,        // 등록리스트에 표시할 시간
-            teacher,     // 등록리스트에 표시할 강사
+            companyName, // 기업명 저장
             color,
             applications: [],
         };
         setBoxes((prev) => [...prev, newBox]);
-        closeCreateSchoolBoxModal();
+        closeCreateCompanyBoxModal();
     };
 
     const onDropToGrid = (boxId, row, col) => {
@@ -259,11 +256,11 @@ export default function ApplyPage() {
                         onCancel={() => setIsCellAdjustModalOpen(false)}
                     />
                 )}
-                {/* 학교 박스 생성 모달 */}
+                {/* 기업 박스 생성 모달 */}
                 <CreateBoxModal
-                    isOpen={isCreateSchoolBoxOpen}
-                    onClose={closeCreateSchoolBoxModal}
-                    onSubmit={handleCreateSchoolBox}
+                    isOpen={isCreateCompanyBoxOpen}
+                    onClose={closeCreateCompanyBoxModal}
+                    onSubmit={handleCreateCompanyBox}
                     colorPalette={COLOR_PALETTE}
                 />
                 {isEditBoxModalOpen && selectedBoxForEdit && (
