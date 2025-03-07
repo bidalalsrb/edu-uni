@@ -8,7 +8,7 @@ export default function RoutePath() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Login />} />
+                <Route path="/" element={<ApplyPage />} />
                 <Route path="/register" element={<Register />} />
                 {/* 로그인 성공 후 이동할 화면 */}
                 <Route path="/joinList" element={<JoinList />} />
