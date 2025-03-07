@@ -1,74 +1,89 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
-function OpenExpo() {
-    const navigate = useNavigate();
-    const [boxes, setBoxes] = useState([]);
-
-    // 로컬 스토리지에서 박스배치도 데이터를 불러오는 함수
-    const loadLayout = () => {
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (storedUser) {
-            const savedLayout = localStorage.getItem("layout_" + storedUser.id);
-            if (savedLayout) {
-                const layout = JSON.parse(savedLayout);
-                return layout.boxes || [];
-            }
-        }
-        return [];
-    };
+function CellAdjustModal({ initialRowCount, initialColCount, onApply, onCancel }) {
+    const [tempRowCount, setTempRowCount] = useState(initialRowCount);
+    const [tempColCount, setTempColCount] = useState(initialColCount);
 
     useEffect(() => {
-        setBoxes(loadLayout());
-    }, []);
+        setTempRowCount(initialRowCount);
+    }, [initialRowCount]);
+
+    useEffect(() => {
+        setTempColCount(initialColCount);
+    }, [initialColCount]);
 
     return (
-        <div className="p-4 bg-white rounded-md shadow-md">
-            <h2 className="text-center text-2xl font-bold mb-4">오픈 박람회</h2>
-            {boxes.length > 0 ? (
-                boxes.map((box) => {
-                    // 학교 박스라면 box.school 값이 존재할 것입니다.
-                    const title = box.school || box.companyName || "제목없음";
-                    let subInfo = "";
-                    if (box.school) {
-                        // 학교 박스의 경우 등록 리스트에 저장된 시간과 강사 정보를 사용
-                        subInfo = `${box.time || "시간 없음"} ${box.teacher || "강사 없음"}`;
-                    } else {
-                        // 기업 박스인 경우 기본 정보(예: 신청 건수) 출력
-                        subInfo =
-                            box.applications && box.applications.length > 0
-                                ? `신청 건수: ${box.applications.length}`
-                                : "정보 없음";
-                    }
-                    return (
-                        <div
-                            key={box.id}
-                            className="border rounded-md p-4 hover:bg-gray-50 transition mb-2"
-                        >
-                            {/* 첫 줄: 학교명 (또는 기업명) */}
-                            <h3 className="text-lg font-semibold text-gray-800">
-                                {title}
-                            </h3>
-                            {/* 두 번째 줄: 등록 리스트에 있는 시간, 강사 정보 */}
-                            <p className="text-sm text-gray-600">{subInfo}</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+            <div className=" max-w-md bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
+                {/* 상단 헤더 */}
+                <div className="flex items-center justify-between px-4 py-3 border-b">
+                    <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <h2 className="text-lg font-semibold text-gray-800">셀 추가/삭제</h2>
+                    <div className="w-6 h-6" />
+                </div>
+                {/* 본문 영역 */}
+                <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+                    {/* 행 개수 영역 */}
+                    <div className="flex items-center gap-x-20">
+                        <span className="text-sm font-medium text-gray-700">행 개수:</span>
+                        <div className="flex items-center space-x-1">
                             <button
-                                onClick={() =>
-                                    navigate("/apply", { state: { expoId: box.id } })
-                                }
-                                className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                onClick={() => setTempRowCount(Math.max(tempRowCount - 1, 1))}
+                                className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
                             >
-                                신청하기
+                                -
+                            </button>
+                            <span className="text-xl font-semibold">{tempRowCount}</span>
+                            <button
+                                onClick={() => setTempRowCount(tempRowCount + 1)}
+                                className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                            >
+                                +
                             </button>
                         </div>
-                    );
-                })
-            ) : (
-                <p className="text-center text-sm text-gray-500">
-                    저장된 박스 배치도가 없습니다.
-                </p>
-            )}
+                    </div>
+                    {/* 열 개수 영역 */}
+                    <div className="flex items-center gap-x-20">
+                        <span className="text-sm font-medium text-gray-700">열 개수:</span>
+                        <div className="flex items-center space-x-1">
+                            <button
+                                onClick={() => setTempColCount(Math.max(tempColCount - 1, 1))}
+                                className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                            >
+                                -
+                            </button>
+                            <span className="text-xl font-semibold">{tempColCount}</span>
+                            <button
+                                onClick={() => setTempColCount(tempColCount + 1)}
+                                className="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                            >
+                                +
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {/* 하단 버튼 영역 */}
+                <div className="border-t px-4 py-3 flex justify-between items-center bg-gray-50">
+                    <button
+                        onClick={onCancel}
+                        className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-100"
+                    >
+                        취소
+                    </button>
+                    <button
+                        onClick={() => onApply(tempRowCount, tempColCount)}
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                    >
+                        적용
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
 
-export default OpenExpo;
+export default CellAdjustModal;
