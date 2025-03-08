@@ -1,4 +1,3 @@
-// src/pages/admin/ApplyPage.jsx
 import React, { useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -39,35 +38,32 @@ export default function ApplyPage() {
     const [isCellAdjustModalOpen, setIsCellAdjustModalOpen] = React.useState(false);
     const [alert, setAlert] = React.useState(null);
 
-    // 컴포넌트 마운트 시, 로컬 스토리지 데이터와 임시 데이터를 병합하여 설정
-    useEffect(() => {
+    // 컴포넌트 마운트 시, 로컬 스토리지 데이터가 있으면 저장된 데이터 사용, 없으면 sampleLayout 사용
+    const loadLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
-        let storedBoxes = [];
-        let storedRowCount, storedColCount;
+        let layout;
         if (storedUser) {
             const savedLayout = localStorage.getItem("layout_" + storedUser.id);
             if (savedLayout) {
-                const layout = JSON.parse(savedLayout);
-                storedBoxes = layout.boxes || [];
-                storedRowCount = layout.rowCount;
-                storedColCount = layout.colCount;
+                layout = JSON.parse(savedLayout);
             }
         } else {
-            // 로그인하지 않은 경우 "layout_sample" 키 사용
             const savedLayout = localStorage.getItem("layout_sample");
             if (savedLayout) {
-                const layout = JSON.parse(savedLayout);
-                storedBoxes = layout.boxes || [];
-                storedRowCount = layout.rowCount;
-                storedColCount = layout.colCount;
+                layout = JSON.parse(savedLayout);
             }
         }
-        // sampleLayout의 박스와 저장된 박스를 병합 (sample 데이터가 항상 기본으로 포함)
-        const sampleBoxes = sampleLayout.boxes;
-        const combinedBoxes = [...sampleBoxes, ...storedBoxes];
-        setBoxes(combinedBoxes);
-        setRowCount(storedRowCount !== undefined ? storedRowCount : sampleLayout.rowCount);
-        setColCount(storedColCount !== undefined ? storedColCount : sampleLayout.colCount);
+        if (!layout) {
+            layout = sampleLayout;
+        }
+        return layout;
+    };
+
+    useEffect(() => {
+        const layout = loadLayout();
+        setBoxes(layout.boxes);
+        setRowCount(layout.rowCount);
+        setColCount(layout.colCount);
     }, [initializeLayout, setBoxes, setRowCount, setColCount]);
 
     // Header 영역
@@ -321,3 +317,4 @@ export default function ApplyPage() {
         </DndProvider>
     );
 }
+

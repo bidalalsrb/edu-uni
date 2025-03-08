@@ -1,4 +1,3 @@
-// src/components/user/OpenExpo.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import sampleLayout from "../../data/sampleData";
@@ -9,69 +8,53 @@ function OpenExpo() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // 저장된 데이터와 샘플 데이터를 병합하여 반환하는 함수
+    // 저장된 데이터가 있으면 저장된 데이터만, 없으면 샘플 데이터를 반환하는 함수
     const loadLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
-        let storedBoxes = [];
-        let storedRowCount, storedColCount;
+        let layout;
         if (storedUser) {
             const savedLayout = localStorage.getItem("layout_" + storedUser.id);
             if (savedLayout) {
-                const layout = JSON.parse(savedLayout);
-                storedBoxes = layout.boxes || [];
-                storedRowCount = layout.rowCount;
-                storedColCount = layout.colCount;
+                layout = JSON.parse(savedLayout);
             }
         } else {
             // 로그인하지 않은 경우 "layout_sample" 키 사용
             const savedLayout = localStorage.getItem("layout_sample");
             if (savedLayout) {
-                const layout = JSON.parse(savedLayout);
-                storedBoxes = layout.boxes || [];
-                storedRowCount = layout.rowCount;
-                storedColCount = layout.colCount;
+                layout = JSON.parse(savedLayout);
             }
         }
-        // 항상 샘플 데이터를 기본으로 포함하고, 저장된 데이터는 그 뒤에 추가
-        const sampleBoxes = sampleLayout.boxes;
-        const combinedBoxes = [...sampleBoxes, ...storedBoxes];
-        return {
-            boxes: combinedBoxes,
-            rowCount: storedRowCount !== undefined ? storedRowCount : sampleLayout.rowCount,
-            colCount: storedColCount !== undefined ? storedColCount : sampleLayout.colCount,
-        };
+        // 저장된 데이터가 없으면 sampleLayout 사용
+        if (!layout) {
+            layout = sampleLayout;
+        }
+        return layout.boxes || [];
     };
 
     useEffect(() => {
-        const layout = loadLayout();
-        setBoxes(layout.boxes);
-        // rowCount, colCount도 필요 시 상태로 설정
-    }, []); // 컴포넌트 마운트 시 한 번만 실행
+        setBoxes(loadLayout());
+    }, []);
 
     // 모든 박스의 신청 내역을 하나의 배열로 구성
-    // 중복 키 문제 해결을 위해 각 항목에 전역 인덱스를 추가하여 고유 키를 생성함
+    // 고유 키 생성을 위해 box.id, app.id, 인덱스를 결합
     const aggregatedApps = boxes.flatMap((box) =>
-        (box.applications || []).map((app) => ({
+        (box.applications || []).map((app, index) => ({
             id: app.id,
             boxId: box.id,
             company: box.companyName || box.school || "제목없음",
             startTime: app.startTime ? new Date(app.startTime) : null,
             endTime: app.endTime ? new Date(app.endTime) : null,
             teacher: box.teacher || app.name || "강사 없음",
+            keyIndex: index,
         }))
     );
 
-    // startTime 기준 오름차순 정렬 (startTime이 없는 경우는 뒤로 배치)
+    // startTime 기준 오름차순 정렬
     aggregatedApps.sort((a, b) => {
-        if (a.startTime && b.startTime) {
-            return a.startTime - b.startTime;
-        } else if (a.startTime) {
-            return -1;
-        } else if (b.startTime) {
-            return 1;
-        } else {
-            return 0;
-        }
+        if (a.startTime && b.startTime) return a.startTime - b.startTime;
+        if (a.startTime) return -1;
+        if (b.startTime) return 1;
+        return 0;
     });
 
     const totalPages = Math.ceil(aggregatedApps.length / itemsPerPage);
@@ -108,7 +91,7 @@ function OpenExpo() {
                                     : "시간 없음";
                             return (
                                 <li
-                                    key={`aggregated-${app.boxId}-${app.id}-${index}`}
+                                    key={`openexpo-${app.boxId}-${app.id}-${index}`}
                                     className="flex items-center justify-between py-4"
                                 >
                                     <div className="flex-1">
@@ -141,8 +124,8 @@ function OpenExpo() {
                                 이전
                             </button>
                             <span className="text-gray-700">
-                                {currentPage} / {totalPages}
-                            </span>
+                {currentPage} / {totalPages}
+              </span>
                             <button
                                 onClick={handleNextPage}
                                 disabled={currentPage === totalPages}
