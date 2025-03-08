@@ -1,5 +1,7 @@
+// src/components/user/OpenExpo.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import sampleLayout from "../../data/sampleData";
 
 function OpenExpo() {
     const navigate = useNavigate();
@@ -7,24 +9,30 @@ function OpenExpo() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // 로컬 스토리지에서 박스 데이터를 불러오는 함수
+    // 로컬 스토리지에서 박스 데이터를 불러오거나 임시 데이터(sampleLayout)를 사용
     const loadLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
+        let layout;
         if (storedUser) {
             const savedLayout = localStorage.getItem("layout_" + storedUser.id);
             if (savedLayout) {
-                const layout = JSON.parse(savedLayout);
-                return layout.boxes || [];
+                layout = JSON.parse(savedLayout);
             }
         }
-        return [];
+        if (!layout) {
+            // 저장 데이터 출력
+            // layout = { boxes: [], rowCount: 5, colCount: 8 };
+            // 임시 데이터 출력
+            layout = sampleLayout;
+        }
+        return layout.boxes || [];
     };
 
     useEffect(() => {
         setBoxes(loadLayout());
     }, []);
 
-    // 모든 박스의 신청 내역을 모아서 하나의 배열로 구성
+    // 모든 박스의 신청 내역을 하나의 배열로 구성
     const aggregatedApps = boxes.flatMap((box) =>
         (box.applications || []).map((app) => ({
             id: app.id,
@@ -37,7 +45,7 @@ function OpenExpo() {
         }))
     );
 
-    // startTime 기준 오름차순 정렬 (startTime 없는 경우는 뒤로)
+    // startTime 기준 오름차순 정렬 (startTime이 없는 경우는 뒤로 배치)
     aggregatedApps.sort((a, b) => {
         if (a.startTime && b.startTime) {
             return a.startTime - b.startTime;
@@ -104,7 +112,6 @@ function OpenExpo() {
                             );
                         })}
                     </ul>
-                    {/* aggregatedApps의 항목이 5개 이상이면 항상 페이징 컨트롤 표시 */}
                     {aggregatedApps.length >= itemsPerPage && (
                         <div className="flex items-center justify-center mt-6 space-x-4">
                             <button
