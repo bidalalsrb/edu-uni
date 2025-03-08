@@ -1,8 +1,9 @@
-import React, {useEffect} from "react";
-import {DndProvider} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
-import {useNavigate} from "react-router-dom";
-import {COLOR_PALETTE} from "../../components/admin/ApplyPage/constants.js";
+// src/pages/admin/ApplyPage.jsx
+import React, { useEffect } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { useNavigate } from "react-router-dom";
+import { COLOR_PALETTE } from "../../components/admin/ApplyPage/constants.js";
 import GridCell from "../../components/admin/ApplyPage/GridCell.jsx";
 import DraggableBox from "../../components/admin/ApplyPage/DraggableBox.jsx";
 import CreateBoxModal from "../../components/admin/ApplyPage/modal/CreateBoxModal.jsx";
@@ -38,27 +39,35 @@ export default function ApplyPage() {
     const [isCellAdjustModalOpen, setIsCellAdjustModalOpen] = React.useState(false);
     const [alert, setAlert] = React.useState(null);
 
-    // 컴포넌트 마운트 시, localStorage에 사용자 정보가 있으면 초기화,
-    // 없으면 sampleLayout을 사용하도록 설정
+    // 컴포넌트 마운트 시, 로컬 스토리지 데이터와 임시 데이터를 병합하여 설정
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
+        let storedBoxes = [];
+        let storedRowCount, storedColCount;
         if (storedUser) {
-            initializeLayout(storedUser.id);
-        }
-        // else {
-        //     // 로컬에 데이터가 없으면 빈 기본값을 사용
-        //     setBoxes([]);
-        //     setRowCount(5);
-        //     setColCount(8);
-        // }
-        //     로컬에 데이터가 없으면 샘플 데이터 사용
-        else {
-
-            setBoxes(sampleLayout.boxes);
-            setRowCount(sampleLayout.rowCount);
-            setColCount(sampleLayout.colCount);
+            const savedLayout = localStorage.getItem("layout_" + storedUser.id);
+            if (savedLayout) {
+                const layout = JSON.parse(savedLayout);
+                storedBoxes = layout.boxes || [];
+                storedRowCount = layout.rowCount;
+                storedColCount = layout.colCount;
             }
-
+        } else {
+            // 로그인하지 않은 경우 "layout_sample" 키 사용
+            const savedLayout = localStorage.getItem("layout_sample");
+            if (savedLayout) {
+                const layout = JSON.parse(savedLayout);
+                storedBoxes = layout.boxes || [];
+                storedRowCount = layout.rowCount;
+                storedColCount = layout.colCount;
+            }
+        }
+        // sampleLayout의 박스와 저장된 박스를 병합 (sample 데이터가 항상 기본으로 포함)
+        const sampleBoxes = sampleLayout.boxes;
+        const combinedBoxes = [...sampleBoxes, ...storedBoxes];
+        setBoxes(combinedBoxes);
+        setRowCount(storedRowCount !== undefined ? storedRowCount : sampleLayout.rowCount);
+        setColCount(storedColCount !== undefined ? storedColCount : sampleLayout.colCount);
     }, [initializeLayout, setBoxes, setRowCount, setColCount]);
 
     // Header 영역
@@ -78,8 +87,8 @@ export default function ApplyPage() {
                 gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))`,
             }}
         >
-            {Array.from({length: rowCount}).map((_, row) =>
-                Array.from({length: colCount}).map((__, col) => {
+            {Array.from({ length: rowCount }).map((_, row) =>
+                Array.from({ length: colCount }).map((__, col) => {
                     const placedBox = boxes.find(
                         (b) => b.placed && b.row === row && b.col === col
                     );
@@ -109,7 +118,7 @@ export default function ApplyPage() {
                 {unplacedBoxes.length > 0 ? (
                     unplacedBoxes.map((box) => (
                         <div key={box.id} className="mb-2">
-                            <DraggableBox box={box} onDropToGrid={onDropToGrid}/>
+                            <DraggableBox box={box} onDropToGrid={onDropToGrid} />
                         </div>
                     ))
                 ) : (
@@ -152,7 +161,7 @@ export default function ApplyPage() {
     );
 
     // 기업 박스 생성 함수
-    const handleCreateCompanyBox = ({companyName, color}) => {
+    const handleCreateCompanyBox = ({ companyName, color }) => {
         const newBox = {
             id: Date.now(),
             placed: false,
@@ -164,7 +173,7 @@ export default function ApplyPage() {
         };
         addBox(newBox);
         setIsCreateCompanyBoxOpen(false);
-        setAlert({message: "기업 추가가 완료되었습니다.", type: "success"});
+        setAlert({ message: "기업 추가가 완료되었습니다.", type: "success" });
     };
 
     // 셀 추가/삭제 적용 함수
@@ -177,7 +186,7 @@ export default function ApplyPage() {
             )
         );
         setIsCellAdjustModalOpen(false);
-        setAlert({message: "셀 추가/삭제가 적용되었습니다.", type: "success"});
+        setAlert({ message: "셀 추가/삭제가 적용되었습니다.", type: "success" });
     };
 
     // 박스 드롭 핸들러
@@ -187,10 +196,10 @@ export default function ApplyPage() {
             (b) => b.placed && b.row === row && b.col === col
         );
         if (targetBox && droppedBox.placed) {
-            updateBox({...droppedBox, row, col});
-            updateBox({...targetBox, row: droppedBox.row, col: droppedBox.col});
+            updateBox({ ...droppedBox, row, col });
+            updateBox({ ...targetBox, row: droppedBox.row, col: droppedBox.col });
         } else if (!targetBox) {
-            updateBox({...droppedBox, placed: true, row, col});
+            updateBox({ ...droppedBox, placed: true, row, col });
         } else {
             alert("해당 칸은 이미 박스가 있습니다.");
         }
@@ -220,15 +229,20 @@ export default function ApplyPage() {
         navigate("/joinList");
     };
 
-    // 레이아웃 저장
+    // 레이아웃 저장 (로컬 스토리지에 저장)
     const handleSaveLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
+        const layoutData = {
+            boxes,
+            rowCount,
+            colCount,
+        };
         if (storedUser) {
-            saveLayout(storedUser.id);
-            setAlert({message: "배치도가 저장되었습니다.", type: "success"});
+            localStorage.setItem("layout_" + storedUser.id, JSON.stringify(layoutData));
+            setAlert({ message: "배치도가 저장되었습니다.", type: "success" });
         } else {
-            // 사용자 정보가 없더라도 임시 데이터 저장 완료 메시지 표시
-            setAlert({message: "배치도가 저장되었습니다.", type: "success"});
+            localStorage.setItem("layout_sample", JSON.stringify(layoutData));
+            setAlert({ message: "배치도가 저장되었습니다.", type: "success" });
         }
     };
 
@@ -245,17 +259,17 @@ export default function ApplyPage() {
 
     // 신청 완료 시 알림 호출
     const handleApplicationComplete = () => {
-        setAlert({message: "신청이 완료되었습니다.", type: "success"});
+        setAlert({ message: "신청이 완료되었습니다.", type: "success" });
     };
 
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="max-w-7xl mx-auto p-6">
-                <Header/>
-                <GridLayout/>
+                <Header />
+                <GridLayout />
                 <div className="flex justify-between items-start mt-6">
-                    <Inventory/>
-                    <ButtonBar/>
+                    <Inventory />
+                    <ButtonBar />
                 </div>
                 {isCellAdjustModalOpen && (
                     <CellAdjustModal

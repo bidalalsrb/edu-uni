@@ -9,38 +9,54 @@ function OpenExpo() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // 로컬 스토리지에서 박스 데이터를 불러오거나 임시 데이터(sampleLayout)를 사용
+    // 저장된 데이터와 샘플 데이터를 병합하여 반환하는 함수
     const loadLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
-        let layout;
+        let storedBoxes = [];
+        let storedRowCount, storedColCount;
         if (storedUser) {
             const savedLayout = localStorage.getItem("layout_" + storedUser.id);
             if (savedLayout) {
-                layout = JSON.parse(savedLayout);
+                const layout = JSON.parse(savedLayout);
+                storedBoxes = layout.boxes || [];
+                storedRowCount = layout.rowCount;
+                storedColCount = layout.colCount;
+            }
+        } else {
+            // 로그인하지 않은 경우 "layout_sample" 키 사용
+            const savedLayout = localStorage.getItem("layout_sample");
+            if (savedLayout) {
+                const layout = JSON.parse(savedLayout);
+                storedBoxes = layout.boxes || [];
+                storedRowCount = layout.rowCount;
+                storedColCount = layout.colCount;
             }
         }
-        if (!layout) {
-            // 저장 데이터 출력
-            // layout = { boxes: [], rowCount: 5, colCount: 8 };
-            // 임시 데이터 출력
-            layout = sampleLayout;
-        }
-        return layout.boxes || [];
+        // 항상 샘플 데이터를 기본으로 포함하고, 저장된 데이터는 그 뒤에 추가
+        const sampleBoxes = sampleLayout.boxes;
+        const combinedBoxes = [...sampleBoxes, ...storedBoxes];
+        return {
+            boxes: combinedBoxes,
+            rowCount: storedRowCount !== undefined ? storedRowCount : sampleLayout.rowCount,
+            colCount: storedColCount !== undefined ? storedColCount : sampleLayout.colCount,
+        };
     };
 
     useEffect(() => {
-        setBoxes(loadLayout());
-    }, []);
+        const layout = loadLayout();
+        setBoxes(layout.boxes);
+        // rowCount, colCount도 필요 시 상태로 설정
+    }, []); // 컴포넌트 마운트 시 한 번만 실행
 
     // 모든 박스의 신청 내역을 하나의 배열로 구성
+    // 중복 키 문제 해결을 위해 각 항목에 전역 인덱스를 추가하여 고유 키를 생성함
     const aggregatedApps = boxes.flatMap((box) =>
         (box.applications || []).map((app) => ({
             id: app.id,
-            // 기업명이 있으면 기업명, 없으면 학교명 사용
+            boxId: box.id,
             company: box.companyName || box.school || "제목없음",
             startTime: app.startTime ? new Date(app.startTime) : null,
             endTime: app.endTime ? new Date(app.endTime) : null,
-            // 강사는 박스의 teacher가 있으면 사용, 없으면 신청 항목의 name 사용
             teacher: box.teacher || app.name || "강사 없음",
         }))
     );
@@ -85,13 +101,16 @@ function OpenExpo() {
             {aggregatedApps.length > 0 ? (
                 <div>
                     <ul className="divide-y divide-gray-200">
-                        {displayedApps.map((app) => {
+                        {displayedApps.map((app, index) => {
                             const timeRange =
                                 app.startTime && app.endTime
                                     ? `${formatTime(app.startTime)} ~ ${formatTime(app.endTime)}`
                                     : "시간 없음";
                             return (
-                                <li key={app.id} className="flex items-center justify-between py-4">
+                                <li
+                                    key={`aggregated-${app.boxId}-${app.id}-${index}`}
+                                    className="flex items-center justify-between py-4"
+                                >
                                     <div className="flex-1">
                                         <div className="text-lg font-bold text-gray-900">
                                             {app.company}
@@ -122,8 +141,8 @@ function OpenExpo() {
                                 이전
                             </button>
                             <span className="text-gray-700">
-                {currentPage} / {totalPages}
-              </span>
+                                {currentPage} / {totalPages}
+                            </span>
                             <button
                                 onClick={handleNextPage}
                                 disabled={currentPage === totalPages}

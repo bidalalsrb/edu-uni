@@ -4,7 +4,7 @@
 const sampleLayout = {
     boxes: [
         {
-            id: 1,
+            id: 101,
             placed: true,
             row: 0,
             col: 0,
@@ -12,31 +12,31 @@ const sampleLayout = {
             color: "#4682B4",
             applications: [
                 {
-                    id: 101,
+                    id: 1001,
                     startTime: "2025-03-01T09:00:00", // ISO 형식의 문자열
                     endTime: "2025-03-01T09:10:00",
                     name: "김대리",
                 },
                 {
-                    id: 102,
+                    id: 1002,
                     startTime: "2025-03-01T09:15:00",
                     endTime: "2025-03-01T09:25:00",
                     name: "오과장",
                 },
                 {
-                    id: 103,
+                    id: 1003,
                     startTime: "2025-03-01T09:15:00",
                     endTime: "2025-03-01T09:25:00",
                     name: "김대리",
                 },
                 {
-                    id: 104,
+                    id: 1004,
                     startTime: "2025-03-01T09:15:00",
                     endTime: "2025-03-01T09:25:00",
                     name: "김주임",
                 },
                 {
-                    id: 105,
+                    id: 1005,
                     startTime: "2025-03-01T09:15:00",
                     endTime: "2025-03-01T09:25:00",
                     name: "김대표",
@@ -44,7 +44,7 @@ const sampleLayout = {
             ],
         },
         {
-            id: 2,
+            id: 102,
             placed: true,
             row: 0,
             col: 1,
@@ -52,32 +52,32 @@ const sampleLayout = {
             color: "#00ff00",
             applications: [
                 {
-                    id: 1,
+                    id: 1006,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "네대리",
-                },    {
-                    id: 2,
+                }, {
+                    id: 1007,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "네주임",
-                },    {
-                    id: 3,
+                }, {
+                    id: 1008,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "네과장",
-                },    {
-                    id: 4,
+                }, {
+                    id: 1009,
                     startTime: "2025-03-01T09:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "네대리",
-                },    {
-                    id: 5,
+                }, {
+                    id: 1010,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "네책임",
                 }, {
-                    id: 6,
+                    id: 1011,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "네인턴",
@@ -85,16 +85,7 @@ const sampleLayout = {
             ],
         },
         {
-            id: 3,
-            placed: false,
-            row: null,
-            col: null,
-            companyName: "Example Company C",
-            color: "#0000ff",
-            applications: [],
-        },
-        {
-            id: 4,
+            id: 104,
             placed: true,
             row: 0,
             col: 3,
@@ -102,32 +93,32 @@ const sampleLayout = {
             color: "#FFFACD",
             applications: [
                 {
-                    id: 11,
+                    id: 1012,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "카대리",
-                },    {
-                    id: 12,
+                }, {
+                    id: 1013,
                     startTime: "2025-03-01T09:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "카주임",
-                },    {
-                    id: 13,
+                }, {
+                    id: 1014,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "카과장",
-                },    {
-                    id: 14,
+                }, {
+                    id: 1015,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "카대리",
-                },    {
-                    id: 15,
+                }, {
+                    id: 1016,
                     startTime: "2025-03-01T09:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "카책임",
                 }, {
-                    id: 16,
+                    id: 1017,
                     startTime: "2025-03-01T10:00:00",
                     endTime: "2025-03-01T10:10:00",
                     name: "카인턴",
