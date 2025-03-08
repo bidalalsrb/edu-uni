@@ -1,3 +1,4 @@
+// src/components/user/OpenExpo.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import sampleLayout from "../../data/sampleData";
@@ -63,6 +64,16 @@ function OpenExpo() {
         currentPage * itemsPerPage
     );
 
+    // 필요한 placeholder 수를 계산하여 배열 생성
+    const itemsNeeded = itemsPerPage - displayedApps.length;
+    const placeholders = Array.from({ length: itemsNeeded }, (_, idx) => ({
+        placeholder: true,
+        key: `placeholder-${idx}`,
+    }));
+
+    // 실제 데이터 + placeholder 합치기
+    const finalItems = [...displayedApps, ...placeholders];
+
     const formatTime = (dateObj) => {
         if (!dateObj) return "";
         return dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -84,27 +95,60 @@ function OpenExpo() {
             {aggregatedApps.length > 0 ? (
                 <div>
                     <ul className="divide-y divide-gray-200">
-                        {displayedApps.map((app, index) => {
+                        {finalItems.map((item, index) => {
+                            // placeholder인 경우에도 실제 항목과 동일한 구조를 가지되, 내부 요소에만 visibility: hidden
+                            if (item.placeholder) {
+                                return (
+                                    <li
+                                        key={item.key}
+                                        className="flex items-center justify-between py-4"
+                                    >
+                                        <div className="flex-1">
+                                            {/* 실제 데이터와 동일한 구조, but visibility:hidden */}
+                                            <div
+                                                className="text-lg font-bold text-gray-900"
+                                                style={{ visibility: "hidden" }}
+                                            >
+                                                Placeholder
+                                            </div>
+                                            <div
+                                                className="text-sm text-gray-700"
+                                                style={{ visibility: "hidden" }}
+                                            >
+                                                Placeholder
+                                            </div>
+                                        </div>
+                                        <button
+                                            className="ml-4 px-4 py-1 bg-blue-500 rounded-full text-white text-xs font-medium shadow-sm hover:bg-blue-600 focus:outline-none"
+                                            style={{ visibility: "hidden" }}
+                                        >
+                                            신청하기
+                                        </button>
+                                    </li>
+                                );
+                            }
+
+                            // 실제 데이터 렌더링
                             const timeRange =
-                                app.startTime && app.endTime
-                                    ? `${formatTime(app.startTime)} ~ ${formatTime(app.endTime)}`
+                                item.startTime && item.endTime
+                                    ? `${formatTime(item.startTime)} ~ ${formatTime(item.endTime)}`
                                     : "시간 없음";
                             return (
                                 <li
-                                    key={`openexpo-${app.boxId}-${app.id}-${index}`}
+                                    key={`openexpo-${item.boxId}-${item.id}-${item.keyIndex}`}
                                     className="flex items-center justify-between py-4"
                                 >
                                     <div className="flex-1">
                                         <div className="text-lg font-bold text-gray-900">
-                                            {app.company}
+                                            {item.company}
                                         </div>
                                         <div className="text-sm text-gray-700">
-                                            {timeRange} | {app.teacher}
+                                            {timeRange} | {item.teacher}
                                         </div>
                                     </div>
                                     <button
                                         onClick={() =>
-                                            navigate("/apply", { state: { expoId: app.id } })
+                                            navigate("/apply", { state: { expoId: item.id } })
                                         }
                                         className="ml-4 px-4 py-1 bg-blue-500 rounded-full text-white text-xs font-medium shadow-sm hover:bg-blue-600 focus:outline-none"
                                     >
@@ -114,6 +158,8 @@ function OpenExpo() {
                             );
                         })}
                     </ul>
+
+                    {/* 이전/다음 버튼 */}
                     {aggregatedApps.length >= itemsPerPage && (
                         <div className="flex items-center justify-center mt-6 space-x-4">
                             <button

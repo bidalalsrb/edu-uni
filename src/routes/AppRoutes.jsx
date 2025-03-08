@@ -1,18 +1,39 @@
-// src/routes/AppRoutes.jsx
+// routes/AppRoutes.jsx
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import JoinList from "../pages/user/JoinList";
 import ApplyPage from "../pages/admin/ApplyPage";
+import BottomNavBar from "../components/BottomNavBar";
+
+// 모든 페이지에 공통으로 적용할 레이아웃 컴포넌트
+function GlobalLayout({ children }) {
+    return (
+        <div className="bg-gray-100 min-h-screen">
+            <div className="max-w-4xl mx-auto min-h-screen bg-white shadow-md rounded-md">
+                {children}
+            </div>
+        </div>
+    );
+}
 
 function AuthLayout() {
-    // 인증 페이지 레이아웃 (예: 공통 헤더, 푸터 등 필요 시)
-    return <Outlet />;
+    return (
+        <GlobalLayout>
+            <Outlet />
+        </GlobalLayout>
+    );
 }
 
 function AppLayout() {
-    // 로그인 이후의 레이아웃 (네비게이션 바 등 공통 레이아웃)
-    return <Outlet />;
+    return (
+        <>
+            <GlobalLayout>
+                <Outlet />
+            </GlobalLayout>
+            <BottomNavBar />
+        </>
+    );
 }
 
 export default function AppRoutes() {
