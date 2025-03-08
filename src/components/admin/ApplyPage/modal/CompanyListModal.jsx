@@ -1,3 +1,4 @@
+// src/components/admin/ApplyPage/modal/CompanyListModal.jsx
 import React, { useState } from "react";
 import ApplyFormModal from "./ApplyFormModal.jsx";
 
@@ -30,7 +31,18 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
     // 신청 내역 배열에서 현재 페이지에 해당하는 항목만 추출
     const apps = companyBox.applications || [];
     const totalPages = Math.ceil(apps.length / itemsPerPage);
-    const displayedApps = apps.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const displayedApps = apps.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    // 4개 미만이면 placeholder 생성해서 높이 고정
+    const itemsNeeded = itemsPerPage - displayedApps.length;
+    const placeholders = Array.from({ length: itemsNeeded }, (_, idx) => ({
+        placeholder: true,
+        key: `placeholder-${idx}`,
+    }));
+    const finalItems = [...displayedApps, ...placeholders];
 
     const handlePrevPage = () => {
         if (currentPage > 1) setCurrentPage((prev) => prev - 1);
@@ -46,11 +58,19 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
                 {/* 상단 헤더 */}
                 <div className="flex items-center justify-between px-4 py-3 border-b">
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    <h2 className="text-lg font-semibold text-gray-800">{companyBox.companyName} 등록 리스트</h2>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        {companyBox.companyName} 등록 리스트
+                    </h2>
                     <div className="w-6 h-6" />
                 </div>
 
@@ -59,25 +79,54 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
                     {apps.length > 0 ? (
                         <>
                             <div className="space-y-3">
-                                {displayedApps.map((app) => (
-                                    <div
-                                        key={app.id}
-                                        className="border rounded-md p-3 bg-white shadow-sm flex items-center justify-between"
-                                    >
-                                        <div>
-                                            <div className="text-sm text-gray-500">
-                                                {formatTime(app.startTime)} ~ {formatTime(app.endTime)}
+                                {finalItems.map((app) => {
+                                    if (app.placeholder) {
+                                        // 테두리 제거 + visibility:hidden
+                                        return (
+                                            <div
+                                                key={app.key}
+                                                className="p-3 bg-white shadow-sm flex items-center justify-between"
+                                                style={{ border: "none" }}
+                                            >
+                                                <div style={{ visibility: "hidden" }}>
+                                                    <div className="text-sm text-gray-500">Placeholder</div>
+                                                    <div className="text-base font-medium text-gray-700">
+                                                        Placeholder
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    className="cursor-pointer px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                                    style={{ visibility: "hidden", border: "none" }}
+                                                >
+                                                    신청하기
+                                                </button>
                                             </div>
-                                            <div className="text-base font-medium text-gray-700">{app.name}</div>
-                                        </div>
-                                        <button
-                                            className="cursor-pointer px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                            onClick={() => alert("신청하기 버튼 클릭")}
-                                        >
-                                            신청하기
-                                        </button>
-                                    </div>
-                                ))}
+                                        );
+                                    } else {
+                                        // 실제 데이터
+                                        return (
+                                            <div
+                                                key={app.id}
+                                                className="border rounded-md p-3 bg-white shadow-sm flex items-center justify-between"
+                                            >
+                                                <div>
+                                                    <div className="text-sm text-gray-500">
+                                                        {formatTime(app.startTime)} ~ {formatTime(app.endTime)}
+                                                    </div>
+                                                    <div className="text-base font-medium text-gray-700">
+                                                        {app.name}
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    className="cursor-pointer px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                                    onClick={() => alert("신청하기 버튼 클릭")}
+                                                >
+                                                    신청하기
+                                                </button>
+                                            </div>
+                                        );
+                                    }
+                                })}
                             </div>
                             {totalPages > 1 && (
                                 <div className="flex items-center justify-center mt-4 space-x-2">
