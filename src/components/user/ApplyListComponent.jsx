@@ -1,4 +1,4 @@
-// pages/user/ApplyList.jsx
+// pages/user/ApplyListComponent.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import JoinItem from "./JoinItem.jsx"; // 파일 경로에 맞게 조정
