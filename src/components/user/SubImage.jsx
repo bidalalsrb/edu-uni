@@ -1,5 +1,6 @@
 // components/user/SubImage.jsx
 import React, { useState } from "react";
+import logo from "/public/bultiger.png";
 
 function SubImage() {
     const supportingImages = [
