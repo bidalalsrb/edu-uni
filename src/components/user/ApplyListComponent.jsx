@@ -1,8 +1,6 @@
 // pages/user/ApplyListComponent.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import JoinItem from "./JoinItem.jsx"; // 파일 경로에 맞게 조정
-import logo from "/public/bultiger.png";
 
 function ApplyListCom() {
     // 예시 데이터 (참석 내역 리스트)
@@ -53,26 +51,11 @@ function ApplyListCom() {
         },
     ];
 
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        navigate("/");
-    };
 
     return (
         <div className="bg-gray-100 min-h-screen">
             {/* 내부 컨테이너: JoinList와 동일한 디자인 */}
             <div className="max-w-4xl mx-auto min-h-screen bg-white shadow-md rounded-md">
-                {/* 헤더 */}
-                <header className="relative border-b p-4 flex items-center justify-center">
-                    <img src={logo} alt="logo" className="w-60 object-contain" />
-                    <button
-                        onClick={handleLogout}
-                        className="absolute right-4 top-4 px-4 py-2 bg-red-500 text-white font-semibold rounded"
-                    >
-                        로그아웃
-                    </button>
-                </header>
                 {/* 메인 컨텐츠: 참석 내역 리스트 */}
                 <main className="p-4 space-y-6">
                     <div className="p-4 bg-white rounded-md shadow-md">

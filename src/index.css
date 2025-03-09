@@ -1,2 +1,5 @@
 @import "tailwindcss";
 
+.container-with-scroll {
+    scrollbar-gutter: stable;
+}

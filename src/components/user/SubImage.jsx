@@ -1,11 +1,11 @@
-// components/user/ExpoAttendance.jsx
+// components/user/SubImage.jsx
 import React, { useState } from "react";
 
-function ExpoAttendance() {
+function SubImage() {
     const supportingImages = [
-        "https://picsum.photos/seed/support1/800/300",
-        "https://picsum.photos/seed/support2/800/300",
-        "https://picsum.photos/seed/support3/800/300"
+        "/public/bultiger.png",
+        "/public/bultiger1.png",
+        "/public/bultiger2.png"
     ];
 
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,4 +48,4 @@ function ExpoAttendance() {
     );
 }
 
-export default ExpoAttendance;
+export default SubImage;
