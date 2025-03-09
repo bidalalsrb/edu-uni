@@ -1,93 +1,48 @@
-import React from "react";
-import JoinItem from "../../pages/user/JoinItem.jsx";
+// components/user/ExpoAttendance.jsx
+import React, { useState } from "react";
 
 function ExpoAttendance() {
-    // 예시 데이터
-    const joinItems = [
-        {
-            id: 1,
-            title: "코엑스웨딩박람회",
-            accordion: true,
-            details: {
-                expoName: "코엑스웨딩박람회",
-                teacher: "남상민",
-                time: "2025-02-14",
-                attendance: "참석",
-            },
-        },
-        {
-            id: 2,
-            title: "인터컨, 웨딩",
-            accordion: true,
-            details: {
-                expoName: "인터컨, 웨딩",
-                teacher: "김하나",
-                time: "2025-03-20",
-                attendance: "참석",
-            },
-        },
-        {
-            id: 3,
-            title: "맞춤 신청3",
-            accordion: true,
-            details: {
-                expoName: "웨딩박람회3",
-                teacher: "이둘",
-                time: "2025-04-01",
-                attendance: "불참석",
-            },
-        },
-        {
-            id: 4,
-            title: "맞춤 신청4",
-            accordion: true,
-            details: {
-                expoName: "웨딩박람회4",
-                teacher: "박셋",
-                time: "2025-04-10",
-                attendance: "참석",
-            },
-        },
+    const supportingImages = [
+        "https://picsum.photos/seed/support1/800/300",
+        "https://picsum.photos/seed/support2/800/300",
+        "https://picsum.photos/seed/support3/800/300"
     ];
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const handlePrev = () => {
+        setCurrentIndex((prev) =>
+            prev === 0 ? supportingImages.length - 1 : prev - 1
+        );
+    };
+
+    const handleNext = () => {
+        setCurrentIndex((prev) =>
+            prev === supportingImages.length - 1 ? 0 : prev + 1
+        );
+    };
 
     return (
         <div className="p-4 bg-white rounded-md shadow-md">
             <h2 className="text-center text-2xl font-bold mb-4">박람회 참석 내역</h2>
-            {/* 게이지 & 점수 영역 */}
-            <div className="flex flex-col items-center mb-6">
-                <div className="relative">
-                    <svg className="w-40 h-40" viewBox="0 0 120 120">
-                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" strokeWidth="10" />
-                        <circle
-                            cx="60"
-                            cy="60"
-                            r="50"
-                            fill="none"
-                            stroke="#3b82f6"
-                            strokeWidth="10"
-                            strokeDasharray="314"
-                            strokeDashoffset="50"
-                            strokeLinecap="round"
-                        />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-3xl font-bold text-gray-900">90%</span>
-                    </div>
-                </div>
-                <div className="flex space-x-4 mt-2">
-                    <div className="text-sm text-gray-500">
-                        참석 <span className="font-semibold">4건</span>
-                    </div>
-                    <div className="text-sm text-red-500">
-                        미참석 <span className="font-semibold">1건</span>
-                    </div>
-                </div>
-            </div>
-            {/* 아코디언 목록 */}
-            <div className="mt-6 space-y-2">
-                {joinItems.map((item) => (
-                    <JoinItem key={item.id} item={item} />
-                ))}
+            <div className="relative">
+                <img
+                    src={supportingImages[currentIndex]}
+                    alt={`Supporting ${currentIndex + 1}`}
+                    className="w-full object-cover rounded-md"
+                />
+                <button
+                    onClick={handlePrev}
+                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-700 bg-opacity-50 text-white px-2 py-1 rounded"
+                >
+                    {"<"}
+                </button>
+                <button
+                    onClick={handleNext}
+                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-700 bg-opacity-50 text-white px-2 py-1 rounded"
+                >
+                    {">"}
+                </button>
             </div>
         </div>
     );
