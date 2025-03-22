@@ -1,4 +1,3 @@
-// routes/AppRoutes.jsx
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -7,6 +6,8 @@ import ApplyPage from "../pages/admin/ApplyPage";
 import ApplyList from "../pages/user/ApplyList.jsx";
 import BottomNavBar from "../components/BottomNavBar";
 import GlobalLayout from "../components/GlobalLayout";
+import AdminLayout from "../pages/admin/AdminLayout.jsx";
+import BatchCode from "../components/admin/Web/BatchCode.jsx";
 
 function AuthLayout() {
     return (
@@ -41,6 +42,10 @@ export default function AppRoutes() {
                     <Route path="joinList" element={<JoinList />} />
                     <Route path="mypage" element={<ApplyList />} />
                     <Route path="apply" element={<ApplyPage />} />
+                </Route>
+                {/* 관리자 라우트: AdminLayout을 부모로 설정하고, 배치코드는 자식 라우트로 중첩 */}
+                <Route path="index/admin" element={<AdminLayout />}>
+                    <Route path="batchcode" element={<BatchCode />} />
                 </Route>
             </Routes>
         </BrowserRouter>
