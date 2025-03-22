@@ -1,12 +1,10 @@
 // components/user/SubImage.jsx
-import React, { useState } from "react";
-import logo from "/public/bultiger.png";
+import React, {useState} from "react";
 
 function SubImage() {
     const supportingImages = [
-        "/public/bultiger.png",
-        "/public/bultiger1.png",
-        "/public/bultiger2.png"
+        "/public/tem.jpg",
+        "/public/batch.jpg"
     ];
 
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,7 +23,7 @@ function SubImage() {
 
     return (
         <div className="p-4 bg-white rounded-md shadow-md">
-            <h2 className="text-center text-2xl font-bold mb-4">박람회 참석 내역</h2>
+            <h2 className="text-center text-2xl font-bold mb-4"></h2>
             <div className="relative">
                 <img
                     src={supportingImages[currentIndex]}

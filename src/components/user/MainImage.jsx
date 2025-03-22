@@ -1,6 +1,6 @@
 // components/user/MainImage.jsx
 import React from "react";
-import logo from "/public/bultiger.png";
+import logo from "/public/per.png";
 
 function MainImage() {
     return (
@@ -9,8 +9,9 @@ function MainImage() {
             <img
                 src={logo}
                 alt="Main"
-                className="w-full object-cover rounded-md"
+                className="w-full object-cover rounded-md h- "
             />
+            <div className="ob"/>
         </div>
     );
 }

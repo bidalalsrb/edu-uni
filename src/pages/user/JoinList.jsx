@@ -8,8 +8,6 @@ function JoinList() {
         <main className="p-4 space-y-6">
             <MainImage />
             <SubImage />
-            <SubImage />
-            <SubImage />
         </main>
     );
 }
