@@ -69,7 +69,7 @@ export default function ApplyPage() {
     // Header 영역
     const Header = () => (
         <header className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-md shadow-md mb-6">
-            <h1 className="text-2xl font-bold text-center">박스 배치도 관리자 전용</h1>
+            <h1 className="text-2xl font-bold text-center">배치도</h1>
         </header>
     );
 

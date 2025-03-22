@@ -1,29 +1,30 @@
 import React from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 function AdminLayout() {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // 현재 경로에 "batchCode"가 포함되어 있으면 배치 관리 메뉴가 활성화되도록 처리
+    const isBatchCodeActive = location.pathname.includes("batchCode");
 
     return (
         <div className="flex min-h-screen bg-gray-100 text-gray-800">
             {/* 사이드바 영역 */}
             <aside className="w-64 bg-white border-r border-gray-200 p-4">
                 <div className="mb-8">
-                    <h1 className="text-xl font-bold tracking-wide text-gray-800">관리자 페이지</h1>
+                    <h1 className="text-xl font-bold tracking-wide text-gray-800">
+                        관리자 페이지
+                    </h1>
                 </div>
                 <nav className="space-y-1">
-                    {/* 여기서 상대 경로로 이동하면 부모인 /admin 경로가 유지됨 */}
                     <a
                         onClick={() => navigate("batchCode")}
-                        className="cursor-pointer block py-2 px-3 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                        className={`cursor-pointer block py-2 px-3 rounded-md text-sm font-medium text-gray-700  ${
+                            isBatchCodeActive ? "bg-blue-500 text-white border-blue-500" : ""
+                        }`}
                     >
-                        배치코드 관리
-                    </a>
-                    <a
-                        onClick={() => navigate("layoutManagement")}
-                        className="cursor-pointer block py-2 px-3 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
-                    >
-                        배치도 관리
+                        배치 관리
                     </a>
                 </nav>
             </aside>
