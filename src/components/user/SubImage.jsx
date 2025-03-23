@@ -23,7 +23,7 @@ function SubImage() {
 
     return (
         <div className="p-4 bg-white rounded-md shadow-md">
-            <h2 className="text-center text-2xl font-bold mb-4"></h2>
+            <h2 className="text-center text-2xl font-bold mb-4">캐러셀 이미지 자리</h2>
             <div className="relative">
                 <img
                     src={supportingImages[currentIndex]}

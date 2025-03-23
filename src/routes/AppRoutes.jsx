@@ -9,14 +9,6 @@ import GlobalLayout from "../components/GlobalLayout";
 import AdminLayout from "../pages/admin/AdminLayout.jsx";
 import BatchCode from "../components/admin/Web/BatchCode.jsx";
 
-function AuthLayout() {
-    return (
-        <GlobalLayout>
-            <Outlet />
-        </GlobalLayout>
-    );
-}
-
 function AppLayout() {
     return (
         <>
@@ -33,9 +25,11 @@ export default function AppRoutes() {
         <BrowserRouter>
             <Routes>
                 {/* 인증 관련 라우트 */}
-                <Route element={<AuthLayout />}>
+                <Route>
                     <Route path="/" element={<Login />} />
                     <Route path="register" element={<Register />} />
+                    <Route path="index/admin/login" element={<Login />} />
+                    <Route path="index/admin/register" element={<Register />} />
                 </Route>
                 {/* 로그인 후 페이지 */}
                 <Route element={<AppLayout />}>
@@ -45,6 +39,7 @@ export default function AppRoutes() {
                 </Route>
                 {/* 관리자 라우트: AdminLayout을 부모로 설정하고, 배치코드는 자식 라우트로 중첩 */}
                 <Route path="index/admin" element={<AdminLayout />}>
+                    <Route path="login" element={<Login />} />
                     <Route path="batchcode" element={<BatchCode />} />
                     {/* 기존 배치도 관리 관련 경로 삭제 */}
                 </Route>
