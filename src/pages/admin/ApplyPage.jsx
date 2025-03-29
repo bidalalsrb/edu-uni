@@ -100,12 +100,31 @@ export default function ApplyPage({ record }) {
         );
     };
 
-    // GridLayout 영역: record가 전달되면 해당 배치코드에 속한 박스만 필터링
+    // GridLayout 영역: record가 있으면 해당 배치코드, 없으면 회원가입 시 저장된 배치코드에 맞는 박스만 필터링
     const GridLayout = () => {
-        // record가 있으면, 해당 배치코드에 속한 박스만 표시
-        const filteredBoxes = record
-            ? boxes.filter((b) => b.batchCode === record.batchCode)
+        let normalizedBatchCode = "";
+        if (record && record.batchCode) {
+            normalizedBatchCode = record.batchCode.startsWith("#")
+                ? record.batchCode
+                : "#" + record.batchCode;
+        } else {
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            if (storedUser && storedUser.batchCode) {
+                normalizedBatchCode = storedUser.batchCode.startsWith("#")
+                    ? storedUser.batchCode
+                    : "#" + storedUser.batchCode;
+            }
+        }
+
+        const filteredBoxes = normalizedBatchCode
+            ? boxes.filter((b) => {
+                const normalizedBoxBatchCode = b.batchCode
+                    ? (b.batchCode.startsWith("#") ? b.batchCode : "#" + b.batchCode)
+                    : "";
+                return normalizedBoxBatchCode === normalizedBatchCode;
+            })
             : boxes;
+
         return (
             <div
                 className="gap-1 border p-2 bg-white rounded-md shadow"
@@ -140,8 +159,23 @@ export default function ApplyPage({ record }) {
 
     // Inventory 영역: 배치되지 않은 박스 목록 (전체 목록에서 record에 해당하는 배치코드와 일치하는 항목만 표시)
     const Inventory = () => {
-        const filteredUnplacedBoxes = record
-            ? boxes.filter((b) => !b.placed && b.batchCode === record.batchCode)
+        let normalizedBatchCode = "";
+        if (record && record.batchCode) {
+            normalizedBatchCode = record.batchCode.startsWith("#")
+                ? record.batchCode
+                : "#" + record.batchCode;
+        } else {
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            if (storedUser && storedUser.batchCode) {
+                normalizedBatchCode = storedUser.batchCode.startsWith("#")
+                    ? storedUser.batchCode
+                    : "#" + storedUser.batchCode;
+            }
+        }
+        const filteredUnplacedBoxes = normalizedBatchCode
+            ? boxes.filter((b) =>
+                !b.placed && ((b.batchCode ? (b.batchCode.startsWith("#") ? b.batchCode : "#" + b.batchCode) : "") === normalizedBatchCode)
+            )
             : boxes.filter((b) => !b.placed);
         return (
             <div className="bg-white p-4 border rounded-md shadow-md w-40">
@@ -202,7 +236,7 @@ export default function ApplyPage({ record }) {
             color,
             applications: [],
             // 박스 생성 시 해당 박스가 속할 배치코드를 저장 (record가 존재하면 해당 배치코드 할당)
-            batchCode: record ? record.batchCode : "",
+            batchCode: record && record.batchCode ? record.batchCode : "",
         };
         addBox(newBox);
         setIsCreateCompanyBoxOpen(false);
