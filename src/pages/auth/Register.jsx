@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import logo from "/public/bultiger.png";
-// Zod 스키마 정의
+
+// Zod 스키마 정의 (배치코드 필드 추가)
 const schema = z
     .object({
         id: z
@@ -23,6 +24,7 @@ const schema = z
             ),
         confirmPassword: z.string().nonempty("비밀번호 확인은 필수 입력입니다."),
         address: z.string().nonempty("주소는 필수 입력입니다."),
+        batchCode: z.string().nonempty("배치코드는 필수 입력입니다."),
     })
     .refine((data) => data.password === data.confirmPassword, {
         message: "비밀번호가 일치하지 않습니다.",
@@ -146,6 +148,18 @@ function Register() {
                 />
                 {errors.address && (
                     <p className="col-span-4 text-red-500 text-sm text-left">{errors.address.message}</p>
+                )}
+
+                {/* 배치코드 */}
+                <label className="col-span-4 text-gray-700 font-medium text-left">배치코드</label>
+                <input
+                    {...register("batchCode")}
+                    type="text"
+                    placeholder="배치코드 입력"
+                    className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.batchCode && (
+                    <p className="col-span-4 text-red-500 text-sm text-left">{errors.batchCode.message}</p>
                 )}
 
                 {/* 버튼 */}
