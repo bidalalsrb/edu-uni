@@ -8,6 +8,7 @@ import BottomNavBar from "../components/BottomNavBar";
 import GlobalLayout from "../components/GlobalLayout";
 import AdminLayout from "../pages/admin/AdminLayout.jsx";
 import BatchCode from "../components/admin/Web/BatchCode.jsx";
+import EventRegisterPage from "../pages/admin/EventRegisterPage.jsx";
 
 function AppLayout() {
     return (
@@ -40,6 +41,7 @@ export default function AppRoutes() {
                 {/* 관리자 라우트: AdminLayout을 부모로 설정하고, 배치코드는 자식 라우트로 중첩 */}
                 <Route path="index/admin" element={<AdminLayout />}>
                     <Route path="login" element={<Login />} />
+                    <Route path="event-register" element={<EventRegisterPage />} /> {/* 추가 */}
                     <Route path="batchcode" element={<BatchCode />} />
                     {/* 기존 배치도 관리 관련 경로 삭제 */}
                 </Route>

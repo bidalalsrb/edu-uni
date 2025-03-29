@@ -19,6 +19,14 @@ function AdminLayout() {
                 </div>
                 <nav className="space-y-1">
                     <a
+                        onClick={() => navigate("event-register")}
+                        className={`cursor-pointer block py-2 px-3 rounded-md text-sm font-medium text-gray-700 ${
+                            location.pathname.includes("event-register") ? "bg-blue-500 text-white" : ""
+                        }`}
+                    >
+                        행사 등록
+                    </a>
+                    <a
                         onClick={() => navigate("batchCode")}
                         className={`cursor-pointer block py-2 px-3 rounded-md text-sm font-medium text-gray-700  ${
                             isBatchCodeActive ? "bg-blue-500 text-white border-blue-500" : ""
@@ -26,6 +34,7 @@ function AdminLayout() {
                     >
                         배치 관리
                     </a>
+
                 </nav>
             </aside>
 
