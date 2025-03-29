@@ -59,13 +59,13 @@ export default function EventRegisterPage() {
         };
 
         // 기존 저장된 행사 목록 불러오기
-        const existingEvents = JSON.parse(localStorage.getItem('events')) || [];
+        const existingEvents = JSON.parse(localStorage.getItem("events")) || [];
         // 새 행사 추가
         const updatedEvents = [...existingEvents, finalEventData];
-        localStorage.setItem('events', JSON.stringify(updatedEvents));
+        localStorage.setItem("events", JSON.stringify(updatedEvents));
 
         // 등록 성공 시 관리자 페이지(배치코드)로 이동
-        navigate('/index/admin/batchCode');
+        navigate("/index/admin/batchCode");
     };
 
     return (
@@ -184,7 +184,7 @@ export default function EventRegisterPage() {
                                     mainImagePreview: file ? URL.createObjectURL(file) : null,
                                 }));
                             }}
-                            className="w-full px-3 py-2 border rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="w-full px-3 py-2 border rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
                         {eventData.mainImagePreview && (
                             <img
@@ -197,22 +197,24 @@ export default function EventRegisterPage() {
                     {/* 행사 서브 이미지 */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            행사 서브 이미지 (1장 이상 선택 가능)
+                            행사 서브 이미지 (여러 장 선택 가능)
                         </label>
                         <input
                             type="file"
                             accept="image/*"
                             multiple
                             onChange={(e) => {
-                                const files = Array.from(e.target.files);
-                                const previews = files.map((file) => URL.createObjectURL(file));
+                                const newFiles = Array.from(e.target.files);
+                                const newPreviews = newFiles.map((file) =>
+                                    URL.createObjectURL(file)
+                                );
                                 setEventData(prev => ({
                                     ...prev,
-                                    subImages: files,
-                                    subImagePreviews: previews,
+                                    subImages: [...(prev.subImages || []), ...newFiles],
+                                    subImagePreviews: [...(prev.subImagePreviews || []), ...newPreviews],
                                 }));
                             }}
-                            className="w-full px-3 py-2 border rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="w-full px-3 py-2 border rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
                         {eventData.subImagePreviews && eventData.subImagePreviews.length > 0 && (
                             <div className="mt-3 grid grid-cols-3 gap-2">
