@@ -13,7 +13,7 @@ import AlertNotification from "../../components/noti/AlertNotification.jsx";
 import useLayoutStore from "../../store/layoutStore";
 import sampleLayout from "../../data/sampleData"; // 임시 데이터를 불러옴
 
-export default function ApplyPage() {
+export default function ApplyPage({ record }) {
     const navigate = useNavigate();
     const {
         boxes,
@@ -73,46 +73,81 @@ export default function ApplyPage() {
         </header>
     );
 
-    // GridLayout 영역: 행/열에 따라 그리드 셀 생성
-    const GridLayout = () => (
-        <div
-            className="gap-1 border p-2 bg-white rounded-md shadow"
-            style={{
-                display: "grid",
-                gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`,
-                gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))`,
-            }}
-        >
-            {Array.from({ length: rowCount }).map((_, row) =>
-                Array.from({ length: colCount }).map((__, col) => {
-                    const placedBox = boxes.find(
-                        (b) => b.placed && b.row === row && b.col === col
-                    );
-                    return (
-                        <GridCell
-                            key={`${row}-${col}`}
-                            row={row}
-                            col={col}
-                            box={placedBox}
-                            onDropToGrid={onDropToGrid}
-                            onOpenEdit={openEditBoxModal}
-                            onOpenList={openListModal}
-                            onDelete={handleDeleteBox}
-                        />
-                    );
-                })
-            )}
-        </div>
-    );
+    // 선택된 행사(배치코드) 정보 표시 (record prop이 전달된 경우)
+    const InfoSection = () => {
+        if (!record) return null;
+        return (
+            <div className="mb-4 p-4 bg-gray-100 rounded-md">
+                <p className="text-sm">
+                    <strong>배치코드:</strong> {record.batchCode}
+                </p>
+                <p className="text-sm">
+                    <strong>행사명:</strong> {record.name}
+                </p>
+                <p className="text-sm">
+                    <strong>행사장소:</strong> {record.location}
+                </p>
+                <p className="text-sm">
+                    <strong>담당자:</strong> {record.person}
+                </p>
+                <p className="text-sm">
+                    <strong>시작/종료:</strong> {record.startDate} ~ {record.endDate}
+                </p>
+                <p className="text-sm">
+                    <strong>등록일:</strong> {record.registrationDate}
+                </p>
+            </div>
+        );
+    };
 
-    // Inventory 영역: 배치되지 않은 박스 목록
+    // GridLayout 영역: record가 전달되면 해당 배치코드에 속한 박스만 필터링
+    const GridLayout = () => {
+        // record가 있으면, 해당 배치코드에 속한 박스만 표시
+        const filteredBoxes = record
+            ? boxes.filter((b) => b.batchCode === record.batchCode)
+            : boxes;
+        return (
+            <div
+                className="gap-1 border p-2 bg-white rounded-md shadow"
+                style={{
+                    display: "grid",
+                    gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`,
+                    gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))`,
+                }}
+            >
+                {Array.from({ length: rowCount }).map((_, row) =>
+                    Array.from({ length: colCount }).map((__, col) => {
+                        const placedBox = filteredBoxes.find(
+                            (b) => b.placed && b.row === row && b.col === col
+                        );
+                        return (
+                            <GridCell
+                                key={`${row}-${col}`}
+                                row={row}
+                                col={col}
+                                box={placedBox}
+                                onDropToGrid={onDropToGrid}
+                                onOpenEdit={openEditBoxModal}
+                                onOpenList={openListModal}
+                                onDelete={handleDeleteBox}
+                            />
+                        );
+                    })
+                )}
+            </div>
+        );
+    };
+
+    // Inventory 영역: 배치되지 않은 박스 목록 (전체 목록에서 record에 해당하는 배치코드와 일치하는 항목만 표시)
     const Inventory = () => {
-        const unplacedBoxes = boxes.filter((b) => !b.placed);
+        const filteredUnplacedBoxes = record
+            ? boxes.filter((b) => !b.placed && b.batchCode === record.batchCode)
+            : boxes.filter((b) => !b.placed);
         return (
             <div className="bg-white p-4 border rounded-md shadow-md w-40">
                 <h3 className="font-semibold mb-2">인벤토리</h3>
-                {unplacedBoxes.length > 0 ? (
-                    unplacedBoxes.map((box) => (
+                {filteredUnplacedBoxes.length > 0 ? (
+                    filteredUnplacedBoxes.map((box) => (
                         <div key={box.id} className="mb-2">
                             <DraggableBox box={box} onDropToGrid={onDropToGrid} />
                         </div>
@@ -124,7 +159,7 @@ export default function ApplyPage() {
         );
     };
 
-    // ButtonBar 영역: 셀 추가/삭제, 기업 추가, 저장, joinList 이동 버튼
+    // ButtonBar 영역
     const ButtonBar = () => (
         <div className="flex flex-col space-y-4">
             <div className="flex space-x-4">
@@ -156,7 +191,7 @@ export default function ApplyPage() {
         </div>
     );
 
-    // 기업 박스 생성 함수
+    // 함수들
     const handleCreateCompanyBox = ({ companyName, color }) => {
         const newBox = {
             id: Date.now(),
@@ -166,26 +201,24 @@ export default function ApplyPage() {
             companyName,
             color,
             applications: [],
+            // 박스 생성 시 해당 박스가 속할 배치코드를 저장 (record가 존재하면 해당 배치코드 할당)
+            batchCode: record ? record.batchCode : "",
         };
         addBox(newBox);
         setIsCreateCompanyBoxOpen(false);
         setAlert({ message: "기업 추가가 완료되었습니다.", type: "success" });
     };
 
-    // 셀 추가/삭제 적용 함수
     const handleCellAdjustApply = (newRow, newCol) => {
         setRowCount(newRow);
         setColCount(newCol);
         setBoxes(
-            boxes.filter(
-                (box) => !box.placed || (box.row < newRow && box.col < newCol)
-            )
+            boxes.filter((box) => !box.placed || (box.row < newRow && box.col < newCol))
         );
         setIsCellAdjustModalOpen(false);
         setAlert({ message: "셀 추가/삭제가 적용되었습니다.", type: "success" });
     };
 
-    // 박스 드롭 핸들러
     const onDropToGrid = (boxId, row, col) => {
         const droppedBox = boxes.find((b) => b.id === boxId);
         const targetBox = boxes.find(
@@ -201,31 +234,29 @@ export default function ApplyPage() {
         }
     };
 
-    // 박스 수정 모달 관련 함수
     const openEditBoxModal = (box) => {
         setSelectedBoxForEdit(box);
         setIsEditBoxModalOpen(true);
     };
+
     const closeEditBoxModal = () => {
         setSelectedBoxForEdit(null);
         setIsEditBoxModalOpen(false);
     };
+
     const handleEditBoxSubmit = (updatedBox) => {
         updateBox(updatedBox);
         closeEditBoxModal();
     };
 
-    // 박스 삭제
     const handleDeleteBox = (boxId) => {
         removeBox(boxId);
     };
 
-    // joinList 페이지 이동
     const handleJoinListNavigate = () => {
         navigate("/joinList");
     };
 
-    // 레이아웃 저장 (로컬 스토리지에 저장)
     const handleSaveLayout = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         const layoutData = {
@@ -242,18 +273,18 @@ export default function ApplyPage() {
         }
     };
 
-    // 리스트 모달 관련 함수
     const openListModal = (box) => {
         setSelectedListBoxId(box.id);
         setIsListModalOpen(true);
     };
+
     const closeListModal = () => {
         setSelectedListBoxId(null);
         setIsListModalOpen(false);
     };
+
     const selectedBoxForList = boxes.find((box) => box.id === selectedListBoxId);
 
-    // 신청 완료 시 알림 호출
     const handleApplicationComplete = () => {
         setAlert({ message: "신청이 완료되었습니다.", type: "success" });
     };
@@ -262,6 +293,7 @@ export default function ApplyPage() {
         <DndProvider backend={HTML5Backend}>
             <div className="max-w-7xl mx-auto p-6">
                 <Header />
+                {record && <InfoSection />}
                 <GridLayout />
                 <div className="flex justify-between items-start mt-6">
                     <Inventory />
@@ -317,4 +349,3 @@ export default function ApplyPage() {
         </DndProvider>
     );
 }
-

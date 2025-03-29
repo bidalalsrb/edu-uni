@@ -1,40 +1,40 @@
-import React, {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import NewBatchCodeModal from "./Modal/NewBatchCodeModal"; // 신규 등록 모달
+// BatchCode.jsx
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import NewBatchCodeModal from "./Modal/NewBatchCodeModal";
 import EditBatchCodeModal from "./Modal/EditBatchCodeModal";
-import ApplyPage from "../../../pages/admin/ApplyPage"; // 배치도를 렌더링할 컴포넌트
+import ApplyPage from "../../../pages/admin/ApplyPage"; // 배치도 컴포넌트
 
 function BatchCode() {
-    // 임시 데이터
-    const initialData = [
-        {
-            batchCode: "#4155",
-            location: "산학관",
-            registeredDate: "2025-03-22",
-            person: "홍길동",
-        },
-        // 기타 초기 데이터...
-    ];
-    const [records, setRecords] = useState(initialData);
+    const [records, setRecords] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [editingRecord, setEditingRecord] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [searchOption, setSearchOption] = useState("전체");
     const [filteredRecords, setFilteredRecords] = useState(null);
     const [showLayout, setShowLayout] = useState(false);
+    const [selectedRecordForLayout, setSelectedRecordForLayout] = useState(null);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
         const eventRecords = storedEvents.map(event => ({
-            batchCode: event.title, // 행사명을 배치코드로 사용
-            location: event.location || "미정", // 장소 정보가 없으면 '미정'으로 설정
-            registeredDate: event.date,
-            person: event.person || "관리자", // 담당자 정보가 없으면 '관리자'로 설정
+            batchCode: event.batchCode,  // 배치코드 (행사 등록 시 발급)
+            name: event.name,            // 행사명
+            location: event.location,    // 행사장소
+            person: event.person,        // 담당자
+            startDate: event.startDate,  // 시작 날짜
+            endDate: event.endDate,      // 종료 날짜
+            registrationDate: event.registrationDate,  // 등록일 (행사 등록 시 오늘 날짜)
+            mainImage: event.mainImage,
+            mainImagePreview: event.mainImagePreview,
+            subImages: event.subImages,
+            subImagePreviews: event.subImagePreviews,
         }));
-        setRecords(prevRecords => [...prevRecords, ...eventRecords]);
+        setRecords(eventRecords);
     }, []);
+
     const addRecord = (record) => {
         const updatedRecords = [...records, record];
         setRecords(updatedRecords);
@@ -62,13 +62,14 @@ function BatchCode() {
             if (searchOption === "전체") {
                 return (
                     record.batchCode.includes(searchTerm) ||
+                    record.name.includes(searchTerm) ||
                     record.location.includes(searchTerm) ||
                     record.person.includes(searchTerm)
                 );
-            } else if (searchOption === "장소") {
+            } else if (searchOption === "행사명") {
+                return record.name.includes(searchTerm);
+            } else if (searchOption === "행사장소") {
                 return record.location.includes(searchTerm);
-            } else if (searchOption === "배치코드") {
-                return record.batchCode.includes(searchTerm);
             } else {
                 return true;
             }
@@ -92,8 +93,8 @@ function BatchCode() {
                                 className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option>전체</option>
-                                <option>배치코드</option>
-                                <option>장소</option>
+                                <option>행사명</option>
+                                <option>행사장소</option>
                             </select>
                             <input
                                 type="text"
@@ -130,8 +131,10 @@ function BatchCode() {
                                 <tr>
                                     <th className="px-4 py-3 font-semibold">번호</th>
                                     <th className="px-4 py-3 font-semibold">배치코드</th>
-                                    <th className="px-4 py-3 font-semibold">장소</th>
+                                    <th className="px-4 py-3 font-semibold">행사명</th>
+                                    <th className="px-4 py-3 font-semibold">행사장소</th>
                                     <th className="px-4 py-3 font-semibold">담당자</th>
+                                    <th className="px-4 py-3 font-semibold">시작/종료</th>
                                     <th className="px-4 py-3 font-semibold">등록일</th>
                                     <th className="px-4 py-3 font-semibold">관리</th>
                                     <th className="px-4 py-3 font-semibold">배치도</th>
@@ -140,7 +143,7 @@ function BatchCode() {
                                 <tbody>
                                 {displayRecords.length === 0 ? (
                                     <tr className="border-b border-gray-100">
-                                        <td className="px-4 py-3" colSpan="6">
+                                        <td className="px-4 py-3" colSpan="9">
                                             검색 결과가 없습니다.
                                         </td>
                                     </tr>
@@ -152,9 +155,13 @@ function BatchCode() {
                                         >
                                             <td className="px-4 py-3">{index + 1}</td>
                                             <td className="px-4 py-3">{record.batchCode}</td>
+                                            <td className="px-4 py-3">{record.name}</td>
                                             <td className="px-4 py-3">{record.location}</td>
                                             <td className="px-4 py-3">{record.person}</td>
-                                            <td className="px-4 py-3">{record.registeredDate}</td>
+                                            <td className="px-4 py-3">
+                                                {record.startDate} ~ {record.endDate}
+                                            </td>
+                                            <td className="px-4 py-3">{record.registrationDate}</td>
                                             <td className="px-4 py-3">
                                                 <button
                                                     onClick={() => setEditingRecord(record)}
@@ -165,7 +172,10 @@ function BatchCode() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <button
-                                                    onClick={() => setShowLayout(true)}
+                                                    onClick={() => {
+                                                        setSelectedRecordForLayout(record);
+                                                        setShowLayout(true);
+                                                    }}
                                                     className="text-sm text-green-500 hover:underline ml-2"
                                                 >
                                                     관리
@@ -186,21 +196,22 @@ function BatchCode() {
                     </section>
                 </>
             ) : (
-                // showLayout가 true이면 배치코드 목록 대신 배치도(ApplyPage)만 렌더링
                 <div>
                     <div className="flex justify-end mb-2">
                         <button
-                            onClick={() => setShowLayout(false)}
+                            onClick={() => {
+                                setShowLayout(false);
+                                setSelectedRecordForLayout(null);
+                            }}
                             className="px-4 py-2 bg-red-500 text-white rounded"
                         >
                             목록 보기
                         </button>
                     </div>
-                    {/*todo 배치도 정보 전달 */}
-                    <ApplyPage/>
+                    {/* ApplyPage에 선택된 레코드를 prop으로 전달 */}
+                    <ApplyPage record={selectedRecordForLayout} />
                 </div>
             )}
-
             {modalOpen && (
                 <NewBatchCodeModal
                     onClose={() => setModalOpen(false)}
