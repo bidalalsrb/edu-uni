@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import {Outlet, useNavigate, useLocation} from "react-router-dom";
 
 function AdminLayout() {
     const navigate = useNavigate();
@@ -32,15 +32,15 @@ function AdminLayout() {
                             isBatchCodeActive ? "bg-blue-500 text-white border-blue-500" : ""
                         }`}
                     >
-                        배치 관리
+                        배치 등록/조회
                     </a>
-
                 </nav>
             </aside>
 
             {/* 메인 컨텐츠 영역 */}
             <div className="flex-1 flex flex-col">
-                <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm">
+                <header
+                    className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm">
                     <div className="flex items-center space-x-2">
                         <span className="text-lg font-semibold text-gray-800">학교명</span>
                     </div>
@@ -50,7 +50,7 @@ function AdminLayout() {
                 </header>
                 {/* Outlet을 통해 자식 라우트 내용이 렌더링됨 */}
                 <div className="flex-1">
-                    <Outlet />
+                    <Outlet/>
                 </div>
             </div>
         </div>

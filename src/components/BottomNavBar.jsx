@@ -43,7 +43,7 @@ function BottomNavBar() {
                     }`}
                 >
                     <ClipboardDocumentListIcon className="w-6 h-6 mb-1" />
-                    <span className="text-xs">신청내역</span>
+                    <span className="text-xs">마이페이지</span>
                 </button>
             </div>
         </div>
