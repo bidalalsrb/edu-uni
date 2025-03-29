@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import NewBatchCodeModal from "./Modal/NewBatchCodeModal"; // 신규 등록 모달
 import EditBatchCodeModal from "./Modal/EditBatchCodeModal";
@@ -13,61 +13,28 @@ function BatchCode() {
             registeredDate: "2025-03-22",
             person: "홍길동",
         },
-        {
-            batchCode: "#8472",
-            location: "철산관",
-            registeredDate: "2025-03-22",
-            person: "홍길동",
-        },
-        {
-            batchCode: "#1234",
-            location: "산학관",
-            registeredDate: "2025-03-22",
-            person: "홍길동",
-        },
-        {
-            batchCode: "#5678",
-            location: "공학관",
-            registeredDate: "2025-03-22",
-            person: "홍길동",
-        },
-        {
-            batchCode: "#9012",
-            location: "인문관",
-            registeredDate: "2025-03-22",
-            person: "홍길동",
-        },
-        {
-            batchCode: "#3456",
-            location: "한민관",
-            registeredDate: "2025-03-22",
-            person: "홍길동",
-        },
-        {
-            batchCode: "#7890",
-            location: "장소 7",
-            registeredDate: "2025-03-22",
-            person: "홍길동",
-        },
-        {
-            batchCode: "#2345",
-            location: "장소 8",
-            registeredDate: "2025-03-22",
-            person: "홍길동",
-        },
+        // 기타 초기 데이터...
     ];
-
     const [records, setRecords] = useState(initialData);
     const [modalOpen, setModalOpen] = useState(false);
     const [editingRecord, setEditingRecord] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [searchOption, setSearchOption] = useState("전체");
     const [filteredRecords, setFilteredRecords] = useState(null);
-    // 배치도(ApplyPage) 표시 여부를 위한 상태 추가
     const [showLayout, setShowLayout] = useState(false);
 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
+        const eventRecords = storedEvents.map(event => ({
+            batchCode: event.title, // 행사명을 배치코드로 사용
+            location: event.location || "미정", // 장소 정보가 없으면 '미정'으로 설정
+            registeredDate: event.date,
+            person: event.person || "관리자", // 담당자 정보가 없으면 '관리자'로 설정
+        }));
+        setRecords(prevRecords => [...prevRecords, ...eventRecords]);
+    }, []);
     const addRecord = (record) => {
         const updatedRecords = [...records, record];
         setRecords(updatedRecords);

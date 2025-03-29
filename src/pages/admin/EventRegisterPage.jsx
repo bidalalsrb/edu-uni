@@ -41,7 +41,7 @@ export default function EventRegisterPage() {
         localStorage.setItem('events', JSON.stringify(updatedEvents));
 
         // 등록 성공 시 관리자 페이지로 이동
-        navigate('/index/admin');
+        navigate('/index/admin/batchCode');
     };
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-2xl mt-6">
