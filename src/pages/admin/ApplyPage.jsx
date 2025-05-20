@@ -12,8 +12,14 @@ import CellAdjustModal from "../../components/admin/ApplyPage/modal/CellAdjustMo
 import AlertNotification from "../../components/noti/AlertNotification.jsx";
 import useLayoutStore from "../../store/layoutStore";
 import sampleLayout from "../../data/sampleData"; // 임시 데이터를 불러옴
+import {useGetEventList, useGetLayoutList} from "./api/layout.js";
 
 export default function ApplyPage({ record }) {
+    const {data: layoutList} = useGetLayoutList();
+    const {data: eventList} = useGetEventList();
+
+
+
     const navigate = useNavigate();
     const {
         boxes,

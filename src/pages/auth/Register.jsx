@@ -1,10 +1,11 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {z} from "zod";
+import {useNavigate} from "react-router-dom";
+import {useRef, useState} from "react";
+import {EyeIcon, EyeSlashIcon} from "@heroicons/react/24/solid";
 import logo from "/public/bultiger.png";
+import {useCreateCodsMutation, useValidationCodeMutation} from "./api/auth.js";
 
 // Zod 스키마 정의 (배치코드 필드 추가)
 const schema = z
@@ -32,10 +33,54 @@ const schema = z
     });
 
 function Register() {
+    const {mutate: sendCodeApi} = useCreateCodsMutation();
+    const {mutate: validationCodeApi} = useValidationCodeMutation();
+    // const {createCodsMutation} = useCreateCodsMutation;
+    const phoneNum = useRef('');
+    const code = useRef('');
+    const userPhoneInfo = useRef({
+        phoneNum: '',
+        code: '',
+        uuid: '',
+    });
+    const sendCode = async () => {
+        if (phoneNum !== '') {
+
+            sendCodeApi({phoneNum: phoneNum.current.value}, {
+                onSuccess: (data) => {
+                    console.log('성공', data);
+                    userPhoneInfo.current.phoneNum = phoneNum.current.value;
+                },
+                onError: (error) => {
+                    console.error('실패', error);
+                },
+            });
+            console.log('test');
+        } else console.log('null;;')
+    }
+
+    const validationCode = () => {
+        if (userPhoneInfo.current.phoneNum !== '' && code.current.value !== '') {
+            userPhoneInfo.current.code = code.current.value;
+            console.log(userPhoneInfo.current,'ssssssssss')
+            validationCodeApi(userPhoneInfo.current, {
+                onSuccess: (data) => {
+                    console.log('성공', data);
+                    userPhoneInfo.current.phoneNum = phoneNum.current.value;
+                },
+                onError: (error) => {
+                    console.error('실패', error);
+                },
+            })
+        }
+    }
+
+    ///////////////////////////////
+
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm({
         resolver: zodResolver(schema),
     });
@@ -45,7 +90,7 @@ function Register() {
 
     const onSubmit = (data) => {
         // localStorage에 저장 시 confirmPassword 필드는 제거
-        const { confirmPassword, ...userData } = data;
+        const {confirmPassword, ...userData} = data;
         localStorage.setItem("user", JSON.stringify(userData));
         alert("회원가입 성공! 이제 로그인하세요.");
         navigate("/");
@@ -55,9 +100,25 @@ function Register() {
         <div className="flex flex-col items-center justify-center h-screen bg-white">
             {/* 로고 */}
             <div className="mb-6">
-                <img src={logo} alt="logo" className="w-60" />
+                <img src={logo} alt="logo" className="w-60"/>
             </div>
-
+            {/* 휴대폰인증 폼 */}
+            <form className="w-96 grid grid-cols-4 gap-2 border-8 border-blue-300">
+                <label className="col-span-4 text-gray-700 font-medium text-left">휴대폰 번호</label>
+                <input ref={phoneNum} type="text" placeholder="휴대폰 번호 입력('-'제외)"
+                       className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                <button type="button" className="col-span-4 bg-blue-500 text-white p-3 rounded-md font-semibold mt-3"
+                        onClick={sendCode}>
+                    인증번호 발송
+                </button>
+                <label className="col-span-4 text-gray-700 font-medium text-left">인증 번호</label>
+                <input ref={code} type="text" placeholder="인증번호 입력"
+                       className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                <button type="button" className="col-span-4 bg-blue-500 text-white p-3 rounded-md font-semibold mt-3"
+                        onClick={validationCode}>
+                    인증 확인
+                </button>
+            </form>
             {/* 회원가입 폼 */}
             <form onSubmit={handleSubmit(onSubmit)} className="w-96 grid grid-cols-4 gap-2">
                 {/* 이름 */}
@@ -99,9 +160,9 @@ function Register() {
                         className="absolute right-3 top-3 text-gray-500"
                     >
                         {showPassword ? (
-                            <EyeSlashIcon className="w-6 h-6" />
+                            <EyeSlashIcon className="w-6 h-6"/>
                         ) : (
-                            <EyeIcon className="w-6 h-6" />
+                            <EyeIcon className="w-6 h-6"/>
                         )}
                     </button>
                 </div>
@@ -128,9 +189,9 @@ function Register() {
                         className="absolute right-3 top-3 text-gray-500"
                     >
                         {showConfirmPassword ? (
-                            <EyeSlashIcon className="w-6 h-6" />
+                            <EyeSlashIcon className="w-6 h-6"/>
                         ) : (
-                            <EyeIcon className="w-6 h-6" />
+                            <EyeIcon className="w-6 h-6"/>
                         )}
                     </button>
                 </div>
