@@ -13,6 +13,8 @@ import AlertNotification from "../../components/noti/AlertNotification.jsx";
 import useLayoutStore from "../../store/layoutStore";
 import sampleLayout from "../../data/sampleData"; // 임시 데이터를 불러옴
 import {useGetEventList, useGetLayoutList} from "../admin/api/layout.js";
+import UserCompanyListModal from "../../components/admin/ApplyPage/modal/UserCompanyListModal.jsx";
+import UserGridCell from "../../components/admin/ApplyPage/UserGridCell.jsx";
 
 export default function UserApplyPage({record}) {
     const {data: layoutList} = useGetLayoutList();
@@ -74,7 +76,7 @@ export default function UserApplyPage({record}) {
     // Header 영역
     const Header = () => (
         <header className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-md shadow-md mb-6">
-            <h1 className="text-2xl font-bold text-center">배치도</h1>
+            <h1 className="text-2xl font-bold text-center">2025 공과계열 취업박람회 배치도</h1>
         </header>
     );
 
@@ -145,15 +147,13 @@ export default function UserApplyPage({record}) {
                             (b) => b.placed && b.row === row && b.col === col
                         );
                         return (
-                            <GridCell
+                            <UserGridCell
                                 key={`${row}-${col}`}
                                 row={row}
                                 col={col}
                                 box={placedBox}
                                 onDropToGrid={onDropToGrid}
-                                onOpenEdit={openEditBoxModal}
                                 onOpenList={openListModal}
-                                onDelete={handleDeleteBox}
                             />
                         );
                     })
@@ -294,7 +294,7 @@ export default function UserApplyPage({record}) {
                     />
                 )}
                 {isListModalOpen && selectedBoxForList && (
-                    <CompanyListModal
+                    <UserCompanyListModal
                         isOpen={isListModalOpen}
                         onClose={closeListModal}
                         companyBox={selectedBoxForList}
