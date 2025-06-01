@@ -2,6 +2,7 @@
 import React from "react";
 import { HomeIcon, PencilSquareIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/solid";
 import { useNavigate, useLocation } from "react-router-dom";
+import {useModal} from "../context/ModalContext.jsx";
 
 function BottomNavBar() {
     const navigate = useNavigate();
@@ -11,7 +12,8 @@ function BottomNavBar() {
     const isHomeActive = location.pathname === "/joinList";
     const isApplyActive = location.pathname === "/apply";
     const isApplyListActive = location.pathname === "/mypage";
-
+    const { isModalOpen } = useModal();
+    if (isModalOpen) return null;
     return (
         <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center">
             <div className="w-full max-w-4xl mx-auto bg-white border-t border-gray-200 shadow-sm flex justify-around items-center py-2">
