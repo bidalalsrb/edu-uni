@@ -7,6 +7,7 @@ function AdminLayout() {
 
     // 현재 경로에 "batchCode"가 포함되어 있으면 배치 관리 메뉴가 활성화되도록 처리
     const isBatchCodeActive = location.pathname.includes("batchCode");
+    const isExcelDown = location.pathname.includes("exceldown");
 
     return (
         <div className="flex min-h-screen bg-gray-100 text-gray-800">
@@ -33,6 +34,14 @@ function AdminLayout() {
                         }`}
                     >
                         배치 등록/조회
+                    </a>
+                    <a
+                        onClick={() => navigate("exceldown")}
+                        className={`cursor-pointer block py-2 px-3 rounded-md text-sm font-medium text-gray-700  ${
+                            isExcelDown ? "bg-blue-500 text-white border-blue-500" : ""
+                        }`}
+                    >
+                        엑셀다운로드
                     </a>
                 </nav>
             </aside>

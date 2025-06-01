@@ -97,144 +97,140 @@ function Register() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-white">
-            {/* 로고 */}
-            <div className="mb-6">
-                <img src={logo} alt="logo" className="w-60"/>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+            <div className="w-full max-w-[430px] bg-white rounded-2xl shadow-lg px-6 py-8 space-y-6">
+                <div className="flex justify-center mb-4">
+                    <img src={logo} alt="logo" className="w-40 h-auto object-contain" />
+                </div>
+
+                {/* 휴대폰 인증 폼 */}
+                <form className="space-y-3">
+                    <label className="text-gray-700 font-medium">휴대폰 번호</label>
+                    <div className="flex gap-2">
+                        <input
+                            ref={phoneNum}
+                            type="text"
+                            placeholder="휴대폰 번호 ('-'제외)"
+                            className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <button
+                            type="button"
+                            className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
+                            onClick={sendCode}
+                        >인증번호 발송</button>
+                    </div>
+                    <label className="text-gray-700 font-medium">인증 번호</label>
+                    <div className="flex gap-2">
+                        <input
+                            ref={code}
+                            type="text"
+                            placeholder="인증번호 입력"
+                            className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <button
+                            type="button"
+                            className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
+                            onClick={validationCode}
+                        >인증 확인</button>
+                    </div>
+                </form>
+
+                {/* 회원가입 폼 */}
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+                    <label className="text-gray-700 font-medium">이름</label>
+                    <input
+                        {...register("name")}
+                        type="text"
+                        placeholder="예) 김타이거"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                    {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+
+                    <label className="text-gray-700 font-medium">아이디</label>
+                    <input
+                        {...register("id")}
+                        type="text"
+                        placeholder="예) bultiger"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                    {errors.id && <p className="text-red-500 text-sm">{errors.id.message}</p>}
+
+                    <label className="text-gray-700 font-medium">비밀번호</label>
+                    <div className="relative">
+                        <input
+                            {...register("password")}
+                            type={showPassword ? "text" : "password"}
+                            placeholder="비밀번호"
+                            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-3 text-gray-500"
+                        >
+                            {showPassword
+                                ? <EyeSlashIcon className="w-6 h-6"/>
+                                : <EyeIcon className="w-6 h-6"/>
+                            }
+                        </button>
+                    </div>
+                    <p className="text-gray-500 text-sm">6~15자의 영문 숫자 특수문자를 포함해주세요</p>
+                    {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+
+                    <label className="text-gray-700 font-medium">비밀번호 확인</label>
+                    <div className="relative">
+                        <input
+                            {...register("confirmPassword")}
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="비밀번호 확인"
+                            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-3 text-gray-500"
+                        >
+                            {showConfirmPassword
+                                ? <EyeSlashIcon className="w-6 h-6"/>
+                                : <EyeIcon className="w-6 h-6"/>
+                            }
+                        </button>
+                    </div>
+                    {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
+
+                    <label className="text-gray-700 font-medium">주소</label>
+                    <input
+                        {...register("address")}
+                        type="text"
+                        placeholder="주소"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                    {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
+
+                    <label className="text-gray-700 font-medium">배치코드</label>
+                    <input
+                        {...register("batchCode")}
+                        type="text"
+                        placeholder="배치코드 입력"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                    {errors.batchCode && <p className="text-red-500 text-sm">{errors.batchCode.message}</p>}
+
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white p-3 rounded-lg font-semibold mt-3"
+                    >
+                        회원가입
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => navigate("/")}
+                        className="w-full bg-gray-200 text-gray-700 p-3 rounded-lg font-semibold"
+                    >
+                        로그인 화면으로
+                    </button>
+                </form>
             </div>
-            {/* 휴대폰인증 폼 */}
-            <form className="w-96 grid grid-cols-4 gap-2 border-8 border-blue-300">
-                <label className="col-span-4 text-gray-700 font-medium text-left">휴대폰 번호</label>
-                <input ref={phoneNum} type="text" placeholder="휴대폰 번호 입력('-'제외)"
-                       className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                <button type="button" className="col-span-4 bg-blue-500 text-white p-3 rounded-md font-semibold mt-3"
-                        onClick={sendCode}>
-                    인증번호 발송
-                </button>
-                <label className="col-span-4 text-gray-700 font-medium text-left">인증 번호</label>
-                <input ref={code} type="text" placeholder="인증번호 입력"
-                       className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                <button type="button" className="col-span-4 bg-blue-500 text-white p-3 rounded-md font-semibold mt-3"
-                        onClick={validationCode}>
-                    인증 확인
-                </button>
-            </form>
-            {/* 회원가입 폼 */}
-            <form onSubmit={handleSubmit(onSubmit)} className="w-96 grid grid-cols-4 gap-2">
-                {/* 이름 */}
-                <label className="col-span-4 text-gray-700 font-medium text-left">이름</label>
-                <input
-                    {...register("name")}
-                    type="text"
-                    placeholder="예) 김타이거"
-                    className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.name && (
-                    <p className="col-span-4 text-red-500 text-sm text-left">{errors.name.message}</p>
-                )}
-
-                {/* 아이디 */}
-                <label className="col-span-4 text-gray-700 font-medium text-left">아이디</label>
-                <input
-                    {...register("id")}
-                    type="text"
-                    placeholder="예) bultiger"
-                    className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.id && (
-                    <p className="col-span-4 text-red-500 text-sm text-left">{errors.id.message}</p>
-                )}
-
-                {/* 비밀번호 */}
-                <label className="col-span-4 text-gray-700 font-medium text-left">비밀번호</label>
-                <div className="col-span-4 relative">
-                    <input
-                        {...register("password")}
-                        type={showPassword ? "text" : "password"}
-                        placeholder="비밀번호"
-                        className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-gray-500"
-                    >
-                        {showPassword ? (
-                            <EyeSlashIcon className="w-6 h-6"/>
-                        ) : (
-                            <EyeIcon className="w-6 h-6"/>
-                        )}
-                    </button>
-                </div>
-                {/* 비밀번호 도움말 */}
-                <p className="col-span-4 text-gray-500 text-sm text-left">
-                    6~15자의 영문 숫자 특수문자를 포함해주세요
-                </p>
-                {errors.password && (
-                    <p className="col-span-4 text-red-500 text-sm text-left">{errors.password.message}</p>
-                )}
-
-                {/* 비밀번호 확인 */}
-                <label className="col-span-4 text-gray-700 font-medium text-left">비밀번호 확인</label>
-                <div className="col-span-4 relative">
-                    <input
-                        {...register("confirmPassword")}
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="비밀번호 확인"
-                        className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-3 text-gray-500"
-                    >
-                        {showConfirmPassword ? (
-                            <EyeSlashIcon className="w-6 h-6"/>
-                        ) : (
-                            <EyeIcon className="w-6 h-6"/>
-                        )}
-                    </button>
-                </div>
-                {errors.confirmPassword && (
-                    <p className="col-span-4 text-red-500 text-sm text-left">{errors.confirmPassword.message}</p>
-                )}
-
-                {/* 주소 */}
-                <label className="col-span-4 text-gray-700 font-medium text-left">주소</label>
-                <input
-                    {...register("address")}
-                    type="text"
-                    placeholder="주소"
-                    className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.address && (
-                    <p className="col-span-4 text-red-500 text-sm text-left">{errors.address.message}</p>
-                )}
-
-                {/* 배치코드 */}
-                <label className="col-span-4 text-gray-700 font-medium text-left">배치코드</label>
-                <input
-                    {...register("batchCode")}
-                    type="text"
-                    placeholder="배치코드 입력"
-                    className="col-span-4 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.batchCode && (
-                    <p className="col-span-4 text-red-500 text-sm text-left">{errors.batchCode.message}</p>
-                )}
-
-                {/* 버튼 */}
-                <button type="submit" className="col-span-4 bg-blue-500 text-white p-3 rounded-md font-semibold mt-3">
-                    회원가입
-                </button>
-                <button
-                    type="button"
-                    onClick={() => navigate("/")}
-                    className="col-span-4 bg-gray-200 text-gray-700 p-3 rounded-md font-semibold"
-                >
-                    로그인 화면으로
-                </button>
-            </form>
         </div>
     );
 }
