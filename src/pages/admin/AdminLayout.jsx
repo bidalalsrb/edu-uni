@@ -51,11 +51,17 @@ function AdminLayout() {
                 <header
                     className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm">
                     <div className="flex items-center space-x-2">
-                        <span className="text-lg font-semibold text-gray-800">학교명</span>
+                        <span className="text-lg font-semibold text-gray-800">과학기술대학교</span>
                     </div>
                     <div className="flex items-center space-x-4">
-                        <span className="text-sm text-gray-700">홍길동</span>
+                        <span className="text-sm text-gray-700">남상민</span>
+                        <button type="button"
+                                className="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg 
+                                hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600
+                                 dark:hover:bg-blue-700 dark:focus:ring-blue-800">로그아웃
+                        </button>
                     </div>
+
                 </header>
                 {/* Outlet을 통해 자식 라우트 내용이 렌더링됨 */}
                 <div className="flex-1">

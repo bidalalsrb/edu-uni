@@ -1,207 +1,139 @@
-// BatchCode.jsx
-import React, {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import NewBatchCodeModal from "./Modal/NewBatchCodeModal";
-import EditBatchCodeModal from "./Modal/EditBatchCodeModal";
-import ApplyPage from "../../../pages/admin/ApplyPage"; // 배치도 컴포넌트
+import React, {useState} from "react";
+
+export const sampleEvents = [
+    {
+        name: "2025 상반기 취업박람회",
+        location: "코엑스 A홀",
+        person: "홍길동",
+        endDate: "2025-06-10",
+    },
+    {
+        name: "AI IT 채용박람회",
+        location: "서울시청 1층",
+        person: "김지원",
+        endDate: "2025-07-01",
+    },
+    {
+        name: "청년드림 잡페어",
+        location: "부산 벡스코",
+        person: "이수현",
+        endDate: "2025-06-25",
+    },
+    {
+        name: "산학연계 취업박람회",
+        location: "대구 엑스코",
+        person: "최민재",
+        endDate: "2025-08-12",
+    },
+];
 
 function ExcelDown() {
-    const [records, setRecords] = useState([]);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editingRecord, setEditingRecord] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [searchOption, setSearchOption] = useState("전체");
-    const [filteredRecords, setFilteredRecords] = useState(null);
-    const [showLayout, setShowLayout] = useState(false);
-    const [selectedRecordForLayout, setSelectedRecordForLayout] = useState(null);
+    const [searchOption, setSearchOption] = useState("행사명"); // 기본값 "행사명"
+    const [filteredRecords, setFilteredRecords] = useState(sampleEvents);
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
-        const eventRecords = storedEvents.map(event => ({
-            batchCode: event.batchCode,  // 배치코드 (행사 등록 시 발급)
-            name: event.name,            // 행사명
-            location: event.location,    // 행사장소
-            person: event.person,        // 담당자
-            startDate: event.startDate,  // 시작 날짜
-            endDate: event.endDate,      // 종료 날짜
-            registrationDate: event.registrationDate,  // 등록일 (행사 등록 시 오늘 날짜)
-            mainImage: event.mainImage,
-            mainImagePreview: event.mainImagePreview,
-            subImages: event.subImages,
-            subImagePreviews: event.subImagePreviews,
-        }));
-        setRecords(eventRecords);
-    }, []);
-
-    const addRecord = (record) => {
-        const updatedRecords = [...records, record];
-        setRecords(updatedRecords);
-        if (searchTerm) {
-            handleSearch();
-        }
-    };
-
-    const updateRecord = (updatedRecord) => {
-        const updatedRecords = records.map((rec) =>
-            rec.batchCode === updatedRecord.batchCode ? updatedRecord : rec
-        );
-        setRecords(updatedRecords);
-        if (searchTerm) {
-            handleSearch();
-        }
-    };
-
+    // 검색 버튼 클릭시
     const handleSearch = () => {
         if (searchTerm.trim() === "") {
-            setFilteredRecords(null);
+            setFilteredRecords(sampleEvents);
             return;
         }
-        const filtered = records.filter((record) => {
-            if (searchOption === "전체") {
-                return (
-                    record.batchCode.includes(searchTerm) ||
-                    record.name.includes(searchTerm) ||
-                    record.location.includes(searchTerm) ||
-                    record.person.includes(searchTerm)
-                );
-            } else if (searchOption === "행사명") {
+        const filtered = sampleEvents.filter((record) => {
+            if (searchOption === "행사명") {
                 return record.name.includes(searchTerm);
-            } else if (searchOption === "행사장소") {
-                return record.location.includes(searchTerm);
+            } else if (searchOption === "담당자") {
+                return record.person.includes(searchTerm);
             } else {
                 return true;
             }
         });
         setFilteredRecords(filtered);
-
     };
-    const handleExcelDown = () => {
-        alert('엑셀다운')
-    }
-    const displayRecords = filteredRecords !== null ? filteredRecords : records;
 
+    // 엔터 키로도 검색 가능
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+    };
 
     return (
         <main className="p-6 flex flex-col gap-6">
-            {!showLayout ? (
-                <>
-                    {/* 검색/필터 섹션 */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">엑셀다운로드</h2>
-                        <div className="flex items-center space-x-2">
-                            <select
-                                value={searchOption}
-                                onChange={(e) => setSearchOption(e.target.value)}
-                                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option>전체</option>
-                                <option>행사명</option>
-                                <option>행사장소</option>
-                            </select>
-                            <input
-                                type="text"
-                                placeholder="검색어를 입력하세요"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="border border-gray-300 rounded-md px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <button
-                                onClick={handleSearch}
-                                className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                검색
-                            </button>
-                        </div>
-                    </section>
-
-                    {/* 테이블 섹션 */}
-                    <section className="bg-white rounded-xl shadow-sm">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                            <h3 className="text-lg font-semibold text-gray-800">행사 목록</h3>
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={handleExcelDown}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600"
-                                >
-                                    엑셀 다운로드
-                                </button>
-                            </div>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full text-left text-sm text-gray-600">
-                                <thead className="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th className="px-4 py-3 font-semibold">번호</th>
-                                    <th className="px-4 py-3 font-semibold">행사명</th>
-                                    <th className="px-4 py-3 font-semibold">행사명</th>
-                                    <th className="px-4 py-3 font-semibold">관리자</th>
-                                    <th className="px-4 py-3 font-semibold">날짜</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {displayRecords.length === 0 ? (
-                                    <tr className="border-b border-gray-100">
-                                        <td className="px-4 py-3" colSpan="9">
-                                            검색 결과가 없습니다.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    displayRecords.map((record, index) => (
-                                        <tr
-                                            key={index}
-                                            className="border-b border-gray-100 hover:bg-gray-50"
-                                        >
-                                            <td className="px-4 py-3">{index + 1}</td>
-                                            <td className="px-4 py-3">{record.batchCode}</td>
-                                            <td className="px-4 py-3">{record.name}</td>
-                                            <td className="px-4 py-3">{record.location}</td>
-                                            <td className="px-4 py-3">{record.endDate}</td>
-                                        </tr>
-                                    ))
-                                )}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="p-4 border-t border-gray-200 flex justify-between items-center">
-                            <div className="text-sm text-gray-500">총 {displayRecords.length}건</div>
-                            <div className="space-x-1">
-                                {/* 페이지네이션 버튼들 (필요시 추가) */}
-                            </div>
-                        </div>
-                    </section>
-                </>
-            ) : (
-                <div>
-                    <div className="flex justify-end mb-2">
-                        <button
-                            onClick={() => {
-                                setShowLayout(false);
-                                setSelectedRecordForLayout(null);
-                            }}
-                            className="px-4 py-2 bg-red-500 text-white rounded"
-                        >
-                            목록 보기
-                        </button>
-                    </div>
-                    {/* ApplyPage에 선택된 레코드를 prop으로 전달 */}
-                    <ApplyPage record={selectedRecordForLayout}/>
+            {/* 검색/필터 섹션 */}
+            <section>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">엑셀 다운로드</h2>
+                <div className="flex items-center space-x-2">
+                    <select
+                        value={searchOption}
+                        onChange={(e) => setSearchOption(e.target.value)}
+                        className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="행사명">행사명</option>
+                        <option value="담당자">담당자</option>
+                    </select>
+                    <input
+                        type="text"
+                        placeholder={`${searchOption}으로 검색`}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="border border-gray-300 rounded-md px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        onClick={handleSearch}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        검색
+                    </button>
                 </div>
-            )}
-            {modalOpen && (
-                <NewBatchCodeModal
-                    onClose={() => setModalOpen(false)}
-                    onSave={addRecord}
-                />
-            )}
-            {editingRecord && (
-                <EditBatchCodeModal
-                    record={editingRecord}
-                    onClose={() => setEditingRecord(null)}
-                    onUpdate={updateRecord}
-                />
-            )}
+            </section>
+
+            {/* 테이블 섹션 */}
+            <section className="bg-white rounded-xl shadow-sm">
+                <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 className="text-lg font-semibold text-gray-800">행사 목록</h3>
+                    <button type="button"
+                            className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+                             focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">엑셀 다운로드
+                    </button>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full text-left text-sm text-gray-600">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th className="px-4 py-3 font-semibold">번호</th>
+                            <th className="px-4 py-3 font-semibold">행사명</th>
+                            <th className="px-4 py-3 font-semibold">담당자</th>
+                            <th className="px-4 py-3 font-semibold">날짜</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {filteredRecords.length === 0 ? (
+                            <tr className="border-b border-gray-100">
+                                <td className="px-4 py-3" colSpan="4">
+                                    검색 결과가 없습니다.
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredRecords.map((record, index) => (
+                                <tr
+                                    key={index}
+                                    className="border-b border-gray-100 hover:bg-gray-50"
+                                >
+                                    <td className="px-4 py-3">{index + 1}</td>
+                                    <td className="px-4 py-3">{record.name}</td>
+                                    <td className="px-4 py-3">{record.person}</td>
+                                    <td className="px-4 py-3">{record.endDate}</td>
+                                </tr>
+                            ))
+                        )}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+                    <div className="text-sm text-gray-500">총 {filteredRecords.length}건</div>
+                </div>
+            </section>
         </main>
     );
 }
