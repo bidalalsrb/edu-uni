@@ -1,5 +1,4 @@
 import {useMutation, useQuery} from "@tanstack/react-query";
-import api from "../../../lib/app.js";
 
 export function useDownloadImageToSchoolCd(schoolCd) {
     return useQuery({

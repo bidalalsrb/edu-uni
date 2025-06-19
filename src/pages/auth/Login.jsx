@@ -1,21 +1,35 @@
 import { useNavigate } from "react-router-dom";
 import logo from "/public/bultiger.png";
-import { useSignInMutation } from "./api/auth.js";
-import { useRef } from "react";
+import { useState } from "react";
+import api from "../../util/api/api.js";
 
 function Login() {
     const navigate = useNavigate();
-    const { mutate } = useSignInMutation();
-    const userId = useRef('');
-    const userPassword = useRef('');
-    const userLoginInfo = useRef({ userId: '', password: '' });
 
-    const clickLoginBtn = (e) => {
+    const [loginData, setLoginData] = useState({
+        userId: "",
+        password: "",
+    });
+
+    // input 핸들러 (name 기반)
+    const handleChange = (e) => {
+        setLoginData({ ...loginData, [e.target.name]: e.target.value });
+    };
+
+    // submit 핸들러
+    const submitForm = async (e) => {
         e.preventDefault();
-        userLoginInfo.current.userId = userId.current.value;
-        userLoginInfo.current.password = userPassword.current.value;
-        mutate(userLoginInfo.current);
-        navigate("/joinlist");
+        try {
+            console.log(loginData);
+            const response = await api.post("/api/auth/sign-in", loginData);
+            const accessToken = response.data.data.accessToken;
+            localStorage.setItem("ACCESS_TOKEN", accessToken);
+            alert("로그인 성공");
+            // navigate('/conversation/list');
+        } catch (error) {
+            console.error(error);
+            alert("로그인 실패");
+        }
     };
 
     return (
@@ -25,19 +39,23 @@ function Login() {
                 <div className="flex justify-center mb-4">
                     <img src={logo} alt="logo" className="w-40 h-auto object-contain" />
                 </div>
-                <form className="space-y-5" onSubmit={clickLoginBtn}>
+                <form className="space-y-5" onSubmit={submitForm}>
                     <input
-                        ref={userId}
                         type="text"
+                        name="userId"
                         placeholder="아이디"
                         className="w-full border border-gray-300 rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        onChange={handleChange}
+                        value={loginData.userId}
                         autoComplete="username"
                     />
                     <input
-                        ref={userPassword}
                         type="password"
+                        name="password"
                         placeholder="비밀번호"
                         className="w-full border border-gray-300 rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        onChange={handleChange}
+                        value={loginData.password}
                         autoComplete="current-password"
                     />
                     <button
@@ -62,4 +80,5 @@ function Login() {
         </div>
     );
 }
+
 export default Login;

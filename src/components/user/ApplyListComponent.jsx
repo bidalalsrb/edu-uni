@@ -1,9 +1,8 @@
-// pages/user/ApplyListComponent.jsx
 import React from "react";
-import JoinItem from "./JoinItem.jsx"; // 파일 경로에 맞게 조정
+import JoinItem from "./JoinItem.jsx";
 
 function ApplyListCom() {
-    // 예시 데이터 (참석 내역 리스트)
+    // 예시 데이터
     const joinItems = [
         {
             id: 1,
@@ -24,7 +23,7 @@ function ApplyListCom() {
                 expoName: "인터컨, 웨딩",
                 teacher: "김하나",
                 time: "2025-03-20",
-                attendance: "참석",
+                attendance: "불참석",
             },
         },
         {
@@ -35,7 +34,7 @@ function ApplyListCom() {
                 expoName: "웨딩박람회3",
                 teacher: "이둘",
                 time: "2025-04-01",
-                attendance: "불참석",
+                attendance: "대기중",
             },
         },
         {
@@ -51,12 +50,20 @@ function ApplyListCom() {
         },
     ];
 
+    // 데이터로 참석/미참석/대기중 카운트
+    const attendCount = joinItems.filter(item => item.details.attendance === "참석").length;
+    const absentCount = joinItems.filter(item => item.details.attendance === "불참석").length;
+    const pendingCount = joinItems.filter(item => item.details.attendance === "대기중").length;
+
+    // 참석율 계산 (참석 + 불참석만 대상으로)
+    const totalCount = attendCount + absentCount;
+    const attendanceRate = totalCount > 0 ? Math.round((attendCount / totalCount) * 100) : 0;
+    const gaugeLength = 314; // 원 둘레
+    const offset = gaugeLength - (gaugeLength * attendanceRate / 100);
 
     return (
         <div className="bg-gray-100 min-h-screen">
-            {/* 내부 컨테이너: JoinList와 동일한 디자인 */}
             <div className="max-w-4xl mx-auto min-h-screen bg-white shadow-md rounded-md">
-                {/* 메인 컨텐츠: 참석 내역 리스트 */}
                 <main className="p-4 space-y-6">
                     <div className="p-4 bg-white rounded-md shadow-md">
                         <h2 className="text-center text-2xl font-bold mb-4">박람회 참석 내역</h2>
@@ -72,21 +79,26 @@ function ApplyListCom() {
                                         fill="none"
                                         stroke="#3b82f6"
                                         strokeWidth="10"
-                                        strokeDasharray="314"
-                                        strokeDashoffset="50"
+                                        strokeDasharray={gaugeLength}
+                                        strokeDashoffset={offset}
                                         strokeLinecap="round"
+                                        style={{ transition: "stroke-dashoffset 0.5s" }}
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-3xl font-bold text-gray-900">90%</span>
+                                    <span className="text-3xl font-bold text-gray-900">{attendanceRate}%</span>
+                                    <span className="text-xs text-gray-400 mt-1">참석율</span>
                                 </div>
                             </div>
                             <div className="flex space-x-4 mt-2">
-                                <div className="text-sm text-gray-500">
-                                    참석 <span className="font-semibold">4건</span>
+                                <div className="text-sm text-blue-500">
+                                    참석 <span className="font-semibold">{attendCount}건</span>
                                 </div>
                                 <div className="text-sm text-red-500">
-                                    미참석 <span className="font-semibold">1건</span>
+                                    불참석 <span className="font-semibold">{absentCount}건</span>
+                                </div>
+                                <div className="text-sm text-green-600">
+                                    대기중 <span className="font-semibold">{pendingCount}건</span>
                                 </div>
                             </div>
                         </div>

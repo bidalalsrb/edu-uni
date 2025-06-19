@@ -1,13 +1,12 @@
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {z} from "zod";
-import {useNavigate} from "react-router-dom";
-import {useRef, useState} from "react";
-import {EyeIcon, EyeSlashIcon} from "@heroicons/react/24/solid";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import logo from "/public/bultiger.png";
-import {useCreateCodsMutation, useValidationCodeMutation} from "./api/auth.js";
 
-// Zod 스키마 정의 (배치코드 필드 추가)
+// Zod 스키마 정의 (학번, 학교코드, 학과, 성별 등 추가)
 const schema = z
     .object({
         id: z
@@ -25,7 +24,12 @@ const schema = z
             ),
         confirmPassword: z.string().nonempty("비밀번호 확인은 필수 입력입니다."),
         address: z.string().nonempty("주소는 필수 입력입니다."),
-        batchCode: z.string().nonempty("배치코드는 필수 입력입니다."),
+        batchCode: z.string().nonempty("학교코드는 필수 입력입니다."),
+        department: z.string().nonempty("학과는 필수 입력입니다."),
+        studentNumber: z.string().nonempty("학번은 필수 입력입니다."),
+        gender: z.string().nonempty("성별은 필수 입력입니다."),
+        phone: z.string().nonempty("휴대폰 번호는 필수 입력입니다."),
+        verificationCode: z.string().nonempty("인증 번호는 필수 입력입니다."),
     })
     .refine((data) => data.password === data.confirmPassword, {
         message: "비밀번호가 일치하지 않습니다.",
@@ -33,54 +37,10 @@ const schema = z
     });
 
 function Register() {
-    const {mutate: sendCodeApi} = useCreateCodsMutation();
-    const {mutate: validationCodeApi} = useValidationCodeMutation();
-    // const {createCodsMutation} = useCreateCodsMutation;
-    const phoneNum = useRef('');
-    const code = useRef('');
-    const userPhoneInfo = useRef({
-        phoneNum: '',
-        code: '',
-        uuid: '',
-    });
-    const sendCode = async () => {
-        if (phoneNum !== '') {
-
-            sendCodeApi({phoneNum: phoneNum.current.value}, {
-                onSuccess: (data) => {
-                    console.log('성공', data);
-                    userPhoneInfo.current.phoneNum = phoneNum.current.value;
-                },
-                onError: (error) => {
-                    console.error('실패', error);
-                },
-            });
-            console.log('test');
-        } else console.log('null;;')
-    }
-
-    const validationCode = () => {
-        if (userPhoneInfo.current.phoneNum !== '' && code.current.value !== '') {
-            userPhoneInfo.current.code = code.current.value;
-            console.log(userPhoneInfo.current,'ssssssssss')
-            validationCodeApi(userPhoneInfo.current, {
-                onSuccess: (data) => {
-                    console.log('성공', data);
-                    userPhoneInfo.current.phoneNum = phoneNum.current.value;
-                },
-                onError: (error) => {
-                    console.error('실패', error);
-                },
-            })
-        }
-    }
-
-    ///////////////////////////////
-
     const {
         register,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
     } = useForm({
         resolver: zodResolver(schema),
     });
@@ -90,7 +50,7 @@ function Register() {
 
     const onSubmit = (data) => {
         // localStorage에 저장 시 confirmPassword 필드는 제거
-        const {confirmPassword, ...userData} = data;
+        const { confirmPassword, ...userData } = data;
         localStorage.setItem("user", JSON.stringify(userData));
         alert("회원가입 성공! 이제 로그인하세요.");
         navigate("/");
@@ -103,40 +63,8 @@ function Register() {
                     <img src={logo} alt="logo" className="w-40 h-auto object-contain" />
                 </div>
 
-                {/* 휴대폰 인증 폼 */}
-                <form className="space-y-3">
-                    <label className="text-gray-700 font-medium">휴대폰 번호</label>
-                    <div className="flex gap-2">
-                        <input
-                            ref={phoneNum}
-                            type="text"
-                            placeholder="휴대폰 번호 ('-'제외)"
-                            className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
-                        <button
-                            type="button"
-                            className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
-                            onClick={sendCode}
-                        >인증번호 발송</button>
-                    </div>
-                    <label className="text-gray-700 font-medium">인증 번호</label>
-                    <div className="flex gap-2">
-                        <input
-                            ref={code}
-                            type="text"
-                            placeholder="인증번호 입력"
-                            className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
-                        <button
-                            type="button"
-                            className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
-                            onClick={validationCode}
-                        >인증 확인</button>
-                    </div>
-                </form>
-
-                {/* 회원가입 폼 */}
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+                    {/* 이름 */}
                     <label className="text-gray-700 font-medium">이름</label>
                     <input
                         {...register("name")}
@@ -146,6 +74,7 @@ function Register() {
                     />
                     {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
 
+                    {/* 아이디 */}
                     <label className="text-gray-700 font-medium">아이디</label>
                     <input
                         {...register("id")}
@@ -155,6 +84,7 @@ function Register() {
                     />
                     {errors.id && <p className="text-red-500 text-sm">{errors.id.message}</p>}
 
+                    {/* 비밀번호 */}
                     <label className="text-gray-700 font-medium">비밀번호</label>
                     <div className="relative">
                         <input
@@ -167,16 +97,18 @@ function Register() {
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-3 text-gray-500"
+                            tabIndex={-1}
                         >
                             {showPassword
-                                ? <EyeSlashIcon className="w-6 h-6"/>
-                                : <EyeIcon className="w-6 h-6"/>
+                                ? <EyeSlashIcon className="w-6 h-6" />
+                                : <EyeIcon className="w-6 h-6" />
                             }
                         </button>
                     </div>
                     <p className="text-gray-500 text-sm">6~15자의 영문 숫자 특수문자를 포함해주세요</p>
                     {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 
+                    {/* 비밀번호 확인 */}
                     <label className="text-gray-700 font-medium">비밀번호 확인</label>
                     <div className="relative">
                         <input
@@ -189,32 +121,99 @@ function Register() {
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             className="absolute right-3 top-3 text-gray-500"
+                            tabIndex={-1}
                         >
                             {showConfirmPassword
-                                ? <EyeSlashIcon className="w-6 h-6"/>
-                                : <EyeIcon className="w-6 h-6"/>
+                                ? <EyeSlashIcon className="w-6 h-6" />
+                                : <EyeIcon className="w-6 h-6" />
                             }
                         </button>
                     </div>
                     {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
 
+                    {/* 주소 */}
                     <label className="text-gray-700 font-medium">주소</label>
                     <input
                         {...register("address")}
                         type="text"
-                        placeholder="주소"
+                        placeholder="주소 입력"
                         className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                     {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
 
-                    <label className="text-gray-700 font-medium">배치코드</label>
+                    {/* 학교코드 */}
+                    <label className="text-gray-700 font-medium">학교코드</label>
                     <input
                         {...register("batchCode")}
                         type="text"
-                        placeholder="배치코드 입력"
+                        placeholder="학교코드 입력"
                         className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                     {errors.batchCode && <p className="text-red-500 text-sm">{errors.batchCode.message}</p>}
+
+                    {/* 학과 */}
+                    <label className="text-gray-700 font-medium">학과</label>
+                    <input
+                        {...register("department")}
+                        type="text"
+                        placeholder="학과 입력"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                    {errors.department && <p className="text-red-500 text-sm">{errors.department.message}</p>}
+
+                    {/* 학번 */}
+                    <label className="text-gray-700 font-medium">학번</label>
+                    <input
+                        {...register("studentNumber")}
+                        type="text"
+                        placeholder="학번 입력"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                    {errors.studentNumber && <p className="text-red-500 text-sm">{errors.studentNumber.message}</p>}
+
+                    {/* 성별 */}
+                    <label className="text-gray-700 font-medium">성별</label>
+                    <input
+                        {...register("gender")}
+                        type="text"
+                        placeholder="성별 입력"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                    {errors.gender && <p className="text-red-500 text-sm">{errors.gender.message}</p>}
+
+                    {/* 휴대폰 번호 */}
+                    <label className="text-gray-700 font-medium">휴대폰 번호</label>
+                    <div className="flex gap-2">
+                        <input
+                            {...register("phone")}
+                            type="text"
+                            placeholder="휴대폰 번호 ('-'제외)"
+                            className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <button
+                            type="button"
+                            className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
+                            // onClick={onSendCode} // 실제 인증번호 발송 기능은 원할 때 추가
+                        >인증번호 발송</button>
+                    </div>
+                    {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
+
+                    {/* 인증 번호 */}
+                    <label className="text-gray-700 font-medium">인증 번호</label>
+                    <div className="flex gap-2">
+                        <input
+                            {...register("verificationCode")}
+                            type="text"
+                            placeholder="인증번호 입력"
+                            className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <button
+                            type="button"
+                            className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
+                            // onClick={onVerifyCode} // 실제 인증 확인 기능은 원할 때 추가
+                        >인증 확인</button>
+                    </div>
+                    {errors.verificationCode && <p className="text-red-500 text-sm">{errors.verificationCode.message}</p>}
 
                     <button
                         type="submit"

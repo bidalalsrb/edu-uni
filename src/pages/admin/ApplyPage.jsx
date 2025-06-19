@@ -333,7 +333,7 @@ export default function ApplyPage({ record }) {
         <DndProvider backend={HTML5Backend}>
             <div className="max-w-7xl mx-auto p-6">
                 <Header />
-                {record && <InfoSection />}
+                {/*{record && <InfoSection />}*/}
                 <GridLayout />
                 <div className="flex justify-between items-start mt-6">
                     <Inventory />

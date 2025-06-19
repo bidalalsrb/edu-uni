@@ -1,5 +1,4 @@
 import {useMutation, useQuery} from "@tanstack/react-query";
-import api from "../../../lib/app.js";
 
 // 예약 내역 조회(학교별)
 export function useGetReservationList(schoolCd) {

@@ -1,11 +1,11 @@
-import React from "react";
-import { useDrag } from "react-dnd";
-import { ItemTypes } from "./constants.js";
+import React, {useEffect} from "react";
+import {useDrag} from "react-dnd";
+import {ItemTypes} from "./constants.js";
 
-function DraggableBox({ box, onDropToGrid }) {
-    const [{ isDragging }, dragRef] = useDrag({
+function DraggableBox({box, onDropToGrid}) {
+    const [{isDragging}, dragRef] = useDrag({
         type: ItemTypes.BOX,
-        item: { ...box },
+        item: {...box},
         end: (item, monitor) => {
             const dropResult = monitor.getDropResult();
             if (item && dropResult) {
@@ -18,7 +18,9 @@ function DraggableBox({ box, onDropToGrid }) {
     });
 
     const opacity = isDragging ? 0.5 : 1;
-
+    useEffect(() => {
+        console.log("1111111", box)
+    })
     return (
         <div
             ref={dragRef}

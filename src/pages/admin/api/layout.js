@@ -1,5 +1,4 @@
 import {useMutation, useQuery} from "@tanstack/react-query";
-import api from "../../../lib/app.js";
 
 // 학교코드로 레이아웃 목록
 export function useGetLayoutList(schoolCd) {
