@@ -20,10 +20,12 @@ function Login() {
     const submitForm = async (e) => {
         e.preventDefault();
         try {
+            //todo 쿠키 저장 확인
             console.log(loginData);
-            const response = await api.post("/api/auth/sign-in", loginData);
-            const accessToken = response.data.data.accessToken;
-            localStorage.setItem("ACCESS_TOKEN", accessToken);
+            const response = await api.post("/auth/sign-in", loginData);
+            console.log('로그인',response);
+            const accessToken = response.data.data;
+            Sess.setItem("ACCESS_TOKEN", accessToken);
             alert("로그인 성공");
             // navigate('/conversation/list');
         } catch (error) {

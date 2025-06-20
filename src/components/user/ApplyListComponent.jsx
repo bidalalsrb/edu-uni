@@ -12,7 +12,7 @@ function ApplyListCom() {
                 expoName: "코엑스웨딩박람회",
                 teacher: "남상민",
                 time: "2025-02-14",
-                attendance: "참석",
+                attendance: "불참석",
             },
         },
         {
@@ -71,7 +71,7 @@ function ApplyListCom() {
                         <div className="flex flex-col items-center mb-6">
                             <div className="relative">
                                 <svg className="w-40 h-40" viewBox="0 0 120 120">
-                                    <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" strokeWidth="10" />
+                                    <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" strokeWidth="10"/>
                                     <circle
                                         cx="60"
                                         cy="60"
@@ -82,7 +82,7 @@ function ApplyListCom() {
                                         strokeDasharray={gaugeLength}
                                         strokeDashoffset={offset}
                                         strokeLinecap="round"
-                                        style={{ transition: "stroke-dashoffset 0.5s" }}
+                                        style={{transition: "stroke-dashoffset 0.5s"}}
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -105,7 +105,7 @@ function ApplyListCom() {
                         {/* 아코디언 목록 */}
                         <div className="mt-6 space-y-2">
                             {joinItems.map((item) => (
-                                <JoinItem key={item.id} item={item} />
+                                <JoinItem key={item.id} item={item}/>
                             ))}
                         </div>
                     </div>
