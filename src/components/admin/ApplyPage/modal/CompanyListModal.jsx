@@ -1,20 +1,17 @@
 // src/components/admin/ApplyPage/modal/CompanyListModal.jsx
 import React, { useState, useEffect } from "react";
 import ApplyFormModal from "./ApplyFormModal.jsx";
-import { useModal } from "../../../../context/ModalContext"; // 경로 주의
 
 function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) {
     const [isApplyFormModalOpen, setIsApplyFormModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
 
-    // 🔥 전역 모달 상태 연동
-    const { setIsModalOpen } = useModal();
     useEffect(() => {
-        if (isOpen) setIsModalOpen(true);
-        else setIsModalOpen(false);
-        return () => setIsModalOpen(false);
-    }, [isOpen, setIsModalOpen]);
+        if (isOpen) document.body.style.overflow = 'hidden';
+        else document.body.style.overflow = '';
+        return () => { document.body.style.overflow = ''; };
+    }, [isOpen]);
 
     if (!isOpen || !companyBox) return null;
 
