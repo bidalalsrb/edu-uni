@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { useNavigate } from "react-router-dom";
-import { COLOR_PALETTE } from "../../components/admin/ApplyPage/constants.js";
+import React, {useEffect} from "react";
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
+import {useNavigate} from "react-router-dom";
+import {COLOR_PALETTE} from "../../components/admin/ApplyPage/constants.js";
 import GridCell from "../../components/admin/ApplyPage/GridCell.jsx";
 import DraggableBox from "../../components/admin/ApplyPage/DraggableBox.jsx";
 import CreateBoxModal from "../../components/admin/ApplyPage/modal/CreateBoxModal.jsx";
@@ -333,7 +333,6 @@ export default function ApplyPage({ record }) {
         <DndProvider backend={HTML5Backend}>
             <div className="max-w-7xl mx-auto p-6">
                 <Header />
-                {/*{record && <InfoSection />}*/}
                 <GridLayout />
                 <div className="flex justify-between items-start mt-6">
                     <Inventory />

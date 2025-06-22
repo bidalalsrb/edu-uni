@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import logo from "/public/bultiger.png";
-import { useState } from "react";
+import {useState} from "react";
 import api from "../../util/api/api.js";
 
 function Login() {
@@ -22,10 +22,11 @@ function Login() {
         try {
             //todo 쿠키 저장 확인
             console.log(loginData);
-            const response = await api.post("/auth/sign-in", loginData);
-            console.log('로그인',response);
-            const accessToken = response.data.data;
-            Sess.setItem("ACCESS_TOKEN", accessToken);
+            // const response = await api.post("/auth/sign-in", loginData);
+            // console.log('로그인',response);
+            // const accessToken = response.data.data;
+            // Sess.setItem("ACCESS_TOKEN", accessToken);
+            navigate('/joinlist')
             alert("로그인 성공");
             // navigate('/conversation/list');
         } catch (error) {

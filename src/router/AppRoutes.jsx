@@ -1,3 +1,4 @@
+/*
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -27,23 +28,23 @@ export default function AppRoutes() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* 인증 관련 라우트 */}
+                {/!* 인증 관련 라우트 *!/}
                 <Route>
                     <Route path="/" element={<Login />} />
                     <Route path="register" element={<Register />} />
                     <Route path="index/admin/login" element={<Login />} />
                     <Route path="index/admin/register" element={<Register />} />
                 </Route>
-                {/* 로그인 후 페이지 */}
+                {/!* 로그인 후 페이지 *!/}
                 <Route element={<AppLayout />}>
                     <Route path="joinList" element={<JoinList />} />
                     <Route path="mypage" element={<ApplyList />} />
                     <Route path="apply" element={<UserApplyPage />} />
                 </Route>
-                {/* 관리자 라우트: AdminLayout을 부모로 설정하고, 배치코드는 자식 라우트로 중첩 */}
+                {/!* 관리자 라우트: AdminLayout을 부모로 설정하고, 배치코드는 자식 라우트로 중첩 *!/}
                 <Route path="index/admin" element={<AdminLayout />}>
                     <Route path="login" element={<Login />} />
-                    <Route path="event-register" element={<EventRegisterPage />} /> {/* 추가 */}
+                    <Route path="event-register" element={<EventRegisterPage />} /> {/!* 추가 *!/}
                     <Route path="batchcode" element={<BatchCode />} />
                     <Route path="exceldown" element={<ExcelDown />} />
                 </Route>
@@ -52,3 +53,4 @@ export default function AppRoutes() {
         </BrowserRouter>
     );
 }
+*/
