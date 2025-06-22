@@ -1,9 +1,9 @@
-// components/BottomNavBar.jsx
+// components/UserFooter.jsx
 import React from "react";
 import { HomeIcon, PencilSquareIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/solid";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function BottomNavBar() {
+function UserFooter() {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -50,4 +50,4 @@ function BottomNavBar() {
     );
 }
 
-export default BottomNavBar;
+export default UserFooter;

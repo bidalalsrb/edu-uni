@@ -1,9 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function SubImage({ subImagePreviews }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const defaultImages = ["/public/tem.jpg", "/public/batch.jpg"];
     const images = subImagePreviews && subImagePreviews.length > 0 ? subImagePreviews : defaultImages;
+
+    // 1초마다 자동 변경
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex(prev => (prev + 1) % images.length);
+        }, 1000); // 1000ms = 1초
+
+        // 컴포넌트 언마운트 시 정리
+        return () => clearInterval(interval);
+    }, [images.length]);
 
     const handlePrev = () => {
         setCurrentIndex((prev) =>

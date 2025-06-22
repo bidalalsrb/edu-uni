@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import MainImage from "../../components/user/MainImage.jsx";
+import React, {useEffect, useState} from "react";
 import SubImage from "../../components/user/SubImage.jsx";
 
 function JoinList() {
@@ -22,7 +21,6 @@ function JoinList() {
 
     return (
         <main className="p-4 space-y-6">
-            <MainImage mainImagePreview={eventData ? eventData.mainImagePreview : undefined} />
             <SubImage subImagePreviews={eventData ? eventData.subImagePreviews : undefined} />
         </main>
     );

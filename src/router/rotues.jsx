@@ -2,7 +2,7 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import JoinList from "../pages/user/JoinList";
 import ApplyList from "../pages/user/ApplyList.jsx";
-import AdminLayout from "../pages/admin/AdminLayout.jsx";
+import AdminLayout from "../components/Layouts/admin/AdminLayout.jsx";
 import BatchCode from "../components/admin/Web/BatchCode.jsx";
 import EventRegisterPage from "../pages/admin/EventRegisterPage.jsx";
 import ExcelDown from "../components/admin/Web/ExcelDown.jsx";

@@ -5,7 +5,7 @@ import Register from "../pages/auth/Register";
 import JoinList from "../pages/user/JoinList";
 import ApplyPage from "../pages/admin/ApplyPage";
 import ApplyList from "../pages/user/ApplyList.jsx";
-import BottomNavBar from "../components/BottomNavBar";
+import UserFooter from "../components/UserFooter";
 import GlobalLayout from "../components/GlobalLayout";
 import AdminLayout from "../pages/admin/AdminLayout.jsx";
 import BatchCode from "../components/admin/Web/BatchCode.jsx";
@@ -19,7 +19,7 @@ function AppLayout() {
             <GlobalLayout>
                 <Outlet />
             </GlobalLayout>
-            <BottomNavBar />
+            <UserFooter />
         </>
     );
 }
