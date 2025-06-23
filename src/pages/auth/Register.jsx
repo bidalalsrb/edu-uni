@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import logo from "/public/bultiger.png";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import {EyeIcon, EyeSlashIcon} from "@heroicons/react/24/solid";
+import api from "js-cookie";
 
 const steps = [
     "휴대폰 인증",
@@ -32,24 +33,24 @@ export default function Register() {
 
     // 핸들러: 입력값 변경
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setForm(prev => ({
             ...prev,
             [name]: value,
             // id는 항상 phone값과 동기화
-            ...(name === "phone" ? { id: value } : {})
+            ...(name === "phone" ? {id: value} : {})
         }));
     };
 
     // 1단계: 인증번호 발송
     const handleSendCode = () => {
         if (!form.phone) {
-            setErrors(prev => ({ ...prev, phone: "휴대폰 번호를 입력하세요." }));
+            setErrors(prev => ({...prev, phone: "휴대폰 번호를 입력하세요."}));
             return;
         }
         setSentCode("1234"); // 실제 서비스는 백엔드 발송
         alert("인증번호가 발송되었습니다. (테스트: 1234)");
-        setErrors(prev => ({ ...prev, phone: null }));
+        setErrors(prev => ({...prev, phone: null}));
     };
 
     // 1단계: 인증 확인
@@ -100,7 +101,7 @@ export default function Register() {
     };
 
     // 3단계: 회원가입 완료
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         let error = {};
         if (!form.name) error.name = "이름은 필수 입력입니다.";
@@ -114,18 +115,36 @@ export default function Register() {
             return;
         }
         setErrors({});
-        // id는 phone값으로 저장
-        const { confirmPassword, verificationCode, ...userData } = { ...form, id: form.phone };
-        localStorage.setItem("user", JSON.stringify(userData));
-        alert("회원가입 성공! 이제 로그인하세요.");
-        window.location.href = "/";
+        // todo
+        const data = {
+            userId: form.phone,
+            password: form.password,
+            name: form.name,
+            phoneNumber: form.phone,
+            major: form.department,
+            studentNumber: form.studentNumber,
+            gender: form.gender,
+            schoolCd: form.batchCode,
+            username: form.name,
+        };
+        const uuid = '22222asdadasd'
+        try {
+            console.log('전 ' , data)
+            const response = await api.post(`/auth/sign-up/student/${uuid}`, data);
+            console.log('통과',response)
+            alert("회원가입 성공! 이제 로그인하세요.");
+            window.location.href = "/";
+        } catch (err) {
+            console.log(err)
+            alert("회원가입 실패\n" + (err?.response?.data?.message || ""));
+        }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="w-full max-w-[430px] bg-white rounded-2xl shadow-lg px-6 py-8 space-y-6">
                 <div className="flex justify-center mb-4">
-                    <img src={logo} alt="logo" className="w-40 h-auto object-contain" />
+                    <img src={logo} alt="logo" className="w-40 h-auto object-contain"/>
                 </div>
                 {/* Stepper */}
                 <div className="flex items-center justify-between mb-8">
@@ -143,7 +162,8 @@ export default function Register() {
                                 >
                                     {idx + 1}
                                 </div>
-                                <span className="mt-1 text-xs text-gray-700 text-center whitespace-nowrap">{label}</span>
+                                <span
+                                    className="mt-1 text-xs text-gray-700 text-center whitespace-nowrap">{label}</span>
                             </div>
                             {idx < steps.length - 1 && (
                                 <div className="flex-1 h-1 bg-gray-200 mx-1">
@@ -175,7 +195,8 @@ export default function Register() {
                                 className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
                                 onClick={handleSendCode}
                                 disabled={isPhoneVerified}
-                            >인증번호 발송</button>
+                            >인증번호 발송
+                            </button>
                         </div>
                         {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
 
@@ -194,7 +215,8 @@ export default function Register() {
                                 type="submit"
                                 className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
                                 disabled={isPhoneVerified}
-                            >인증 확인</button>
+                            >인증 확인
+                            </button>
                         </div>
                         {errors.verificationCode && <p className="text-red-500 text-sm">{errors.verificationCode}</p>}
                     </form>
@@ -230,8 +252,8 @@ export default function Register() {
                                 tabIndex={-1}
                             >
                                 {showPassword
-                                    ? <EyeSlashIcon className="w-6 h-6" />
-                                    : <EyeIcon className="w-6 h-6" />
+                                    ? <EyeSlashIcon className="w-6 h-6"/>
+                                    : <EyeIcon className="w-6 h-6"/>
                                 }
                             </button>
                         </div>
@@ -256,8 +278,8 @@ export default function Register() {
                                 tabIndex={-1}
                             >
                                 {showConfirmPassword
-                                    ? <EyeSlashIcon className="w-6 h-6" />
-                                    : <EyeIcon className="w-6 h-6" />
+                                    ? <EyeSlashIcon className="w-6 h-6"/>
+                                    : <EyeIcon className="w-6 h-6"/>
                                 }
                             </button>
                         </div>
@@ -267,10 +289,12 @@ export default function Register() {
                             <button type="button"
                                     onClick={() => setStep(1)}
                                     className="px-4 py-2 rounded bg-gray-200 text-gray-600 font-semibold"
-                            >이전</button>
+                            >이전
+                            </button>
                             <button type="submit"
                                     className="px-4 py-2 rounded bg-blue-500 text-white font-semibold"
-                            >다음</button>
+                            >다음
+                            </button>
                         </div>
                     </form>
                 )}
@@ -289,7 +313,6 @@ export default function Register() {
                             className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                         {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-
 
 
                         {/* 학교코드 */}
@@ -361,10 +384,12 @@ export default function Register() {
                             <button type="button"
                                     onClick={() => setStep(2)}
                                     className="px-4 py-2 rounded bg-gray-200 text-gray-600 font-semibold"
-                            >이전</button>
+                            >이전
+                            </button>
                             <button type="submit"
                                     className="px-4 py-2 rounded bg-blue-500 text-white font-semibold"
-                            >가입 완료</button>
+                            >가입 완료
+                            </button>
                         </div>
                     </form>
                 )}

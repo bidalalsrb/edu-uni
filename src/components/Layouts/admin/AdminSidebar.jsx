@@ -14,6 +14,13 @@ function AdminSidebar() {
             </div>
             <nav className="space-y-1">
                 <a
+                    onClick={() => navigate("/index/admin/event-search")}
+                    className={`cursor-pointer block py-2 px-3 rounded-md text-sm font-medium text-gray-700 ${
+                        location.pathname.includes("event-search") ? "bg-blue-500 text-white" : ""
+                    }`}
+                >
+                    행사 조회
+                </a> <a
                     onClick={() => navigate("/index/admin/event-register")}
                     className={`cursor-pointer block py-2 px-3 rounded-md text-sm font-medium text-gray-700 ${
                         location.pathname.includes("event-register") ? "bg-blue-500 text-white" : ""

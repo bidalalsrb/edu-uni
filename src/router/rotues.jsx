@@ -1,12 +1,17 @@
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import JoinList from "../pages/user/JoinList";
-import ApplyList from "../pages/user/ApplyList.jsx";
 import AdminLayout from "../components/Layouts/admin/AdminLayout.jsx";
 import BatchCode from "../components/admin/Web/BatchCode.jsx";
 import EventRegisterPage from "../pages/admin/EventRegisterPage.jsx";
-import ExcelDown from "../components/admin/Web/ExcelDown.jsx";
+import ExcelDown from "../pages/admin/ExcelDown.jsx";
 import UserApplyPage from "../pages/user/UserApplyPage.jsx";
+import EventSearch from "../pages/admin/EventSearch.jsx";
+import ExcelSearchDetail from "../pages/admin/EventSearchDetail.jsx";
+import MyAccount from "../components/user/MyPage/MyAccount.jsx";
+import MyAttendList from "../components/user/MyPage/MyAttendList.jsx";
+import MyPageList from "../pages/user/MyPageList.jsx";
+import MyCounselingCancel from "../components/user/MyPage/MyCounselingCancel.jsx";
 
 // 중첩 라우트 구조 (admin은 children 사용)
 const routes = [
@@ -39,7 +44,19 @@ const routes = [
     },
     {
         path: "/mypage",
-        element: <ApplyList />,
+        element: <MyPageList />,
+        layout: "default",
+    },   {
+        path: "/myappendlist",
+        element: <MyAttendList />,
+        layout: "default",
+    }, {
+        path: "/myaccount",
+        element: <MyAccount />,
+        layout: "default",
+    },{
+        path: "/mycounselingcancel",
+        element: <MyCounselingCancel />,
         layout: "default",
     },
     {
@@ -66,6 +83,12 @@ const routes = [
             {
                 path: "exceldown",
                 element: <ExcelDown />,
+            },  {
+                path: "event-search",
+                element: <EventSearch />,
+            }, {
+                path: "event-search-detail",
+                element: <ExcelSearchDetail />,
             },
             // 필요하면 index(기본) route도 추가
             // { path: "", element: <div>관리자 홈</div> }
