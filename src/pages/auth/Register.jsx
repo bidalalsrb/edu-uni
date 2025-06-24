@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import logo from "/public/bultiger.png";
 import {EyeIcon, EyeSlashIcon} from "@heroicons/react/24/solid";
-import api from "js-cookie";
+import api from '../../util/api/api.js'
 
 const steps = [
     "휴대폰 인증",
@@ -10,7 +10,7 @@ const steps = [
 ];
 
 export default function Register() {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2);
 
     // 모든 입력필드 상태 (id는 phone과 동일)
     const [form, setForm] = useState({
@@ -30,7 +30,7 @@ export default function Register() {
     const [isPhoneVerified, setIsPhoneVerified] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+    const [uuid, setUuid] = useState("");
     // 핸들러: 입력값 변경
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -43,18 +43,28 @@ export default function Register() {
     };
 
     // 1단계: 인증번호 발송
-    const handleSendCode = () => {
+    const handleSendCode = async () => {
         if (!form.phone) {
             setErrors(prev => ({...prev, phone: "휴대폰 번호를 입력하세요."}));
             return;
         }
-        setSentCode("1234"); // 실제 서비스는 백엔드 발송
-        alert("인증번호가 발송되었습니다. (테스트: 1234)");
+
+        try {
+            const response = await api.post("/auth/create-code", {
+                phoneNum: form.phone,
+            });
+            alert("인증번호가 발송되었습니다. (테스트: 1234)");
+            console.log('인증번호', response);
+            // setSentCode(response.data.code);
+        } catch (error) {
+            console.log(error);
+        }
+
         setErrors(prev => ({...prev, phone: null}));
     };
 
     // 1단계: 인증 확인
-    const handleVerifyCode = (e) => {
+    const handleVerifyCode = async (e) => {
         e.preventDefault();
         let error = {};
         if (!form.phone) error.phone = "휴대폰 번호는 필수입니다.";
@@ -63,16 +73,26 @@ export default function Register() {
             setErrors(error);
             return;
         }
-        if (form.verificationCode !== sentCode || !sentCode) {
-            setErrors(prev => ({
-                ...prev,
-                verificationCode: "인증번호가 올바르지 않습니다."
-            }));
-            return;
-        }
+        // if (form.verificationCode !== sentCode || !sentCode) {
+        //     setErrors(prev => ({
+        //         ...prev,
+        //         verificationCode: "인증번호가 올바르지 않습니다."
+        //     }));
+        //     return;
+        // }
         setIsPhoneVerified(true);
-        alert("인증 성공!");
-        setStep(2);
+        try {
+            const response = await api.post("/auth/validate-code", {
+                phoneNum: form.phone,
+                code: form.verificationCode
+            })
+            console.log('인증번호 여부 확인', response);
+            setUuid(response.data.data);
+            alert("인증 성공!");
+            setStep(2);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     // 2단계 → 3단계
@@ -127,11 +147,10 @@ export default function Register() {
             schoolCd: form.batchCode,
             username: form.name,
         };
-        const uuid = '22222asdadasd'
         try {
-            console.log('전 ' , data)
+            console.log('전 ', data)
             const response = await api.post(`/auth/sign-up/student/${uuid}`, data);
-            console.log('통과',response)
+            console.log('통과', response)
             alert("회원가입 성공! 이제 로그인하세요.");
             window.location.href = "/";
         } catch (err) {
