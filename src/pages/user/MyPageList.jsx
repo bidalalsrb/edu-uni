@@ -27,11 +27,11 @@ function MyPageList() {
             label: "참석 현황",
             path: "/myappendlist",
         },
-        {
-            icon: <QuestionMarkCircleIcon className="w-7 h-7 text-blue-500"/>,
-            label: "학교코드",
-            path: "/friend",
-        },
+        // {
+        //     icon: <QuestionMarkCircleIcon className="w-7 h-7 text-blue-500"/>,
+        //     label: "학교코드",
+        //     path: "/friend",
+        // },
         {
             icon: <UserGroupIcon className="w-7 h-7 text-blue-500"/>,
             label: "계정 정보",
@@ -44,35 +44,35 @@ function MyPageList() {
         {
             id: 1,
             expoName: "AI박람회",
-            counselor: "남상민",
+            counselor: "삼성전자",
             date: "250333",
             time: "09:00",
             status: "신청완료",
         },   {
             id: 13,
             expoName: "AI박람회",
-            counselor: "남상민",
+            counselor: "삼성전자",
             date: "250333",
             time: "09:00",
             status: "신청완료",
         },   {
             id: 121,
             expoName: "AI박람회",
-            counselor: "남상민",
+            counselor: "카카오",
             date: "250333",
             time: "09:00",
             status: "신청완료",
         },   {
             id: 132,
             expoName: "AI박람회",
-            counselor: "남상민",
+            counselor: "카카오",
             date: "250333",
             time: "09:00",
             status: "신청완료",
         },   {
             id: 3,
             expoName: "AI박람회",
-            counselor: "남상민",
+            counselor: "네이버",
             date: "250333",
             time: "09:00",
             status: "신청완료",
@@ -109,7 +109,7 @@ function MyPageList() {
 
             {/* 메뉴 그리드 */}
             <section className="bg-white mt-4 mx-2 rounded-2xl shadow p-4">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                     {menuList.map((m, i) => (
                         <button
                             key={i}
@@ -134,9 +134,9 @@ function MyPageList() {
                         <tr>
                             <th className="px-3 py-2 font-semibold">No</th>
                             <th className="px-3 py-2 font-semibold">행사명</th>
-                            <th className="px-3 py-2 font-semibold">상담자</th>
-                            <th className="px-3 py-2 font-semibold">상담날짜</th>
-                            <th className="px-3 py-2 font-semibold">상담시간</th>
+                            <th className="px-3 py-2 font-semibold">업체명</th>
+                            <th className="px-3 py-2 font-semibold">신청 날짜</th>
+                            <th className="px-3 py-2 font-semibold">신청 시간</th>
                             <th className="px-3 py-2 font-semibold">현황</th>
                             <th className="px-3 py-2 font-semibold">비고</th>
                         </tr>

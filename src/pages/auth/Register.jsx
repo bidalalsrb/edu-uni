@@ -10,7 +10,7 @@ const steps = [
 ];
 
 export default function Register() {
-    const [step, setStep] = useState(2);
+    const [step, setStep] = useState(3);
 
     // 모든 입력필드 상태 (id는 phone과 동일)
     const [form, setForm] = useState({
@@ -26,7 +26,6 @@ export default function Register() {
         grade: "",
     });
     const [errors, setErrors] = useState({});
-    const [sentCode, setSentCode] = useState(""); // 실제로는 백엔드에서 발송
     const [isPhoneVerified, setIsPhoneVerified] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -37,7 +36,6 @@ export default function Register() {
         setForm(prev => ({
             ...prev,
             [name]: value,
-            // id는 항상 phone값과 동기화
             ...(name === "phone" ? {id: value} : {})
         }));
     };
@@ -73,13 +71,7 @@ export default function Register() {
             setErrors(error);
             return;
         }
-        // if (form.verificationCode !== sentCode || !sentCode) {
-        //     setErrors(prev => ({
-        //         ...prev,
-        //         verificationCode: "인증번호가 올바르지 않습니다."
-        //     }));
-        //     return;
-        // }
+
         setIsPhoneVerified(true);
         try {
             const response = await api.post("/auth/validate-code", {
@@ -347,7 +339,7 @@ export default function Register() {
                         {errors.batchCode && <p className="text-red-500 text-sm">{errors.batchCode}</p>}
 
                         {/* 학과 */}
-                        <label className="text-gray-700 font-medium">학과</label>
+                        <label className="text-gray-700 font-medium">학과<span className="text-red-500"> 드롭다운</span> </label>
                         <input
                             name="department"
                             value={form.department}
@@ -371,7 +363,7 @@ export default function Register() {
                         {errors.studentNumber && <p className="text-red-500 text-sm">{errors.studentNumber}</p>}
 
                         {/* 성별 */}
-                        <label className="text-gray-700 font-medium">성별</label>
+                        <label className="text-gray-700 font-medium">성별 <span className="text-red-500"> 라디오 성별1/2</span></label>
                         <input
                             name="gender"
                             value={form.gender}
@@ -383,7 +375,7 @@ export default function Register() {
                         {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
 
                         {/* 학년 */}
-                        <label className="text-gray-700 font-medium">학년</label>
+                        <label className="text-gray-700 font-medium">학년 <span className="text-red-500"> 성별 2/2</span></label>
                         <select
                             name="grade"
                             value={form.grade}

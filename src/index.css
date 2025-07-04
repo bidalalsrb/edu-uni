@@ -5,3 +5,25 @@
 .container-with-scroll {
     scrollbar-gutter: stable;
 }
+.gra-outline {
+    position: relative;
+    z-index: 1;
+}
+.gra-outline::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px; /* 두께 조절 가능 */
+    background: linear-gradient(to bottom, #375DDC, #1F3EA6);
+    -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: -1;
+}
+body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
+}

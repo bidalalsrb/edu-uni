@@ -1,93 +1,251 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import api from "../../util/api/api.js";
+import {FormControl, FormControlLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, TextField} from "@mui/material";
 
-export const sampleEvents = [
-    {
-        name: "2025 상반기 취업박람회",
-        location: "코엑스 A홀",
-        person: "홍길동",
-        endDate: "2025-06-10",
-    },
-    {
-        name: "AI IT 채용박람회",
-        location: "서울시청 1층",
-        person: "김지원",
-        endDate: "2025-07-01",
-    },
-    {
-        name: "청년드림 잡페어",
-        location: "부산 벡스코",
-        person: "이수현",
-        endDate: "2025-06-25",
-    },
-    {
-        name: "산학연계 취업박람회",
-        location: "대구 엑스코",
-        person: "최민재",
-        endDate: "2025-08-12",
-    },
-];
 
-function ExcelSearch() {
+function EventSearch() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [searchOption, setSearchOption] = useState("행사명"); // 기본값 "행사명"
-    const [filteredRecords, setFilteredRecords] = useState(sampleEvents);
+    const [searchOption, setSearchOption] = useState("목록"); // 기본값 "행사명"
+    const [statusValue, setStatusValue] = useState("option1");
+    const [categoryValue, setCategoryValue] = useState("option1");
+    const [filteredRecords, setFilteredRecords] = useState([]);
     const navigate = useNavigate();
     // 검색 버튼 클릭시
-    const handleSearch = () => {
-        if (searchTerm.trim() === "") {
-            setFilteredRecords(sampleEvents);
-            return;
-        }
-        const filtered = sampleEvents.filter((record) => {
-            if (searchOption === "행사명") {
-                return record.name.includes(searchTerm);
-            } else if (searchOption === "담당자") {
-                return record.person.includes(searchTerm);
-            } else {
-                return true;
+    /* const handleSearch = () => {
+         if (searchTerm.trim() === "") {
+             // setFilteredRecords(sampleEvents);
+             return;
+         }
+         const filtered = sampleEvents.filter((record) => {
+             if (searchOption === "행사명") {
+                 return record.name.includes(searchTerm);
+             } else if (searchOption === "담당자") {
+                 return record.person.includes(searchTerm);
+             } else {
+                 return true;
+             }
+         });
+         setFilteredRecords(filtered);
+     };
+ */
+    /*
+        // 엔터 키로도 검색 가능
+        const handleKeyDown = (e) => {
+            if (e.key === "Enter") {
+                handleSearch();
             }
-        });
-        setFilteredRecords(filtered);
-    };
+        };
+    */
 
-    // 엔터 키로도 검색 가능
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            handleSearch();
-        }
-    };
-
+    useEffect(() => {
+        const getInitData = async () => {
+            try {
+                const response = await api.get(`/event/program-list/mgmg/school-cd/S9490`);
+                setFilteredRecords(response.data.data);
+                console.log(response);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        getInitData();
+    }, []);
     return (
         <main className="p-6 flex flex-col gap-6">
             {/* 검색/필터 섹션 */}
-            <section>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">행사 조회</h2>
-                <div className="flex items-center space-x-2">
-                    <select
-                        value={searchOption}
-                        onChange={(e) => setSearchOption(e.target.value)}
-                        className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="행사명">행사명</option>
-                        <option value="담당자">담당자</option>
-                    </select>
-                    <input
-                        type="text"
-                        placeholder={`${searchOption}으로 검색`}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        className="border border-gray-300 rounded-md px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                        onClick={handleSearch}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        검색
-                    </button>
+            <div className="text-sm text-gray-500 font-medium">행사 /<span className='font-bold text-gray-800'> 조회</span>
+            </div>
+            <section className="bg-white rounded-xl shadow-sm  border border-gray-200 px-14 py-14 ">
+                <div className="flex flex-col gap-9 text-xl">
+                    {/* 검색 */}
+                    <div className="flex items-center ">
+                        <div className="w-28 min-w-28 text-left mr-28 font-semibold text-gray-800 ">검색</div>
+                        <div className="flex gap-2 flex-1">
+                            {/* MUI Select */}
+                            <FormControl size="small" sx={{
+                                minWidth: 120,
+                                // OutlinedInput의 스타일 오버라이드
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: '#fffFF',   // 셀렉트 배경 밝게
+                                    '& fieldset': {
+                                        borderColor: '#ffF',     // 기본 테두리 흰색
+                                        boxShadow: '0 0 0 1px rgba(55,93,220,0.10), 0 0px 8px rgba(0,0,0,0.12)',
+
+                                    },
+                                },
+                            }}>
+                                <Select
+                                    labelId="search-option-label"
+                                    value={searchOption}
+                                    onChange={(e) => setSearchOption(e.target.value)}
+                                >
+                                    <MenuItem value="목록">목록</MenuItem>
+                                    <MenuItem value="행사명">행사명</MenuItem>
+                                    <MenuItem value="담당자">담당자</MenuItem>
+                                </Select>
+                            </FormControl>
+                            {/* MUI Input */}
+                            <TextField
+                                size="small"
+                                placeholder="내용을 입력해주세요"
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                                sx={{
+                                    width: "50%",
+                                    // OutlinedInput 전체 커스텀
+                                    '& .MuiOutlinedInput-root': {
+                                        backgroundColor: "#fffFFF",
+                                        '& fieldset': {
+                                            borderColor: '#fffFFF',         // 밝은 흰색 테두리
+                                            boxShadow: '0 0 0 1px rgba(55,93,220,0.10), 0 0px 8px rgba(0,0,0,0.12)',
+                                        },
+
+                                    },
+                                }}
+                            />
+                        </div>
+                    </div>
+                    {/* 상태 */}
+                    <div className="flex items-center">
+                        <div className="w-28 min-w-28 text-left mr-28 font-semibold text-gray-800 ">상태</div>
+                        <div className="flex-1 flex items-center text-xl">
+                            <RadioGroup
+                                row
+                                value={statusValue}
+                                onChange={(e) => setStatusValue(e.target.value)}
+                                name="status"
+                                className="w-full"
+                            >
+                                <FormControlLabel
+                                    value="option1"
+                                    control={<Radio
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: "#1F3EA6", // 체크 됐을 때
+                                            },
+                                        }}
+                                    />}
+                                    label="어쩌구"
+                                    className="!mr-6"
+                                />
+                                <FormControlLabel
+                                    value="option2"
+                                    control={<Radio
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: "#1F3EA6", // 체크 됐을 때
+                                            },
+                                        }}
+                                    />}
+                                    label="저쩌구"
+                                    className="!mr-6"
+                                />
+                                <FormControlLabel
+                                    value="option3"
+                                    control={<Radio
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: "#1F3EA6", // 체크 됐을 때
+                                            },
+                                        }}
+                                    />}
+                                    label="끝남"
+                                    className="!mr-6"
+                                />
+                                <FormControlLabel
+                                    value="option4"
+                                    control={<Radio
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: "#1F3EA6", // 체크 됐을 때
+                                            },
+                                        }}
+                                    />}
+                                    label="쩔라"
+                                    className="!mr-6"
+                                />
+                            </RadioGroup>
+                        </div>
+                    </div>
+                    {/* 카테고리 */}
+                    <div className="flex items-center">
+                        <div className="w-28 min-w-28 text-left mr-28 font-semibold text-gray-800 ">카테고리</div>
+                        <div className="flex-1 text-xl">
+                            <RadioGroup
+                                row
+                                value={categoryValue}
+                                onChange={(e) => setCategoryValue(e.target.value)}
+                                name="status"
+                            >
+                                <FormControlLabel
+                                    value="option1"
+                                    control={<Radio
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: "#1F3EA6", // 체크 됐을 때
+                                            },
+                                        }}
+                                    />}
+                                    label="어쩌구"
+                                    className="!mr-6"
+                                />
+                                <FormControlLabel
+                                    value="option2"
+                                    control={<Radio
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: "#1F3EA6", // 체크 됐을 때
+                                            },
+                                        }}
+                                    />}
+                                    label="저쩌구"
+                                    className="!mr-6"
+                                />
+                                <FormControlLabel
+                                    value="option3"
+                                    control={<Radio
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: "#1F3EA6", // 체크 됐을 때
+                                            },
+                                        }}
+                                    />}
+                                    label="끝남"
+                                    className="!mr-6"
+                                />
+                                <FormControlLabel
+                                    value="option4"
+                                    control={<Radio
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: "#1F3EA6", // 체크 됐을 때
+                                            },
+                                        }}
+                                    />}
+                                    label="쩔라"
+                                    className="!mr-6"
+                                />
+                            </RadioGroup>
+                        </div>
+                    </div>
+                    {/* 버튼 */}
+                    <div className="flex justify-center gap-2 mt-2">
+                        <button
+                            type="button"
+                            className="px-6 py-2 rounded-lg text-white bg-graBackColor font-semibold transition"
+                        >
+                            검색
+                        </button>
+                        <button
+                            type="button"
+                            className="gra-outline bg-white text-[#375DDC] font-semibold px-6 py-2 rounded-lg transition hover:bg-blue-50"
+                        >
+                            초기화
+                        </button>
+                    </div>
                 </div>
             </section>
+
 
             {/* 테이블 섹션 */}
             <section className="bg-white rounded-xl shadow-sm">
@@ -105,8 +263,10 @@ function ExcelSearch() {
                         <tr>
                             <th className="px-4 py-3 font-semibold">번호</th>
                             <th className="px-4 py-3 font-semibold">행사명</th>
+                            <th className="px-4 py-3 font-semibold">장소</th>
                             <th className="px-4 py-3 font-semibold">담당자</th>
-                            <th className="px-4 py-3 font-semibold">날짜</th>
+                            <th className="px-4 py-3 font-semibold">시작날짜</th>
+                            <th className="px-4 py-3 font-semibold">종료날짜</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -124,9 +284,11 @@ function ExcelSearch() {
                                 >
                                     <td className="px-4 py-3">{index + 1}</td>
                                     <td className="px-4 py-3"
-                                        onClick={() => navigate('/index/admin/event-search-detail')}>{record.name}</td>
-                                    <td className="px-4 py-3">{record.person}</td>
-                                    <td className="px-4 py-3">{record.endDate}</td>
+                                        onClick={() => navigate('/index/admin/event-search-detail')}>{record.programName}</td>
+                                    <td className="px-4 py-3">{record.coordinatorName}</td>
+                                    <td className="px-4 py-3">{record.place}</td>
+                                    <td className="px-4 py-3">{record.programStartAt}</td>
+                                    <td className="px-4 py-3">{record.programEndAt}</td>
                                 </tr>
                             ))
                         )}
@@ -141,4 +303,4 @@ function ExcelSearch() {
     );
 }
 
-export default ExcelSearch;
+export default EventSearch;
