@@ -2,6 +2,20 @@ import React, {useState} from "react";
 import logo from "/public/bultiger.png";
 import {EyeIcon, EyeSlashIcon} from "@heroicons/react/24/solid";
 import api from '../../util/api/api.js'
+import {
+    Box,
+    Button,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Radio,
+    RadioGroup,
+    Select,
+    TextField,
+} from "@mui/material";
 
 const steps = [
     "휴대폰 인증",
@@ -150,7 +164,29 @@ export default function Register() {
             alert("회원가입 실패\n" + (err?.response?.data?.message || ""));
         }
     };
+    const UncheckedIcon = (
+        <span style={{
+            display: "block",
+            width: 24,
+            height: 24,
+            borderRadius: "50%",
+            border: "3px solid #C6CBDF",
+            background: "#fff",
+        }}/>
+    );
 
+    const CheckedIcon = (
+        <span style={{
+            display: "block",
+            width: 24,
+            height: 24,
+            borderRadius: "50%",
+            border: "7px solid #1F3EA6",
+            background: "#fff",
+            boxSizing: "border-box",
+            boxShadow: "0 1px 6px 0 rgba(40,77,254,0.10)",
+        }}/>
+    );
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="w-full max-w-[430px] bg-white rounded-2xl shadow-lg px-6 py-8 space-y-6">
@@ -189,221 +225,364 @@ export default function Register() {
 
                 {/* Step 1: 휴대폰 인증 */}
                 {step === 1 && (
-                    <form className="space-y-4" onSubmit={handleVerifyCode}>
-                        <label className="text-gray-700 font-medium">휴대폰 번호</label>
-                        <div className="flex gap-2">
-                            <input
-                                name="phone"
-                                value={form.phone}
-                                onChange={handleChange}
-                                type="text"
-                                placeholder="'-' 제외하고 입력"
-                                className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                disabled={isPhoneVerified}
-                            />
-                            <button
-                                type="button"
-                                className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
-                                onClick={handleSendCode}
-                                disabled={isPhoneVerified}
-                            >인증번호 발송
-                            </button>
-                        </div>
-                        {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+                    <Box component="form" onSubmit={handleVerifyCode}>
+                        <Grid container spacing={2}>
+                            {/* 휴대폰 번호 입력 + 인증번호 발송 */}
+                            <Grid item xs={8}>
+                                <TextField
+                                    label="휴대폰 번호"
+                                    name="phone"
+                                    value={form.phone}
+                                    onChange={handleChange}
+                                    placeholder="'-' 제외하고 입력"
+                                    fullWidth
+                                    size="small"
+                                    margin="normal"
+                                    disabled={isPhoneVerified}
+                                    error={!!errors.phone}
+                                    helperText={errors.phone}
+                                />
+                            </Grid>
+                            <Grid item xs={4} sx={{display: 'flex', alignItems: 'center', mt: 1}}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={handleSendCode}
+                                    disabled={isPhoneVerified}
+                                    sx={{
+                                        background: "linear-gradient(to bottom, #375DDC, #1F3EA6)",
+                                        color: "#fff",
+                                        borderRadius: 2,
+                                        fontWeight: 600,
+                                        height: 40,
+                                        boxShadow: "none",
+                                        '&:hover': {
+                                            background: "linear-gradient(to bottom, #1F3EA6, #375DDC)"
+                                        }
+                                    }}
+                                >
+                                    인증번호 발송
+                                </Button>
+                            </Grid>
 
-                        <label className="text-gray-700 font-medium">인증 번호</label>
-                        <div className="flex gap-2">
-                            <input
-                                name="verificationCode"
-                                value={form.verificationCode}
-                                onChange={handleChange}
-                                type="text"
-                                placeholder="인증번호 입력"
-                                className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                disabled={isPhoneVerified}
-                            />
-                            <button
-                                type="submit"
-                                className="bg-blue-500 text-white px-4 rounded-lg font-semibold"
-                                disabled={isPhoneVerified}
-                            >인증 확인
-                            </button>
-                        </div>
-                        {errors.verificationCode && <p className="text-red-500 text-sm">{errors.verificationCode}</p>}
-                    </form>
+                            {/* 인증번호 입력 + 인증 확인 */}
+                            <Grid item xs={8}>
+                                <TextField
+                                    label="인증번호"
+                                    name="verificationCode"
+                                    value={form.verificationCode}
+                                    onChange={handleChange}
+                                    placeholder="인증번호 입력"
+                                    fullWidth
+                                    size="small"
+                                    margin="normal"
+                                    disabled={isPhoneVerified}
+                                    error={!!errors.verificationCode}
+                                    helperText={errors.verificationCode}
+                                />
+                            </Grid>
+                            <Grid item xs={4} sx={{display: 'flex', alignItems: 'center', mt: 1}}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    type="submit"
+                                    disabled={isPhoneVerified}
+                                    sx={{
+                                        background: "linear-gradient(to bottom, #375DDC, #1F3EA6)",
+                                        color: "#fff",
+                                        borderRadius: 2,
+                                        fontWeight: 600,
+                                        height: 40,
+                                        boxShadow: "none",
+                                        '&:hover': {
+                                            background: "linear-gradient(to bottom, #1F3EA6, #375DDC)"
+                                        }
+                                    }}
+                                >
+                                    인증 확인
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Box>
                 )}
 
                 {/* Step 2: 비밀번호 설정 */}
                 {step === 2 && (
-                    <form className="space-y-3" onSubmit={handleNextStep2}>
-                        {/* 아이디: phone 값을 보여주기만 함 */}
-                        <label className="text-gray-700 font-medium">아이디(휴대폰 번호)</label>
-                        <input
-                            name="id"
-                            value={form.phone}
-                            readOnly
-                            className="w-full border border-gray-300 p-3 rounded-lg bg-gray-100"
-                        />
+                    <Box component="form" onSubmit={handleNextStep2}>
+                        <Grid container spacing={2}>
+                            {/* 아이디(휴대폰) */}
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="아이디(휴대폰 번호)"
+                                    value={form.phone}
+                                    InputProps={{readOnly: true}}
+                                    fullWidth
+                                    size="small"
+                                    margin="normal"
+                                />
+                            </Grid>
 
-                        {/* 비밀번호 */}
-                        <label className="text-gray-700 font-medium">비밀번호</label>
-                        <div className="relative">
-                            <input
-                                name="password"
-                                value={form.password}
-                                onChange={handleChange}
-                                type={showPassword ? "text" : "password"}
-                                placeholder="비밀번호"
-                                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            />
-                            <button
+                            {/* 비밀번호 */}
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="비밀번호"
+                                    name="password"
+                                    value={form.password}
+                                    onChange={handleChange}
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="비밀번호"
+                                    fullWidth
+                                    size="small"
+                                    margin="normal"
+                                    error={!!errors.password}
+                                    helperText={errors.password || "6~15자의 영문, 숫자, 특수문자를 포함해주세요"}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <Button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                sx={{minWidth: 0, p: 0, color: "#888"}}
+                                                tabIndex={-1}
+                                            >
+                                                {showPassword
+                                                    ? <EyeSlashIcon className="w-5 h-5"/>
+                                                    : <EyeIcon className="w-5 h-5"/>
+                                                }
+                                            </Button>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+
+                            {/* 비밀번호 확인 */}
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="비밀번호 확인"
+                                    name="confirmPassword"
+                                    value={form.confirmPassword}
+                                    onChange={handleChange}
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    placeholder="비밀번호 확인"
+                                    fullWidth
+                                    size="small"
+                                    margin="normal"
+                                    error={!!errors.confirmPassword}
+                                    helperText={errors.confirmPassword}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <Button
+                                                type="button"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                sx={{minWidth: 0, p: 0, color: "#888"}}
+                                                tabIndex={-1}
+                                            >
+                                                {showConfirmPassword
+                                                    ? <EyeSlashIcon className="w-5 h-5"/>
+                                                    : <EyeIcon className="w-5 h-5"/>
+                                                }
+                                            </Button>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
+
+                        {/* 하단 버튼 */}
+                        <Box display="flex" justifyContent="space-between" pt={4}>
+                            <Button
                                 type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-3 text-gray-500"
-                                tabIndex={-1}
-                            >
-                                {showPassword
-                                    ? <EyeSlashIcon className="w-6 h-6"/>
-                                    : <EyeIcon className="w-6 h-6"/>
-                                }
-                            </button>
-                        </div>
-                        <p className="text-gray-500 text-sm">6~15자의 영문 숫자 특수문자를 포함해주세요</p>
-                        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-
-                        {/* 비밀번호 확인 */}
-                        <label className="text-gray-700 font-medium">비밀번호 확인</label>
-                        <div className="relative">
-                            <input
-                                name="confirmPassword"
-                                value={form.confirmPassword}
-                                onChange={handleChange}
-                                type={showConfirmPassword ? "text" : "password"}
-                                placeholder="비밀번호 확인"
-                                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute right-3 top-3 text-gray-500"
-                                tabIndex={-1}
-                            >
-                                {showConfirmPassword
-                                    ? <EyeSlashIcon className="w-6 h-6"/>
-                                    : <EyeIcon className="w-6 h-6"/>
-                                }
-                            </button>
-                        </div>
-                        {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
-
-                        <div className="flex justify-between pt-2">
-                            <button type="button"
-                                    onClick={() => setStep(1)}
-                                    className="px-4 py-2 rounded bg-gray-200 text-gray-600 font-semibold"
-                            >이전
-                            </button>
-                            <button type="submit"
-                                    className="px-4 py-2 rounded bg-blue-500 text-white font-semibold"
-                            >다음
-                            </button>
-                        </div>
-                    </form>
+                                variant="outlined"
+                                onClick={() => setStep(1)}
+                                sx={{
+                                    color: "#375DDC",
+                                    borderColor: "#E2E5ED",
+                                    fontWeight: 600,
+                                    borderRadius: 2,
+                                    px: 4,
+                                    background: "#f5f8ff"
+                                }}
+                            >이전</Button>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                sx={{
+                                    background: "linear-gradient(to bottom, #375DDC, #1F3EA6)",
+                                    color: "#fff",
+                                    borderRadius: 2,
+                                    fontWeight: 600,
+                                    px: 4,
+                                    '&:hover': {
+                                        background: "linear-gradient(to bottom, #1F3EA6, #375DDC)"
+                                    }
+                                }}
+                            >다음</Button>
+                        </Box>
+                    </Box>
                 )}
 
                 {/* Step 3: 추가 정보 입력 */}
                 {step === 3 && (
-                    <form className="space-y-3" onSubmit={handleSubmit}>
+                    <Box component="form" onSubmit={handleSubmit}>
                         {/* 이름 */}
-                        <label className="text-gray-700 font-medium">이름</label>
-                        <input
-                            name="name"
+                        <TextField
+                            label='이름'
+                            size="small"
+                            fullWidth
+                            margin='normal'
                             value={form.name}
                             onChange={handleChange}
-                            type="text"
                             placeholder="예) 김타이거"
-                            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            error={!!errors.name}
+                            helperText={errors.name}
+                            sx={{mb: 1}}
                         />
-                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
 
+                        {/* 학교코드 + 확인 버튼 */}
+                        <Grid container spacing={1} alignItems="center" sx={{mt: 2}}>
+                            <Grid item xs>
+                                <TextField
+                                    label='학교코드'
+                                    value={form.batchCode}
+                                    onChange={handleChange}
+                                    placeholder="학교코드 입력를 입력하시오"
+                                    size="small"
+                                    fullWidth
+                                    error={!!errors.batchCode}
+                                />
+                            </Grid>
+                            <Grid item sx={{alignSelf: "center"}}>
+                                <Button
+                                    variant="contained"
+                                    sx={{
+                                        minWidth: 80,
+                                        background: "linear-gradient(to bottom, #375DDC, #1F3EA6)",
+                                        color: "#fff",
+                                        borderRadius: 2,
+                                        fontWeight: 600,
+                                        boxShadow: "none",
+                                        '&:hover': {
+                                            background: "linear-gradient(to bottom, #1F3EA6, #375DDC)"
+                                        }
+                                    }}
 
-                        {/* 학교코드 */}
-                        <label className="text-gray-700 font-medium">학교코드</label>
-                        <input
-                            name="batchCode"
-                            value={form.batchCode}
-                            onChange={handleChange}
-                            type="text"
-                            placeholder="학교코드 입력"
-                            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
-                        {errors.batchCode && <p className="text-red-500 text-sm">{errors.batchCode}</p>}
+                                >
+                                    확인
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        {errors.batchCode && (
+                            <Box sx={{color: "error.main", mb: 1}}>{errors.batchCode}</Box>
+                        )}
 
                         {/* 학과 */}
-                        <label className="text-gray-700 font-medium">학과<span className="text-red-500"> 드롭다운</span> </label>
-                        <input
-                            name="department"
-                            value={form.department}
-                            onChange={handleChange}
-                            type="text"
-                            placeholder="학과 입력"
-                            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
-                        {errors.department && <p className="text-red-500 text-sm">{errors.department}</p>}
+                        <FormControl fullWidth variant="outlined" size="small" sx={{mt: 3}}>
+                            <InputLabel id="dept-label">학과</InputLabel>
+                            <Select
+                                labelId="dept-label"
+                                label="학과"
+                                value={form.grade}
+                                onChange={handleChange}
+                            >
+                                <MenuItem value=""><em>학과 선택</em></MenuItem>
+                                <MenuItem value="컴퓨터공학과">컴퓨터공학과</MenuItem>
+                            </Select>
+                        </FormControl>
 
                         {/* 학번 */}
-                        <label className="text-gray-700 font-medium">학번</label>
-                        <input
-                            name="studentNumber"
+                        <TextField
+                            label='학번'
                             value={form.studentNumber}
                             onChange={handleChange}
-                            type="text"
                             placeholder="학번 입력"
-                            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            size="small"
+                            margin='normal'
+                            fullWidth
+                            error={!!errors.studentNumber}
+                            helperText={errors.studentNumber}
+                            sx={{mt: 3}}
                         />
-                        {errors.studentNumber && <p className="text-red-500 text-sm">{errors.studentNumber}</p>}
 
-                        {/* 성별 */}
-                        <label className="text-gray-700 font-medium">성별 <span className="text-red-500"> 라디오 성별1/2</span></label>
-                        <input
-                            name="gender"
-                            value={form.gender}
-                            onChange={handleChange}
-                            type="text"
-                            placeholder="성별 입력"
-                            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
-                        {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
+                        {/* 성별, 학년 */}
+                        <Grid container spacing={2} sx={{mt: 1}}>
+                            {/* 성별 */}
+                            <Grid item xs={6}>
+                                <FormControl component="fieldset">
+                                    <FormLabel component="legend">성별</FormLabel>
+                                    <RadioGroup row name="gender" value={form.gender} onChange={handleChange}>
+                                        <FormControlLabel
+                                            value="남"
+                                            control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon} />}
+                                            label="남"
+                                            className="!mr-6"
+                                        />
+                                        <FormControlLabel
+                                            value="여"
+                                            control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon} />}
+                                            label="여"
+                                            className="!mr-6"
+                                        />
+                                    </RadioGroup>
+                                </FormControl>
+                                {errors.gender && (
+                                    <Box sx={{color: "error.main", fontSize: 13, mt: 0.5}}>
+                                        {errors.gender}
+                                    </Box>
+                                )}
+                            </Grid>
+                            {/* 학년 */}
+                            <Grid item xs={6}>
+                                <FormControl fullWidth size="small" sx={{mt: 3}}>
+                                    <InputLabel id="school-year-label">학년</InputLabel>
+                                    <Select
+                                        labelId="school-year-label"
+                                        label="학년"
+                                        value={form.schoolYear}
+                                        onChange={handleChange}   // e => setForm({...form, schoolYear: e.target.value})
+                                        name="schoolYear"
+                                    >
+                                        <MenuItem value=""><em>학년 선택</em></MenuItem>
+                                        <MenuItem value="1">1학년</MenuItem>
+                                        <MenuItem value="2">2학년</MenuItem>
+                                        <MenuItem value="3">3학년</MenuItem>
+                                        <MenuItem value="4">4학년</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
 
-                        {/* 학년 */}
-                        <label className="text-gray-700 font-medium">학년 <span className="text-red-500"> 성별 2/2</span></label>
-                        <select
-                            name="grade"
-                            value={form.grade}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        >
-                            <option value="">학년 선택</option>
-                            <option value="1">1학년</option>
-                            <option value="2">2학년</option>
-                            <option value="3">3학년</option>
-                            <option value="4">4학년</option>
-                            <option value="외부">외부</option>
-                        </select>
-                        {errors.grade && <p className="text-red-500 text-sm">{errors.grade}</p>}
-
-                        <div className="flex justify-between pt-2">
-                            <button type="button"
-                                    onClick={() => setStep(2)}
-                                    className="px-4 py-2 rounded bg-gray-200 text-gray-600 font-semibold"
-                            >이전
-                            </button>
-                            <button type="submit"
-                                    className="px-4 py-2 rounded bg-blue-500 text-white font-semibold"
-                            >가입 완료
-                            </button>
-                        </div>
-                    </form>
+                        {/* 버튼 */}
+                        <Box display="flex" justifyContent="space-between" pt={4}>
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                onClick={() => setStep(2)}
+                                sx={{
+                                    color: "#375DDC",
+                                    borderColor: "#E2E5ED",
+                                    fontWeight: 600,
+                                    borderRadius: 2,
+                                    px: 4,
+                                    background: "#f5f8ff"
+                                }}
+                            >이전</Button>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                sx={{
+                                    background: "linear-gradient(to bottom, #375DDC, #1F3EA6)",
+                                    color: "#fff",
+                                    borderRadius: 2,
+                                    fontWeight: 600,
+                                    px: 4,
+                                    '&:hover': {
+                                        background: "linear-gradient(to bottom, #1F3EA6, #375DDC)"
+                                    }
+                                }}
+                            >가입 완료</Button>
+                        </Box>
+                    </Box>
                 )}
+
             </div>
         </div>
     );

@@ -2,7 +2,6 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import JoinList from "../pages/user/JoinList";
 import AdminLayout from "../components/Layouts/admin/AdminLayout.jsx";
-import BatchCode from "../components/admin/Web/BatchCode.jsx";
 import EventRegisterPage from "../pages/admin/EventRegisterPage.jsx";
 import ExcelDown from "../pages/admin/ExcelDown.jsx";
 import UserApplyPage from "../pages/user/UserApplyPage.jsx";
@@ -12,6 +11,8 @@ import MyAccount from "../components/user/MyPage/MyAccount.jsx";
 import MyAttendList from "../components/user/MyPage/MyAttendList.jsx";
 import MyPageList from "../pages/user/MyPageList.jsx";
 import MyCounselingCancel from "../components/user/MyPage/MyCounselingCancel.jsx";
+import EventLayout from "../pages/admin/EventLayout/EventLayout.jsx";
+import EventLayoutCreate from "../pages/admin/EventLayout/EventLayoutCreate.jsx";
 
 // 중첩 라우트 구조 (admin은 children 사용)
 const routes = [
@@ -77,8 +78,11 @@ const routes = [
                 element: <EventRegisterPage />,
             },
             {
-                path: "batchcode",
-                element: <BatchCode />,
+                path: "event-layout",
+                element: <EventLayout />,
+            },   {
+                path: "event-layout/create",
+                element: <EventLayoutCreate />,
             },
             {
                 path: "exceldown",

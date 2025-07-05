@@ -35,9 +35,9 @@ function AdminSidebar() {
                 행사 등록
             </a>
             <a
-                onClick={() => navigate("/index/admin/batchcode")}
+                onClick={() => navigate("/index/admin/event-layout")}
                 className={`cursor-pointer block py-2 px-3 rounded-md text-sm font-medium
-        ${location.pathname.includes("batchcode") ? "text-white bg-gradient-to-b from-[#375DDC] to-[#1F3EA6]" : "text-gray-700"}
+        ${location.pathname.includes("event-layout") ? "text-white bg-gradient-to-b from-[#375DDC] to-[#1F3EA6]" : "text-gray-700"}
     `}>
                 배치 등록/조회
             </a>

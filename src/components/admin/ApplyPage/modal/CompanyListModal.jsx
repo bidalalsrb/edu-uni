@@ -1,4 +1,4 @@
-// src/components/admin/ApplyPage/modal/CompanyListModal.jsx
+// src/components/admin/EventLayoutCreate/modal/CompanyListModal.jsx
 import React, { useState, useEffect } from "react";
 import ApplyFormModal from "./ApplyFormModal.jsx";
 

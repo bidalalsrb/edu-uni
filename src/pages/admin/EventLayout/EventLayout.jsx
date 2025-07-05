@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import api from "../../util/api/api.js";
+import api from "../../../util/api/api.js";
 import {
     Box,
     Button, Checkbox,
@@ -13,10 +13,10 @@ import {
     Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow,
     TextField
 } from "@mui/material";
-import CustomPagination from "../../components/common/CustomPagination.jsx";
+import CustomPagination from "../../../components/common/CustomPagination.jsx";
 
 
-function EventSearch() {
+function EventLayout() {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchOption, setSearchOption] = useState("목록"); // 기본값 "행사명"
     const [statusValue, setStatusValue] = useState("option1");
@@ -26,32 +26,6 @@ function EventSearch() {
     const rowsPerPage = 10; // 사진 기준 한 페이지 7개
 
     const navigate = useNavigate();
-    // 검색 버튼 클릭시
-    /* const handleSearch = () => {
-         if (searchTerm.trim() === "") {
-             // setFilteredRecords(sampleEvents);
-             return;
-         }
-         const filtered = sampleEvents.filter((record) => {
-             if (searchOption === "행사명") {
-                 return record.name.includes(searchTerm);
-             } else if (searchOption === "담당자") {
-                 return record.person.includes(searchTerm);
-             } else {
-                 return true;
-             }
-         });
-         setFilteredRecords(filtered);
-     };
- */
-    /*
-        // 엔터 키로도 검색 가능
-        const handleKeyDown = (e) => {
-            if (e.key === "Enter") {
-                handleSearch();
-            }
-        };
-    */
 
     useEffect(() => {
         const getInitData = async () => {
@@ -301,7 +275,7 @@ function EventSearch() {
                 <TableContainer component={Paper} sx={{
                     boxShadow: "none", borderRadius: 3, px: 2, background: "#fff"
                 }}>
-                    <Table stickyHeader style={{ tableLayout: "fixed", width: "100%" }}>
+                    <Table stickyHeader style={{tableLayout: "fixed", width: "100%"}}>
                         <TableHead>
                             <TableRow
                                 sx={{
@@ -315,18 +289,20 @@ function EventSearch() {
                                     }
                                 }}
                             >
-                                <TableCell align="center" style={{ width: '7%' }}>NO.</TableCell>
-                                <TableCell style={{ width: '28%' }}>행사명</TableCell>
-                                <TableCell style={{ width: '20%' }}>행사장소</TableCell>
-                                <TableCell style={{ width: '15%' }}>담당자</TableCell>
-                                <TableCell style={{ width: '15%' }}>시작날짜</TableCell>
-                                <TableCell style={{ width: '15%' }}>종료날짜</TableCell>
+                                <TableCell align="center" style={{width: '7%'}}>NO.</TableCell>
+                                <TableCell style={{width: '28%'}}>행사명</TableCell>
+                                <TableCell style={{width: '20%'}}>행사장소</TableCell>
+                                <TableCell style={{width: '15%'}}>담당자</TableCell>
+                                <TableCell style={{width: '15%'}}>시작날짜</TableCell>
+                                <TableCell style={{width: '15%'}}>종료날짜</TableCell>
+                                <TableCell style={{width: '15%'}}>수정</TableCell>
+                                <TableCell style={{width: '15%'}}>생성</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {filteredRecords.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} align="center" sx={{ color: "#aaa" }}>
+                                    <TableCell colSpan={6} align="center" sx={{color: "#aaa"}}>
                                         검색 결과가 없습니다.
                                     </TableCell>
                                 </TableRow>
@@ -338,19 +314,52 @@ function EventSearch() {
                                             key={idx}
                                             hover
                                             sx={{
-                                                "&:hover": { background: "#F8FAFF" },
+                                                "&:hover": {background: "#F8FAFF"},
                                                 cursor: "pointer",
-                                                "&:last-child td": { borderBottom: 0 }
+                                                "&:last-child td": {borderBottom: 0}
                                             }}
                                         >
-                                            <TableCell align="center" style={{ width: '7%' }}>
+                                            <TableCell align="center" style={{width: '7%'}}>
                                                 {idx + 1 + page * rowsPerPage}
                                             </TableCell>
-                                            <TableCell style={{ width: '28%' }}>{record.programName}</TableCell>
-                                            <TableCell style={{ width: '20%' }}>{record.place}</TableCell>
-                                            <TableCell style={{ width: '15%' }}>{record.coordinatorName}</TableCell>
-                                            <TableCell style={{ width: '15%' }}>{record.programStartAt}</TableCell>
-                                            <TableCell style={{ width: '15%' }}>{record.programEndAt}</TableCell>
+                                            <TableCell style={{width: '28%'}}>{record.programName}</TableCell>
+                                            <TableCell style={{width: '20%'}}>{record.place}</TableCell>
+                                            <TableCell style={{width: '15%'}}>{record.coordinatorName}</TableCell>
+                                            <TableCell style={{width: '15%'}}>{record.programStartAt}</TableCell>
+                                            <TableCell style={{width: '15%'}}>{record.programEndAt}</TableCell>
+                                            <TableCell style={{width: '15%'}}> <Button
+                                                type="button"
+                                                variant="contained"
+                                                sx={{
+                                                    background: "linear-gradient(to bottom, #375DDC, #1F3EA6)",
+                                                    fontSize: "15px",      // text-xl과 비슷
+                                                    borderRadius: "0.5rem",   // rounded-lg
+                                                    boxShadow: "none",
+                                                    '&:hover': {
+                                                        background: "linear-gradient(to bottom, #1F3EA6, #375DDC)",
+                                                        boxShadow: "0 2px 8px 0 rgba(55,93,220,0.16)",
+                                                    },
+                                                }}
+                                            >
+                                                수정
+                                            </Button></TableCell>
+                                            <TableCell style={{width: '15%'}}> <Button
+                                                type="button"
+                                                variant="contained"
+                                                sx={{
+                                                    background: "linear-gradient(to bottom, #375DDC, #1F3EA6)",
+                                                    fontSize: "15px",
+                                                    borderRadius: "0.5rem",
+                                                    boxShadow: "none",
+                                                    '&:hover': {
+                                                        background: "linear-gradient(to bottom, #1F3EA6, #375DDC)",
+                                                        boxShadow: "0 2px 8px 0 rgba(55,93,220,0.16)",
+                                                    },
+                                                }}
+                                                onClick={() => navigate('/index/admin/event-layout/create')}
+                                            >
+                                                생성
+                                            </Button></TableCell>
                                         </TableRow>
                                     ))
                             )}
@@ -373,4 +382,4 @@ function EventSearch() {
     );
 }
 
-export default EventSearch;
+export default EventLayout;

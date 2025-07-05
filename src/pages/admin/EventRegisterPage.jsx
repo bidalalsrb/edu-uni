@@ -1,243 +1,327 @@
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import api from "../../util/api/api.js";
-import EventRegisterStep from "../../components/admin/EventRegister/EventRegisterStep.jsx";
+import {Box, Button, Grid, Paper, TextField, Typography} from "@mui/material";
 
 export default function EventRegisterPage() {
     const navigate = useNavigate();
-    const [step, setStep] = useState(1);
     const [eventData, setEventData] = useState({
         name: "",
         person: "",
         startDate: "",
-        place:"",
+        place: "",
         endDate: "",
         uploadImages: [],
         uploadImagePreviews: []
     });
-
-    const handleNext = () => {
-        if (
-            !eventData.name ||
-            !eventData.person ||
-            !eventData.startDate ||
-            !eventData.endDate
-        ) {
-            alert("모든 기본 정보를 입력하고 배치코드를 발급해주세요.");
-            return;
-        }
-        setStep(2);
-    };
-
-    /*    const handleSubmit = () => {
-            if (!eventData.mainImage) {
-                alert("행사 메인 이미지를 등록해주세요.");
-                return;
-            }
-            if (!eventData.subImages || eventData.subImages.length === 0) {
-                alert("행사 서브 이미지를 최소 1장 이상 등록해주세요.");
-                return;
-            }
-            const today = new Date().toISOString().split("T")[0];
-            const finalEventData = { ...eventData, registrationDate: today };
-            const existingEvents = JSON.parse(localStorage.getItem("events")) || [];
-            const updatedEvents = [...existingEvents, finalEventData];
-            localStorage.setItem("events", JSON.stringify(updatedEvents));
-            navigate("/index/admin/batchCode");
-        };*/
+    const [images, setImages] = useState([]); // File[]
+    const [previews, setPreviews] = useState([]); // string[]
+    const [selectedIdx, setSelectedIdx] = useState(0);
+    const fileInputRef = useRef();
 
     const handleSubmit = async () => {
-        if (!eventData.uploadImages.length) {
-            alert("이미지를 최소 1장 이상 선택해주세요.");
-            return;
-        }
         try {
-            // 1. 행사 등록
-            const payload = {
-                schoolCd: "S9490",
+            // 1. 행사정보 등록
+            const eventPayload = {
+                schoolCd: 'S9490',
                 programName: eventData.name,
-                place: eventData.place,
                 coordinatorName: eventData.person,
-                programStartAt: new Date(eventData.startDate).toISOString(),
-                programEndAt: new Date(eventData.endDate).toISOString()
+                place: eventData.place,
+                programStartAt: eventData.startDate,
+                programEndAt: eventData.endDate,
+                description: eventData.memo || ""
             };
-            console.log(payload);
-            const response = await api.post(`/event/program-list/mgmg`, payload);
-            console.log(response);
-             if (response.status === 200) {
-                 console.log('성공',response);
-                 // 2. 이미지 여러 장 업로드
-                 for (let file of eventData.uploadImages) {
-                     const formData = new FormData();
-                     formData.append("file", file);
-                     await api.post('/resource/upload', formData, {
-                         headers: { "Content-Type": "multipart/form-data" }
-                     });
-                 }
-                 // console.log('이미지 성공',formData);
-                 alert("등록이 완료되었습니다.");
-                 navigate("/index/admin/event-search");
-             }
+            console.log('행사정보 데이터 입력', eventPayload);
+
+            const res = await api.post('/event/program-list/mgmg', eventPayload);
+            if (res.status === 200) {
+                let imageUploadSuccess = true;
+
+                // 2. 이미지 여러 장 업로드
+                if (images.length > 0) {
+                    const formData = new FormData();
+                    formData.append("schoolCd", "S9490");
+                    formData.append("programCd", "0");
+                    images.forEach(file => {
+                        formData.append("image", file);
+                    });
+
+                    // formData를 콘솔로 확인하려면:
+                    for (let pair of formData.entries()) {
+                        console.log(pair[0] + ':', pair[1]);
+                    }
+
+                    try {
+                        const imageRes = await api.post('/resource/upload', formData, {
+                            headers: {"Content-Type": "multipart/form-data"}
+                        });
+                        if (imageRes.status !== 200) {
+                            imageUploadSuccess = false;
+                        }
+                    } catch (err) {
+                        imageUploadSuccess = false;
+                        console.log(err);
+                    }
+                }
+
+                if (imageUploadSuccess) {
+                    alert("등록이 완료되었습니다.");
+                    navigate("/index/admin/event-search");
+                } else {
+                    alert("행사정보는 저장되었으나, 이미지 업로드에 실패했습니다.");
+                }
+            } else {
+                alert("행사 등록 실패(코드 반환 없음)");
+            }
         } catch (err) {
             console.log(err);
             alert("등록에 실패했습니다.");
         }
     };
+
+
+    // 파일 업로드 버튼 클릭
+    const handleImageClick = () => {
+        if (fileInputRef.current) fileInputRef.current.click();
+    };
+
+    // 파일 업로드 시
+    const handleImageChange = (e) => {
+        const files = Array.from(e.target.files);
+        const newFiles = files.slice(0, 5 - images.length);
+        const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+        setImages(prev => [...prev, ...newFiles]);
+        setPreviews(prev => [...prev, ...newPreviews]);
+        if (images.length === 0 && newFiles.length > 0) setSelectedIdx(0);
+    };
+
+    // 썸네일 클릭시 큰 이미지로
+    const handleThumbnailClick = idx => setSelectedIdx(idx);
+
+    // 큰 이미지 미리보기 내용
+    const mainPreview = previews.length
+        ? previews[selectedIdx]
+        : null;
     return (
-        <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-2xl mt-6">
-            <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">행사 등록</h1>
-            <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-8">
-                <div
-                    className={`h-2 transition-all duration-300 ${
-                        step === 1 ? "w-1/2 bg-blue-400" : "w-full bg-blue-500"
-                    }`}
-                ></div>
-            </div>
-            {step === 1 && (
-                <div className="space-y-5">
-                    {/* 기본 정보 입력 */}
-                    <div>
-                        <label className="text-sm text-gray-700 font-medium">행사명</label>
-                        <input
-                            type="text"
-                            value={eventData.name}
-                            onChange={e =>
-                                setEventData({...eventData, name: e.target.value})
-                            }
-                            placeholder="예: 캠퍼스 잡페어"
-                            className="w-full mt-1 px-4 py-2 border rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
-                    <div>
-                        <label className="text-sm text-gray-700 font-medium">행사장소</label>
-                        <input
-                            type="text"
-                            value={eventData.place}
-                            onChange={e =>
-                                setEventData({...eventData, place: e.target.value})
-                            }
-                            placeholder="예: 산학관"
-                            className="w-full mt-1 px-4 py-2 border rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
-                    <div>
-                        <label className="text-sm text-gray-700 font-medium">행사 담당자</label>
-                        <input
-                            type="text"
-                            value={eventData.person}
-                            onChange={e =>
-                                setEventData({...eventData, person: e.target.value})
-                            }
-                            placeholder="예: 홍길동"
-                            className="w-full mt-1 px-4 py-2 border rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
-                    <div className='w-1/3'>
-                        <label className="text-sm text-gray-700 font-medium">행사 시작 날짜</label>
-                        <input
-                            type="datetime-local"
-                            value={eventData.startDate}
-                            onChange={e =>
-                                setEventData({...eventData, startDate: e.target.value})
-                            }
-                            className="w-full mt-1 px-4 py-2 border rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
-                    <div className='w-1/3'>
-                        <label className="text-sm text-gray-700 font-medium">행사 종료 날짜</label>
-                        <input
-                            type="datetime-local"
-                            value={eventData.endDate}
-                            onChange={e =>
-                                setEventData({...eventData, endDate: e.target.value})
-                            }
-                            className="w-full mt-1 px-4 py-2 border rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
-                    <button
-                        onClick={handleNext}
-                        className="w-full py-3 bg-blue-500 text-white font-semibold text-sm rounded-xl hover:bg-blue-600 transition"
-                    >
-                        다음
-                    </button>
-                </div>
-            )}
-            {step === 2 && (
-                <div className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            행사 서브 이미지 (여러 장 선택 가능)
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                            {eventData.uploadImagePreviews.map((img, idx) => (
-                                <img
-                                    key={idx}
-                                    src={img}
-                                    alt={`서브 이미지 ${idx + 1}`}
-                                    className="w-full h-24 object-cover rounded-md border"
+        <Box sx={{width: "100%", bgcolor: "#f5f6fa"}}>
+            {/* 메인 */}
+            <Grid container sx={{width: "100%", m: 0, p: 0}}>
+                <Grid container spacing={3} sx={{px: 4, py: 4}}>
+                    {/* 행사 정보 */}
+                    <Grid item xs={12} md={6} sx={{p: 0}}>
+                        <Paper sx={{
+                            p: 4,
+                            borderRadius: 3,
+                            boxShadow: 1,
+                            minHeight: 700,
+                            display: "flex", flexDirection: "column"
+                        }}>
+                            <Typography variant="h6" fontWeight={700} align="center" mb={4}>
+                                행사 정보
+                            </Typography>
+                            <Box sx={{flex: 1, display: "flex", flexDirection: "column", gap: 2}}>
+                                <TextField
+                                    label="행사명 *"
+                                    size="small"
+                                    fullWidth
+                                    margin="normal"
+                                    value={eventData.name}
+                                    onChange={e => setEventData({...eventData, name: e.target.value})}
                                 />
-                            ))}
-                            <div
-                                className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50">
-                                <label
-                                    htmlFor="subImageInput"
-                                    className="flex flex-col items-center justify-center p-2"
-                                >
-                                    <svg
-                                        className="w-6 h-6 text-gray-400 mb-1"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
+                                <TextField
+                                    label="행사 장소 *"
+                                    size="small"
+                                    fullWidth
+                                    margin="normal"
+                                    value={eventData.place}
+                                    onChange={e => setEventData({...eventData, place: e.target.value})}
+                                />
+                                <TextField
+                                    label="행사 담당자 *"
+                                    size="small"
+                                    fullWidth
+                                    margin="normal"
+                                    value={eventData.person}
+                                    onChange={e => setEventData({...eventData, person: e.target.value})}
+                                />
+                                <Grid container spacing={2}>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            label="행사 시작 날짜 *"
+                                            size="small"
+                                            type="datetime-local"
+                                            fullWidth
+                                            InputLabelProps={{shrink: true}}
+                                            margin="normal"
+                                            value={eventData.startDate}
+                                            onChange={e => setEventData({...eventData, startDate: e.target.value})}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            label="행사 종료 날짜 *"
+                                            size="small"
+                                            type="datetime-local"
+                                            fullWidth
+                                            InputLabelProps={{shrink: true}}
+                                            margin="normal"
+                                            value={eventData.endDate}
+                                            onChange={e => setEventData({...eventData, endDate: e.target.value})}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <TextField
+                                    label="비고"
+                                    size="small"
+                                    fullWidth
+                                    margin="normal"
+                                    multiline
+                                    minRows={5}
+                                    value={eventData.memo || ""}
+                                    onChange={e => setEventData({...eventData, memo: e.target.value})}
+                                />
+                            </Box>
+
+                        </Paper>
+                    </Grid>
+                    {/* 이미지 등록 */}
+                    <Grid item xs={12} md={6} sx={{p: 0}}>
+                        <Paper sx={{
+                            p: 4,
+                            borderRadius: 3,
+                            boxShadow: 1,
+                            minHeight: 700,
+                            maxHeight: 700,
+                            display: "flex", flexDirection: "column"
+                        }}>
+                            <Typography variant="h6" fontWeight={700} align="center" mb={4}>
+                                행사 이미지 등록
+                            </Typography>
+
+                            {/* 큰 미리보기 (빨간박스) */}
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                    aspectRatio: "4/3",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    border: "2px dashed #eee",
+                                    borderRadius: 2,
+                                    minHeight: 270,
+                                    height: 0,              // ★ 추가: flex:1과 함께하면 '남는 공간'만큼만 차지
+                                    maxHeight: 400,         // ★ 추가: 최대 높이 제한
+                                    mb: 3,
+                                    bgcolor: "#fafbfc",
+                                    cursor: "pointer",
+                                    position: "relative",
+                                    overflow: "hidden"      // ★ 추가: 자식이 절대 벗어나지 않도록
+                                }}
+                                onClick={images.length === 0 ? handleImageClick : undefined}
+                            >
+                                {/* 이미지 없으면 +, 있으면 미리보기 */}
+                                {mainPreview ? (
+                                    <img
+                                        src={mainPreview}
+                                        alt="선택이미지"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "contain",
+                                            borderRadius: 8,
+                                            display: "block",
+                                            maxHeight: "100%",
+                                            maxWidth: "100%"
+                                        }}
+                                    />
+                                ) : (
+                                    <Box sx={{textAlign: "center"}}>
+                                        <Box sx={{mb: 1}}>
+                                            <svg width={44} height={44} fill="none" stroke="#bbb" viewBox="0 0 24 24">
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M12 4v16m8-8H4"
+                                                />
+                                            </svg>
+                                        </Box>
+                                        <Typography color="#888" fontSize={16}>이미지 추가</Typography>
+                                    </Box>
+                                )}
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    style={{display: "none"}}
+                                    ref={fileInputRef}
+                                    onChange={handleImageChange}
+                                />
+                            </Box>
+
+                            {/* 썸네일 + 추가 버튼 (파란박스) */}
+                            <Box sx={{display: "flex", gap: 1.5, mb: 2}}>
+                                {previews.map((src, idx) => (
+                                    <Box
+                                        key={idx}
+                                        onClick={() => handleThumbnailClick(idx)}
+                                        sx={{
+                                            width: 54,
+                                            height: 54,
+                                            borderRadius: 2,
+                                            border: idx === selectedIdx ? "2px solid #2258E9" : "1px solid #eee",
+                                            bgcolor: "#fafbfc",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            overflow: "hidden",
+                                            cursor: "pointer"
+                                        }}
                                     >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M12 4v16m8-8H4"
-                                        ></path>
-                                    </svg>
-                                    <span className="text-gray-600 text-xs">추가</span>
-                                </label>
-                            </div>
-                        </div>
-                        <input
-                            id="subImageInput"
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={e => {
-                                const newFiles = Array.from(e.target.files);
-                                const newPreviews = newFiles.map(file =>
-                                    URL.createObjectURL(file)
-                                );
-                                setEventData(prev => ({
-                                    ...prev,
-                                    uploadImages: [...(prev.uploadImages || []), ...newFiles],
-                                    uploadImagePreviews: [
-                                        ...(prev.uploadImagePreviews || []),
-                                        ...newPreviews
-                                    ]
-                                }));
-                            }}
-                            className="hidden"
-                        />
-                    </div>
-                    <div className="flex justify-between gap-2">
-                        <button
-                            onClick={() => setStep(1)}
-                            className="w-1/2 py-3 border rounded-xl text-sm text-gray-700 hover:bg-gray-100 transition"
-                        >
-                            이전
-                        </button>
-                        <button
-                            onClick={handleSubmit}
-                            className="w-1/2 py-3 bg-green-500 text-white font-semibold text-sm rounded-xl hover:bg-green-600 transition"
-                        >
-                            등록
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
+                                        <img
+                                            src={src}
+                                            alt={`썸네일${idx + 1}`}
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "cover",
+                                                borderRadius: 8
+                                            }}
+                                        />
+                                    </Box>
+                                ))}
+                                {/* + 버튼은 이미지 5장 미만일 때만 */}
+                                {images.length < 5 && (
+                                    <Button
+                                        variant="outlined"
+                                        onClick={handleImageClick}
+                                        sx={{
+                                            width: 54, height: 54, borderRadius: 2, color: "#aaa",
+                                            border: "2px dashed #ccc", minWidth: 0, fontSize: 34, fontWeight: 500
+                                        }}
+                                    >+</Button>
+                                )}
+                            </Box>
+
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                sx={{
+                                    width: 110,
+                                    alignSelf: "flex-end",
+                                    bgcolor: "#2258E9",
+                                    fontWeight: 600,
+                                    py: 1,
+                                    mt: "auto"
+                                }}
+                                onClick={handleSubmit}
+                            >
+                                등록하기
+                            </Button>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Box>
     );
 }
