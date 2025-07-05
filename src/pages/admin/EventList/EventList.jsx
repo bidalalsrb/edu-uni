@@ -51,7 +51,7 @@ function EventList() {
                 filteredRecords={filteredRecords}
                 page={page}
                 setPage={setPage}
-                rowsPerPage={7}
+                rowsPerPage={5}
             />
         </main>
     );

@@ -2,7 +2,7 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import JoinList from "../pages/user/JoinList";
 import AdminLayout from "../components/Layouts/admin/AdminLayout.jsx";
-import EventRegisterPage from "../pages/admin/EventRegister/EventRegisterPage.jsx";
+import EventRegister from "../pages/admin/EventRegister/EventRegister.jsx";
 import ExcelDown from "../pages/admin/ExcelDown/ExcelDown.jsx";
 import UserApplyPage from "../pages/user/UserApplyPage.jsx";
 import EventList from "../pages/admin/EventList/EventList.jsx";
@@ -75,7 +75,7 @@ const routes = [
         children: [
             {
                 path: "event-register",
-                element: <EventRegisterPage />,
+                element: <EventRegister />,
             },
             {
                 path: "event-layout",
