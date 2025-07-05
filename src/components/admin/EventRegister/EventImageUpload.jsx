@@ -82,7 +82,7 @@ export default function EventImageUpload({ images, setImages, previews, setPrevi
                         key={idx}
                         onClick={() => handleThumbnailClick(idx)}
                         sx={{
-                            width: 54, height: 54, borderRadius: 2,
+                            width: 100, height: 100, borderRadius: 2,
                             border: idx === selectedIdx ? "2px solid #2258E9" : "1px solid #eee",
                             bgcolor: "#fafbfc",
                             display: "flex", alignItems: "center", justifyContent: "center",
@@ -95,7 +95,7 @@ export default function EventImageUpload({ images, setImages, previews, setPrevi
                             style={{
                                 width: "100%",
                                 height: "100%",
-                                objectFit: "cover",
+                                objectFit: "contain",
                                 borderRadius: 8
                             }}
                         />
@@ -106,7 +106,7 @@ export default function EventImageUpload({ images, setImages, previews, setPrevi
                         variant="outlined"
                         onClick={handleImageClick}
                         sx={{
-                            width: 54, height: 54, borderRadius: 2, color: "#aaa",
+                            width: 100, height: 100, borderRadius: 2, color: "#aaa",
                             border: "2px dashed #ccc", minWidth: 0, fontSize: 34, fontWeight: 500
                         }}
                     >+</Button>
