@@ -34,7 +34,7 @@ export default function ExcelDownSearchForm({
                                             }) {
     return (
         <section className="bg-white rounded-xl shadow-sm  border border-gray-200 px-14 py-14 ">
-            <div className="flex flex-col gap-9 text-xl">
+            <div className="flex flex-col gap-6 ">
                 {/* 검색 */}
                 <div className="flex items-center ">
                     <div className="w-28 min-w-28 text-left mr-28 font-semibold text-gray-800 ">검색</div>
@@ -46,12 +46,12 @@ export default function ExcelDownSearchForm({
                                 '& fieldset': {
                                     borderColor: '#ffF',
                                     boxShadow: '0 0 0 1px rgba(55,93,220,0.10), 0 0px 8px rgba(0,0,0,0.12)',
-                                },
-                            },
+                                }
+                            }
                         }}>
                             <Select
                                 value={searchOption}
-                                onChange={e => setSearchOption(e.target.value)}
+                                onChange={(e) => setSearchOption(e.target.value)}
                             >
                                 <MenuItem value="목록">목록</MenuItem>
                                 <MenuItem value="행사명">행사명</MenuItem>
@@ -87,15 +87,18 @@ export default function ExcelDownSearchForm({
                             name="status"
                             className="w-full"
                         >
-                            <FormControlLabel
-                                value="option1"
-                                control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
-                                label="어쩌구"
-                                className="!mr-6"
-                            />
-                            <FormControlLabel value="option2" control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>} label="저쩌구" className="!mr-6"/>
-                            <FormControlLabel value="option3" control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>} label="끝남" className="!mr-6"/>
-                            <FormControlLabel value="option4" control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>} label="쩔라" className="!mr-6"/>
+                            <FormControlLabel value="option1"
+                                              control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
+                                              label="어쩌구" className="!mr-6"/>
+                            <FormControlLabel value="option2"
+                                              control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
+                                              label="저쩌구" className="!mr-6"/>
+                            <FormControlLabel value="option3"
+                                              control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
+                                              label="끝남" className="!mr-6"/>
+                            <FormControlLabel value="option4"
+                                              control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
+                                              label="쩔라" className="!mr-6"/>
                         </RadioGroup>
                     </div>
                 </div>
@@ -107,12 +110,20 @@ export default function ExcelDownSearchForm({
                             row
                             value={categoryValue}
                             onChange={e => setCategoryValue(e.target.value)}
-                            name="category"
+                            name="status"
                         >
-                            <FormControlLabel value="option1" control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>} label="어쩌구" className="!mr-6"/>
-                            <FormControlLabel value="option2" control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>} label="저쩌구" className="!mr-6"/>
-                            <FormControlLabel value="option3" control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>} label="끝남" className="!mr-6"/>
-                            <FormControlLabel value="option4" control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>} label="쩔라" className="!mr-6"/>
+                            <FormControlLabel value="option1"
+                                              control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
+                                              label="어쩌구" className="!mr-6"/>
+                            <FormControlLabel value="option2"
+                                              control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
+                                              label="저쩌구" className="!mr-6"/>
+                            <FormControlLabel value="option3"
+                                              control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
+                                              label="끝남" className="!mr-6"/>
+                            <FormControlLabel value="option4"
+                                              control={<Radio icon={UncheckedIcon} checkedIcon={CheckedIcon}/>}
+                                              label="쩔라" className="!mr-6"/>
                         </RadioGroup>
                     </div>
                 </div>
@@ -132,7 +143,9 @@ export default function ExcelDownSearchForm({
                             },
                         }}
                         onClick={onSearch}
-                    >검색</Button>
+                    >
+                        검색
+                    </Button>
                     <Button
                         type="button"
                         variant="outlined"
@@ -149,9 +162,11 @@ export default function ExcelDownSearchForm({
                             },
                         }}
                         onClick={onReset}
-                    >초기화</Button>
+                    >
+                        초기화
+                    </Button>
                 </div>
             </div>
         </section>
-    );
+    )
 }

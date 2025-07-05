@@ -71,7 +71,7 @@ function EventLayout() {
             <div className="text-sm text-gray-500 font-medium">행사 /<span className='font-bold text-gray-800'> 조회</span>
             </div>
             <section className="bg-white rounded-xl shadow-sm  border border-gray-200 px-14 py-14 ">
-                <div className="flex flex-col gap-9 text-xl">
+                <div className="flex flex-col gap-6 ">
                     {/* 검색 */}
                     <div className="flex items-center ">
                         <div className="w-28 min-w-28 text-left mr-28 font-semibold text-gray-800 ">검색</div>

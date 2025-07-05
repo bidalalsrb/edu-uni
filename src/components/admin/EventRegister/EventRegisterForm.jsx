@@ -5,7 +5,9 @@ export default function EventRegisterForm({ eventData, setEventData }) {
     return (
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
             <TextField
-                label="행사명 *"
+                label={
+                    <span> 행사명<span className=" ml-1 text-red-500">*</span></span>
+                }
                 size="small"
                 fullWidth
                 margin="normal"
@@ -13,7 +15,9 @@ export default function EventRegisterForm({ eventData, setEventData }) {
                 onChange={e => setEventData({ ...eventData, name: e.target.value })}
             />
             <TextField
-                label="행사 장소 *"
+                label={
+                    <span> 행사 장소<span className=" ml-1 text-red-500">*</span></span>
+                }
                 size="small"
                 fullWidth
                 margin="normal"
@@ -21,7 +25,9 @@ export default function EventRegisterForm({ eventData, setEventData }) {
                 onChange={e => setEventData({ ...eventData, place: e.target.value })}
             />
             <TextField
-                label="행사 담당자 *"
+                label={
+                    <span> 행사 담당자<span className=" ml-1 text-red-500">*</span></span>
+                }
                 size="small"
                 fullWidth
                 margin="normal"
@@ -31,7 +37,9 @@ export default function EventRegisterForm({ eventData, setEventData }) {
             <Grid container spacing={2}>
                 <Grid item xs={6}>
                     <TextField
-                        label="행사 시작 날짜 *"
+                        label={
+                            <span> 행사 시작 날짜<span className=" ml-1 text-red-500">*</span></span>
+                        }
                         size="small"
                         type="datetime-local"
                         fullWidth
@@ -43,7 +51,9 @@ export default function EventRegisterForm({ eventData, setEventData }) {
                 </Grid>
                 <Grid item xs={6}>
                     <TextField
-                        label="행사 종료 날짜 *"
+                        label={
+                            <span> 행사 종료 날짜<span className=" ml-1 text-red-500">*</span></span>
+                        }
                         size="small"
                         type="datetime-local"
                         fullWidth
