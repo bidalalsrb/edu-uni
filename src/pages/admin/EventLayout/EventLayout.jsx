@@ -14,7 +14,7 @@ import {
     TextField
 } from "@mui/material";
 import CustomPagination from "../../../components/common/CustomPagination.jsx";
-
+import {formatDateTime} from "/src/util/common/commonFunctions.js";
 
 function EventLayout() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -325,8 +325,10 @@ function EventLayout() {
                                             <TableCell style={{width: '28%'}}>{record.programName}</TableCell>
                                             <TableCell style={{width: '20%'}}>{record.place}</TableCell>
                                             <TableCell style={{width: '15%'}}>{record.coordinatorName}</TableCell>
-                                            <TableCell style={{width: '15%'}}>{record.programStartAt}</TableCell>
-                                            <TableCell style={{width: '15%'}}>{record.programEndAt}</TableCell>
+                                            <TableCell
+                                                style={{width: '15%'}}>{formatDateTime(record.programStartAt)}</TableCell>
+                                            <TableCell
+                                                style={{width: '15%'}}>{formatDateTime(record.programEndAt)}</TableCell>
                                             <TableCell style={{width: '15%'}}> <Button
                                                 type="button"
                                                 variant="contained"
