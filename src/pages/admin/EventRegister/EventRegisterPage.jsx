@@ -1,6 +1,6 @@
 import React, {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import api from "../../util/api/api.js";
+import api from "../../../util/api/api.js";
 import {Box, Button, Grid, Paper, TextField, Typography} from "@mui/material";
 
 export default function EventRegisterPage() {

@@ -20,9 +20,9 @@ function AdminSidebar() {
         </div>
         <nav className="space-y-1">
             <a
-                onClick={() => navigate("/index/admin/event-search")}
+                onClick={() => navigate("/index/admin/event-list")}
                 className={`cursor-pointer block py-2 px-3 rounded-md text-sm font-medium
-        ${location.pathname.includes("event-search") ? "text-white bg-gradient-to-b from-[#375DDC] to-[#1F3EA6]" : "text-gray-700"}
+        ${location.pathname.includes("event-list") ? "text-white bg-gradient-to-b from-[#375DDC] to-[#1F3EA6]" : "text-gray-700"}
     `}
             >
                 행사 조회

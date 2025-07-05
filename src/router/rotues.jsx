@@ -2,11 +2,11 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import JoinList from "../pages/user/JoinList";
 import AdminLayout from "../components/Layouts/admin/AdminLayout.jsx";
-import EventRegisterPage from "../pages/admin/EventRegisterPage.jsx";
-import ExcelDown from "../pages/admin/ExcelDown.jsx";
+import EventRegisterPage from "../pages/admin/EventRegister/EventRegisterPage.jsx";
+import ExcelDown from "../pages/admin/ExcelDown/ExcelDown.jsx";
 import UserApplyPage from "../pages/user/UserApplyPage.jsx";
-import EventSearch from "../pages/admin/EventSearch.jsx";
-import ExcelSearchDetail from "../pages/admin/EventSearchDetail.jsx";
+import EventList from "../pages/admin/EventList/EventList.jsx";
+import ExcelListDetail from "../pages/admin/EventList/EventListDetail.jsx";
 import MyAccount from "../components/user/MyPage/MyAccount.jsx";
 import MyAttendList from "../components/user/MyPage/MyAttendList.jsx";
 import MyPageList from "../pages/user/MyPageList.jsx";
@@ -88,11 +88,11 @@ const routes = [
                 path: "exceldown",
                 element: <ExcelDown />,
             },  {
-                path: "event-search",
-                element: <EventSearch />,
+                path: "event-list",
+                element: <EventList />,
             }, {
-                path: "event-search-detail",
-                element: <ExcelSearchDetail />,
+                path: "event-list-detail",
+                element: <ExcelListDetail />,
             },
             // 필요하면 index(기본) route도 추가
             // { path: "", element: <div>관리자 홈</div> }

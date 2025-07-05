@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import api from "../../util/api/api.js";
+import api from "../../../util/api/api.js";
 import {
     Box,
     Button, Checkbox,
@@ -13,10 +13,10 @@ import {
     Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow,
     TextField
 } from "@mui/material";
-import CustomPagination from "../../components/common/CustomPagination.jsx";
+import CustomPagination from "../../../components/common/CustomPagination.jsx";
 
 
-function EventSearch() {
+function ExcelDown() {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchOption, setSearchOption] = useState("목록"); // 기본값 "행사명"
     const [statusValue, setStatusValue] = useState("option1");
@@ -293,15 +293,20 @@ function EventSearch() {
             <section className="bg-white rounded-xl shadow-sm border border-gray-200">
                 {/* 상단: TOTAL */}
                 <div className="flex items-center justify-between px-8 pt-6 pb-2">
-        <span className="text-gray-600 text-sm font-medium">
-          TOTAL : <span className="text-[#375DDC]">{filteredRecords.length}</span>
-        </span>
+                    <span className="text-gray-600 text-sm font-medium">
+                      TOTAL : <span className="text-[#375DDC]">{filteredRecords.length}</span>
+                    </span>
+                    <button type="button"
+                            className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+                             focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">엑셀
+                        다운로드
+                    </button>
                     {/* 최신순 셀렉트 등 필요시 여기에 */}
                 </div>
                 <TableContainer component={Paper} sx={{
                     boxShadow: "none", borderRadius: 3, px: 2, background: "#fff"
                 }}>
-                    <Table stickyHeader style={{ tableLayout: "fixed", width: "100%" }}>
+                    <Table stickyHeader style={{tableLayout: "fixed", width: "100%"}}>
                         <TableHead>
                             <TableRow
                                 sx={{
@@ -315,18 +320,18 @@ function EventSearch() {
                                     }
                                 }}
                             >
-                                <TableCell align="center" style={{ width: '7%' }}>NO.</TableCell>
-                                <TableCell style={{ width: '28%' }}>행사명</TableCell>
-                                <TableCell style={{ width: '20%' }}>행사장소</TableCell>
-                                <TableCell style={{ width: '15%' }}>담당자</TableCell>
-                                <TableCell style={{ width: '15%' }}>시작날짜</TableCell>
-                                <TableCell style={{ width: '15%' }}>종료날짜</TableCell>
+                                <TableCell align="center" style={{width: '7%'}}>NO.</TableCell>
+                                <TableCell style={{width: '28%'}}>행사명</TableCell>
+                                <TableCell style={{width: '20%'}}>행사장소</TableCell>
+                                <TableCell style={{width: '15%'}}>담당자</TableCell>
+                                <TableCell style={{width: '15%'}}>시작날짜</TableCell>
+                                <TableCell style={{width: '15%'}}>종료날짜</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {filteredRecords.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} align="center" sx={{ color: "#aaa" }}>
+                                    <TableCell colSpan={6} align="center" sx={{color: "#aaa"}}>
                                         검색 결과가 없습니다.
                                     </TableCell>
                                 </TableRow>
@@ -338,19 +343,19 @@ function EventSearch() {
                                             key={idx}
                                             hover
                                             sx={{
-                                                "&:hover": { background: "#F8FAFF" },
+                                                "&:hover": {background: "#F8FAFF"},
                                                 cursor: "pointer",
-                                                "&:last-child td": { borderBottom: 0 }
+                                                "&:last-child td": {borderBottom: 0}
                                             }}
                                         >
-                                            <TableCell align="center" style={{ width: '7%' }}>
+                                            <TableCell align="center" style={{width: '7%'}}>
                                                 {idx + 1 + page * rowsPerPage}
                                             </TableCell>
-                                            <TableCell style={{ width: '28%' }}>{record.programName}</TableCell>
-                                            <TableCell style={{ width: '20%' }}>{record.place}</TableCell>
-                                            <TableCell style={{ width: '15%' }}>{record.coordinatorName}</TableCell>
-                                            <TableCell style={{ width: '15%' }}>{record.programStartAt}</TableCell>
-                                            <TableCell style={{ width: '15%' }}>{record.programEndAt}</TableCell>
+                                            <TableCell style={{width: '28%'}}>{record.programName}</TableCell>
+                                            <TableCell style={{width: '20%'}}>{record.place}</TableCell>
+                                            <TableCell style={{width: '15%'}}>{record.coordinatorName}</TableCell>
+                                            <TableCell style={{width: '15%'}}>{record.programStartAt}</TableCell>
+                                            <TableCell style={{width: '15%'}}>{record.programEndAt}</TableCell>
                                         </TableRow>
                                     ))
                             )}
@@ -373,4 +378,4 @@ function EventSearch() {
     );
 }
 
-export default EventSearch;
+export default ExcelDown;
