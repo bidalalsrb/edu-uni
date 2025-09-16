@@ -6,8 +6,8 @@ const sampleLayout = {
         {
             id: 101,
             placed: true,
-            row: 0,
-            col: 0,
+            rowNum: 0,
+            colNum: 0,
             companyName: "삼성전자",
             color: "#4682B4",
             applications: [
@@ -46,8 +46,8 @@ const sampleLayout = {
         {
             id: 102,
             placed: true,
-            row: 0,
-            col: 1,
+            rowNum: 0,
+            colNum: 1,
             companyName: "네이버",
             color: "#00ff00",
             applications: [
@@ -87,8 +87,8 @@ const sampleLayout = {
         {
             id: 104,
             placed: true,
-            row: 0,
-            col: 3,
+            rowNum: 0,
+            colNum: 3,
             companyName: "카카오",
             color: "#FFFACD",
             applications: [

@@ -9,7 +9,7 @@ function DraggableBox({box, onDropToGrid}) {
         end: (item, monitor) => {
             const dropResult = monitor.getDropResult();
             if (item && dropResult) {
-                onDropToGrid(item.id, dropResult.row, dropResult.col);
+                onDropToGrid(item.id, dropResult.rowNum, dropResult.colNum);
             }
         },
         collect: (monitor) => ({
@@ -27,11 +27,11 @@ function DraggableBox({box, onDropToGrid}) {
             className="border rounded-lg p-2 shadow-md cursor-move w-full h-full flex flex-col items-center justify-center bg-white"
             style={{
                 opacity,
-                backgroundColor: box.color || "#ffffff",
+                backgroundColor: box.blockColor || "#ffffff",
             }}
         >
             <div className="text-sm font-semibold text-gray-800">
-                {box.companyName || box.school}
+                {box.eventName || '이름없음'}
             </div>
             {/* 필요 시 추가 정보 영역 */}
         </div>

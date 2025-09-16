@@ -24,7 +24,7 @@ const steps = [
 ];
 
 export default function Register() {
-    const [step, setStep] = useState(3);
+    const [step, setStep] = useState(2);
 
     // 모든 입력필드 상태 (id는 phone과 동일)
     const [form, setForm] = useState({

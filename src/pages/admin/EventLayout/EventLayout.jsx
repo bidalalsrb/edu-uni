@@ -23,7 +23,7 @@ function EventLayout() {
     const [categoryValue, setCategoryValue] = useState("option1");
     const [filteredRecords, setFilteredRecords] = useState([]);
     const [page, setPage] = useState(0);
-    const rowsPerPage = 10; // 사진 기준 한 페이지 7개
+    const rowsPerPage = 5; // 사진 기준 한 페이지 7개
 
     const navigate = useNavigate();
 
@@ -227,7 +227,7 @@ function EventLayout() {
                             variant="contained"
                             sx={{
                                 background: "linear-gradient(to bottom, #375DDC, #1F3EA6)",
-                                fontSize: "15px",      // text-xl과 비슷
+                                fontSize: "`15px",      // text-xl과 비슷
                                 borderRadius: "0.5rem",   // rounded-lg
                                 boxShadow: "none",
                                 '&:hover': {

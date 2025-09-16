@@ -7,8 +7,7 @@ import CellAdjustModal from "../../../components/admin/ApplyPage/modal/CellAdjus
 import CompanyListModal from "../../../components/admin/ApplyPage/modal/CompanyListModal.jsx";
 import CreateCompanyBoxModal from "../../../components/admin/ApplyPage/modal/CreateCompanyBoxModal.jsx";
 import {COLOR_PALETTE} from "../../../components/admin/ApplyPage/constants.js";
-
-import {Box, Paper, Button, Grid, Typography} from "@mui/material";
+import {Box, Paper, Button, Grid, Typography, TextField} from "@mui/material";
 import api from "../../../util/api/api.js";
 
 export default function EventLayoutCreate({record}) {
@@ -20,16 +19,22 @@ export default function EventLayoutCreate({record}) {
     const [selectedCompanyBox, setSelectedCompanyBox] = useState(null);
     const [isCompanyListModalOpen, setIsCompanyListModalOpen] = useState(false);
     const [createStatus, setCreateStatus] = useState(false);
+    const [eventName, seteventName] = useState('');
     // 기업 박스 생성
-    const handleCreateBox = ({companyName, color}) => {
+    const handleCreateBox = ({schoolCd, programCd, layoutCd, eventName, place, blockColor}) => {
         const newBox = {
             id: Date.now(),
-            companyName,
-            color,
-            applications: [],
+            schoolCd: "S9490",
+            programCd: 26,
+            layoutCd: 12,
+            rowNum: null,
+            colNum: null,
+            eventName,
+            place : '아무데나',
+            blockColor,
+            eventSessionsDto: [],
             placed: false,
-            row: null,
-            col: null,
+
         };
         setBoxes([...boxes, newBox]);
         setIsCreateBoxModalOpen(false);
@@ -39,14 +44,14 @@ export default function EventLayoutCreate({record}) {
     const handleDropToGrid = (id, row, col) => {
         setBoxes((prevBoxes) => {
             const targetBox = prevBoxes.find(
-                (b) => b.placed && b.row === row && b.col === col
+                (b) => b.placed && b.rowNum === row && b.colNum === col
             );
             return prevBoxes.map((box) => {
                 if (box.id === id) {
-                    return {...box, placed: true, row, col};
+                    return {...box, placed: true, rowNum: row, colNum: col};
                 }
                 if (targetBox && box.id === targetBox.id) {
-                    return {...box, placed: false, row: null, col: null};
+                    return {...box, placed: false, rowNum: null, colNum: null};
                 }
                 return box;
             });
@@ -57,7 +62,7 @@ export default function EventLayoutCreate({record}) {
     const handleDeleteBoxFromGrid = (boxId) => {
         setBoxes((prevBoxes) =>
             prevBoxes.map((box) =>
-                box.id === boxId ? {...box, placed: false, row: null, col: null} : box
+                box.id === boxId ? {...box, placed: false, rowNum: null, colNum: null} : box
             )
         );
     };
@@ -77,7 +82,7 @@ export default function EventLayoutCreate({record}) {
         setBoxes((prevBoxes) =>
             prevBoxes.map((box) =>
                 box.id === boxId
-                    ? {...box, applications: [...(box.applications || []), newApplication]}
+                    ? {...box, eventSessionsDto: [...(box.eventSessionsDto || []), newApplication]}
                     : box
             )
         );
@@ -90,8 +95,8 @@ export default function EventLayoutCreate({record}) {
         setIsCellAdjustModalOpen(false);
         setBoxes((prev) =>
             prev.map((b) =>
-                b.placed && (b.row >= newRows || b.col >= newCols)
-                    ? {...b, placed: false, row: null, col: null}
+                b.placed && (b.rowNum >= newRows || b.colNum >= newCols)
+                    ? {...b, placed: false, rowNum: null, colNum: null}
                     : b
             )
         );
@@ -103,7 +108,7 @@ export default function EventLayoutCreate({record}) {
     const gridCells = [];
     for (let row = 0; row < rowCount; row++) {
         for (let col = 0; col < colCount; col++) {
-            const box = boxes.find((b) => b.placed && b.row === row && b.col === col);
+            const box = boxes.find((b) => b.placed && b.rowNum === row && b.colNum === col);
             gridCells.push(
                 <GridCell
                     key={`${row}-${col}`}
@@ -119,11 +124,25 @@ export default function EventLayoutCreate({record}) {
     }
     // 배치도 생성
     const handleCreateLayout = async () => {
+        setCreateStatus(true);
+    };
+
+
+    const handleSubmit = async () => {
+
+        try {
+            console.log('pay', boxes)
+            const response = await api.post(`/admin/event-list/mgmg`, boxes)
+            console.log('res', response)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    const handleInitLayout = async () => {
         const payload = {
             schoolCd: "S9490",
-            programCd: 0,
-            layoutCd: 1,
-            layoutNm: "행사장 A구역",
+            programCd: 26,
+            layoutNm: eventName,
             maxRow: rowCount,
             maxCol: colCount,
             coordinatorName: "남상민",
@@ -132,21 +151,14 @@ export default function EventLayoutCreate({record}) {
             eventEndAt: "2025-07-05T14:54:09.579Z"
         }
         try {
-
             // 실제 생성 API 호출 (userId 값은 실제 값으로 대체)
             const res = await api.post('/admin/layout/mgmg', payload);
             console.log('res', res)
-            if (res.status === 200) {
-                setCreateStatus(true);
-            }
-            // 예시: 1초 후 성공 처리 (필요 없으면 제거해도 됨)
-            // setTimeout(() => setCreateStatus(true), 1000);
         } catch (err) {
             alert("배치도 생성 실패!");
             console.log(err)
         }
-    };
-
+    }
     return (
         createStatus ?
             <DndProvider backend={HTML5Backend}>
@@ -186,7 +198,19 @@ export default function EventLayoutCreate({record}) {
                                     fontWeight: 600,
                                     background: "linear-gradient(to bottom, #6d4aff, #3e1f99)",
                                 }}
-                                // onClick={handleSave} // 저장 핸들러 추가 필요
+                                onClick={handleInitLayout} // 저장 핸들러 추가 필요
+                            >
+                                최초저장
+                            </Button>
+                        </Grid><Grid item>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                sx={{
+                                    fontWeight: 600,
+                                    background: "linear-gradient(to bottom, #6d4aff, #3e1f99)",
+                                }}
+                                onClick={handleSubmit} // 저장 핸들러 추가 필요
                             >
                                 저장
                             </Button>
@@ -269,7 +293,7 @@ export default function EventLayoutCreate({record}) {
                         <CreateCompanyBoxModal
                             isOpen={isCreateBoxModalOpen}
                             onClose={() => setIsCreateBoxModalOpen(false)}
-                            onSubmit={handleCreateBox}
+                            onSubmit={(data) => handleCreateBox(data)}
                             colorPalette={COLOR_PALETTE}
                         />
                     )}
@@ -288,15 +312,42 @@ export default function EventLayoutCreate({record}) {
                     sx={{
                         height: "60vh",
                         display: "flex",
+                        flexDirection: "column",        // 세로 정렬!
                         alignItems: "center",
                         justifyContent: "center",
                         bgcolor: "#fafbfc",
                         borderRadius: 3,
+                        gap: 3,                        // 컴포넌트 간격
                     }}
                 >
+                    <Typography
+                        variant="h6"
+                        fontWeight={600}
+                        gutterBottom
+                        sx={{color: "#375DDC"}}
+                    >
+                        배치도 제목을 입력해주세요
+                    </Typography>
+                    <TextField
+                        size="small"
+                        placeholder="제목을 입력해주세요"
+                        value={eventName}
+                        onChange={e => seteventName(e.target.value)}
+                        sx={{
+                            width: "50%",
+                            minWidth: 260,
+                            '& .MuiOutlinedInput-root': {
+                                backgroundColor: "#fff",
+                                '& fieldset': {
+                                    borderColor: '#e5e8ec',
+                                    boxShadow: '0 0 0 1px rgba(55,93,220,0.10), 0 0px 8px rgba(0,0,0,0.12)',
+                                },
+                            },
+                        }}
+                    />
                     <Button
                         variant="contained"
-                        size="xmall"
+                        size="large"
                         sx={{
                             px: 8,
                             py: 2.5,
@@ -307,6 +358,7 @@ export default function EventLayoutCreate({record}) {
                             boxShadow: 2,
                             '&:hover': {background: "linear-gradient(to bottom, #1F3EA6, #375DDC)"}
                         }}
+                        disabled={!eventName.trim()}      // 제목 없으면 비활성화
                         onClick={handleCreateLayout}
                     >
                         배치도 생성

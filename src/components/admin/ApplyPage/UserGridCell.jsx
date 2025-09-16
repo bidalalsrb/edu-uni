@@ -7,7 +7,7 @@ import { XMarkIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
 function UserGridCell({ row, col, box, onDropToGrid, onOpenEdit, onOpenList, onDelete }) {
     const [{ isOver }, dropRef] = useDrop({
         accept: ItemTypes.BOX,
-        drop: () => ({ row, col }),
+        drop: () => ({ rowNum: row, colNum: col }),
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),

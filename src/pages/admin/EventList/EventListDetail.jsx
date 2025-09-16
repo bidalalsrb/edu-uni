@@ -1,5 +1,6 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Pagination} from "@mui/material";
+import api from "../../../util/api/api.js";
 
 export const sampleRecordsInit = [
     {
@@ -193,7 +194,8 @@ export const sampleRecordsInit = [
     },
 ];
 
-function ExcelSearchDetail() {
+
+const ExcelSearchDetail = () => {
     // sampleRecordsInit을 상태로 관리 (값 변경용)
     const [records, setRecords] = useState(sampleRecordsInit);
 
@@ -230,6 +232,18 @@ function ExcelSearchDetail() {
         );
         setModalOpen(false);
     };
+    useEffect(() => {
+        const handleGet = async () => {
+            try {
+                const response = await api.get('/event/reservation/school-cd/S9490/program-cd/1')
+
+                console.log('response', response)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        handleGet()
+    }, []);
 
     return (
         <main className="p-6 flex flex-col gap-6">

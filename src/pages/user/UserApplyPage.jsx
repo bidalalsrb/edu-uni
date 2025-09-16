@@ -116,7 +116,7 @@ export default function UserApplyPage({ record }) {
                 {Array.from({ length: rowCount }).map((_, row) =>
                     Array.from({ length: colCount }).map((__, col) => {
                         const placedBox = filteredBoxes.find(
-                            (b) => b.placed && b.row === row && b.col === col
+                            (b) => b.placed && b.rowNum === row && b.colNum === col
                         );
                         return (
                             <UserGridCell
@@ -155,7 +155,7 @@ export default function UserApplyPage({ record }) {
     const handleCellAdjustApply = (newRow, newCol) => {
         setRowCount(newRow);
         setColCount(newCol);
-        setBoxes(prev => prev.filter((box) => !box.placed || (box.row < newRow && box.col < newCol)));
+        setBoxes(prev => prev.filter((box) => !box.placed || (box.rowNum < newRow && box.colNum < newCol)));
         setIsCellAdjustModalOpen(false);
         setAlert({ message: "셀 추가/삭제가 적용되었습니다.", type: "success" });
     };
@@ -164,18 +164,18 @@ export default function UserApplyPage({ record }) {
     const onDropToGrid = (boxId, row, col) => {
         setBoxes(prevBoxes => {
             const droppedBox = prevBoxes.find((b) => b.id === boxId);
-            const targetBox = prevBoxes.find((b) => b.placed && b.row === row && b.col === col);
+            const targetBox = prevBoxes.find((b) => b.placed && b.rowNum === row && b.colNum === col);
 
             if (targetBox && droppedBox.placed) {
                 return prevBoxes.map((box) => {
-                    if (box.id === droppedBox.id) return { ...box, row, col };
-                    if (box.id === targetBox.id) return { ...box, row: droppedBox.row, col: droppedBox.col };
+                    if (box.id === droppedBox.id) return { ...box, rowNum: row, colNum: col };
+                    if (box.id === targetBox.id) return { ...box, rowNum: droppedBox.rowNum, colNum: droppedBox.colNum };
                     return box;
                 });
             } else if (!targetBox) {
                 return prevBoxes.map((box) =>
                     box.id === droppedBox.id
-                        ? { ...box, placed: true, row, col }
+                        ? { ...box, placed: true, rowNum: row, colNum: col }
                         : box
                 );
             } else {

@@ -39,7 +39,7 @@ function ApplyFormModal({ isOpen, onClose, onSubmit }) {
             parseInt(endHour),
             parseInt(endMinute)
         );
-        onSubmit({ startTime: startDate, endTime: endDate, name: nameInput });
+        onSubmit({ startTime: startDate, endTime: endDate, coordinatorName: nameInput });
     };
 
     if (!isOpen) return null;

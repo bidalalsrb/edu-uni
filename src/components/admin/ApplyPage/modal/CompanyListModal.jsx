@@ -1,8 +1,8 @@
 // src/components/admin/EventLayoutCreate/modal/CompanyListModal.jsx
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import ApplyFormModal from "./ApplyFormModal.jsx";
 
-function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) {
+function CompanyListModal({isOpen, onClose, companyBox, onSubmitApplication}) {
     const [isApplyFormModalOpen, setIsApplyFormModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
@@ -10,37 +10,43 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
     useEffect(() => {
         if (isOpen) document.body.style.overflow = 'hidden';
         else document.body.style.overflow = '';
-        return () => { document.body.style.overflow = ''; };
+        return () => {
+            document.body.style.overflow = '';
+        };
     }, [isOpen]);
 
     if (!isOpen || !companyBox) return null;
-
+    console.log('컴패니 ㅣㄹ스트', companyBox)
     const openApplyForm = () => setIsApplyFormModalOpen(true);
     const closeApplyForm = () => setIsApplyFormModalOpen(false);
 
     const handleSubmitApplication = (newApp) => {
         onSubmitApplication(companyBox.id, {
             id: Date.now(),
-            startTime: newApp.startTime,
-            endTime: newApp.endTime,
-            name: newApp.name,
+            eventCd: null,
+            reservationStat: false,
+            schoolCd: "S9490",
+            programCd: 26,
+            layoutCd: 12,
+            coordinatorName: companyBox.name,
+            ...newApp
         });
         setIsApplyFormModalOpen(false);
     };
 
     const formatTime = (time) => {
         const d = time instanceof Date ? time : new Date(time);
-        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        return d.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
     };
 
-    const apps = companyBox.applications || [];
+    const apps = companyBox.eventSessionsDto || [];
     const totalPages = Math.ceil(apps.length / itemsPerPage);
     const displayedApps = apps.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
     const itemsNeeded = itemsPerPage - displayedApps.length;
-    const placeholders = Array.from({ length: itemsNeeded }, (_, idx) => ({
+    const placeholders = Array.from({length: itemsNeeded}, (_, idx) => ({
         placeholder: true,
         key: `placeholder-${idx}`,
     }));
@@ -66,9 +72,9 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
                         </svg>
                     </button>
                     <h2 className="text-lg font-semibold text-gray-800">
-                        {companyBox.companyName} 등록 리스트
+                        {companyBox.eventName} 등록 리스트
                     </h2>
-                    <div className="w-6 h-6" />
+                    <div className="w-6 h-6"/>
                 </div>
 
                 {/* 본문 영역 */}
@@ -82,9 +88,9 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
                                             <div
                                                 key={app.key}
                                                 className="p-3 bg-white shadow-sm flex items-center justify-between"
-                                                style={{ border: "none" }}
+                                                style={{border: "none"}}
                                             >
-                                                <div style={{ visibility: "hidden" }}>
+                                                <div style={{visibility: "hidden"}}>
                                                     <div className="text-sm text-gray-500">Placeholder</div>
                                                     <div className="text-base font-medium text-gray-700">
                                                         Placeholder
@@ -92,7 +98,7 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
                                                 </div>
                                                 <button
                                                     className="cursor-pointer px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                                    style={{ visibility: "hidden", border: "none" }}
+                                                    style={{visibility: "hidden", border: "none"}}
                                                 >
                                                     신청하기
                                                 </button>
@@ -109,7 +115,7 @@ function CompanyListModal({ isOpen, onClose, companyBox, onSubmitApplication }) 
                                                         {formatTime(app.startTime)} ~ {formatTime(app.endTime)}
                                                     </div>
                                                     <div className="text-base font-medium text-gray-700">
-                                                        {app.name}
+                                                        {app.coordinatorName}
                                                     </div>
                                                 </div>
                                                 <button

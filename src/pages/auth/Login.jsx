@@ -26,7 +26,7 @@ function Login() {
             console.log('로그인',response);
             const accessToken = response.data.data;
             Cookies.set("ACCESS_TOKEN", accessToken);
-            navigate('/index/admin')
+            navigate('/index/admin/event-list')
             alert("로그인 성공");
         } catch (error) {
             console.error(error);

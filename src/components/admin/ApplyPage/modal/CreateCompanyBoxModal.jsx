@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 
 function CreateCompanyBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] }) {
-    const [companyName, setCompanyName] = useState("");
-    const [color, setColor] = useState("#ffffff");
+    const [eventName, setEventName] = useState("");
+    const [blockColor, setBlockColor] = useState("#ffffff");
 
     useEffect(() => {
         if (isOpen) {
-            setCompanyName("");
-            setColor("#ffffff");
+            setEventName("");
+            setBlockColor("#ffffff");
         }
     }, [isOpen]);
 
     const handleSubmit = () => {
-        if (!companyName.trim()) {
+        if (!eventName.trim()) {
             alert("기업명을 입력하세요.");
             return;
         }
-        onSubmit({ companyName, color });
+        onSubmit({ eventName, blockColor });
     };
 
     if (!isOpen) return null;
@@ -50,8 +50,8 @@ function CreateCompanyBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] })
                         </label>
                         <input
                             type="text"
-                            value={companyName}
-                            onChange={(e) => setCompanyName(e.target.value)}
+                            value={eventName}
+                            onChange={(e) => setEventName(e.target.value)}
                             placeholder="예: (주) 타이거"
                             className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -66,9 +66,9 @@ function CreateCompanyBoxModal({ isOpen, onClose, onSubmit, colorPalette = [] })
                                 <button
                                     key={c}
                                     type="button"
-                                    onClick={() => setColor(c)}
+                                    onClick={() => setBlockColor(c)}
                                     className={`w-8 h-8 rounded-full border-2 transition ${
-                                        color === c ? "border-blue-500" : "border-transparent"
+                                        blockColor === c ? "border-blue-500" : "border-transparent"
                                     }`}
                                     style={{ backgroundColor: c }}
                                 />
